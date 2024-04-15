@@ -16,10 +16,10 @@ class Corazon extends THREE.Object3D {
 
     var that = this;
 
-    materialLoader.load('corazon/12190_Heart_v1_L3.mtl' ,
+    materialLoader.load('../models/corazon/12190_Heart_v1_L3.mtl' ,
       (materials) => {
         objectLoader.setMaterials(materials);
-        objectLoader.load ('corazon/12190_Heart_v1_L3.obj',
+        objectLoader.load ('../models/corazon/12190_Heart_v1_L3.obj',
         (object) => {
           that.add(object);
         },null,null);
