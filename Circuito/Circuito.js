@@ -22,15 +22,17 @@ class Circuito extends THREE.Object3D {
   createForma(){
 
     var pts = [
-      new THREE.Vector3(0.1, -0.2, 1.0), //1
-      new THREE.Vector3(-0.2, 1.0, -0.5), //2
-      new THREE.Vector3(0.3, -0.5, 0.0), //3
-      new THREE.Vector3(-0.3, 0.3, 0.6), //4
-      new THREE.Vector3(-0.6, 0.2, 2.0), //5
-      new THREE.Vector3(0.3, -0.3, 1.5), //8
-      new THREE.Vector3(0.7, 0.3, 1.0), //6
-      new THREE.Vector3(-1.5, 1.0, 0.8), //7
-      new THREE.Vector3(-1.0, 0.3, 0.2) //9
+      new THREE.Vector3(-5, -2, 15), 
+      new THREE.Vector3(1, -2, 10), //1
+      new THREE.Vector3(-2, 10, -5), //2
+      new THREE.Vector3(3, -1, -7),
+      new THREE.Vector3(3, -5, 0), //3
+      new THREE.Vector3(-3, 3, 6), //4
+      new THREE.Vector3(-6, 2, 20), //5
+      new THREE.Vector3(3, -3, 15), //8
+      new THREE.Vector3(7, 3, 10), //6
+      new THREE.Vector3(-15, 10, 8), //7
+      new THREE.Vector3(-10, 3, 2) //9
     ];
 
     // Crear la curva de Catmull-Rom cerrada
@@ -40,7 +42,7 @@ class Circuito extends THREE.Object3D {
     var resolution = 200;
 
     // Radio del tubo
-    var tubeRadius = 0.1;
+    var tubeRadius = 0.5;
 
     // Segmentos que forman el círculo alrededor de la curva
     var segments = 20;
