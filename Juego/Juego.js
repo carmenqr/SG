@@ -18,8 +18,33 @@ class Juego extends THREE.Object3D {
 
     this.circuito = this.createCircuito();
     this.createCoche();
+    this.cubo = this.createCubo();
     
+    //this.add(this.cubo);
     this.add(this.circuito);
+
+  }
+
+  createCubo(){
+    this.cuboGeometry = new THREE.BoxGeometry(0.5,0.5,0.5);
+    var material = new THREE.MeshStandardMaterial({ color: 0xffff00, emissive: 0xffff00, emissiveIntensity: 0.2 }); // Amarillo
+    var cubo = new THREE.Mesh(this.cuboGeometry, material);
+
+    var posIni = this.path.getPointAt(0.2);
+    
+    var tangente = this.path.getTangentAt(0.2);
+    var normal = new THREE.Vector3();
+    normal.crossVectors(tangente, this.path.getTangentAt(0.2 + 0.01)).normalize();
+    var offset = normal.clone().multiplyScalar(this.tubeRadius + 0.25);
+    posIni.add(offset);
+
+    cubo.position.copy(posIni);
+
+    cubo.up = normal;
+    cubo.lookAt(posIni.clone().add(tangente));
+
+    return cubo;
+
   }
 
   createCircuito(){
@@ -39,23 +64,23 @@ class Juego extends THREE.Object3D {
     ];
 
     // Crear la curva de Catmull-Rom cerrada
-    var path = new THREE.CatmullRomCurve3(pts, true);
+    this.path = new THREE.CatmullRomCurve3(pts, true);
 
     // Resolución del tubo
     var resolution = 200;
 
     // Radio del tubo
-    var tubeRadius = 0.5;
+    this.tubeRadius = 0.2;
 
     // Segmentos que forman el círculo alrededor de la curva
-    var segments = 20;
+    this.segments = 20;
 
     // Crear la geometría del tubo cerrado
-    var tubeGeometry = new THREE.TubeGeometry(path, resolution, tubeRadius, segments, true);
+    this.tubeGeometry = new THREE.TubeGeometry(this.path, resolution, this.tubeRadius, this.segments, true);
 
 
     // Crear una malla utilizando la geometría y el material
-    var forma = new THREE.Mesh(tubeGeometry, this.material);
+    var forma = new THREE.Mesh(this.tubeGeometry, this.material);
     return forma;
 
   }
@@ -69,6 +94,30 @@ class Juego extends THREE.Object3D {
         objectLoader.load( '../models/coche2/LEGO_CAR_B2.obj' ,
           (object) => {
             object.scale.set(0.01, 0.01, 0.01); 
+            //object.position.set(-0.25, 0, -0.5);
+
+            /* var posIni = this.path.getPointAt(0.2);
+            object.position.copy(posIni);
+            var tangente = this.path.getTangentAt(0.2);
+
+            posIni.add(tangente);
+            var segmentoActual = Math.floor(0.2*this.segments);
+            object.up = this.tubeGeometry.binormals[segmentoActual];
+            object.lookAt(posIni); */
+
+            var posIni = this.path.getPointAt(0.6); //0.6 es la t
+    
+            var tangente = this.path.getTangentAt(0.6); //0.6 es la t
+            var normal = new THREE.Vector3();
+            normal.crossVectors(tangente, this.path.getTangentAt(0.6 + 0.01)).normalize(); //0.01 para evitar división por 0 //0.6 es la t
+            var offset = normal.clone().multiplyScalar(this.tubeRadius);
+            posIni.add(offset);
+        
+            object.position.copy(posIni);
+        
+            object.up = normal;
+            object.lookAt(posIni.clone().add(tangente));
+
             this.add(object);
           }, null, null);
       });
