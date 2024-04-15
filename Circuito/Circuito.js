@@ -1,7 +1,7 @@
 
 import * as THREE from 'three'
 
-class Barrido extends THREE.Object3D {
+class Circuito extends THREE.Object3D {
   constructor(gui,titleGui) {
     super();
     
@@ -14,9 +14,9 @@ class Barrido extends THREE.Object3D {
     this.material.flatShading = true;
     this.material.needsUpdate = true;
 
-    this.barrido = this.createForma();
+    this.circuito = this.createForma();
     
-    this.add(this.barrido);
+    this.add(this.circuito);
   }
 
   createForma(){
@@ -66,4 +66,4 @@ class Barrido extends THREE.Object3D {
   }
 }
 
-export { Barrido }
+export { Circuito }

@@ -2,7 +2,7 @@
 import * as THREE from 'three'
 import { CSG } from '../libs/CSG-v2.js'
 
-class Construccion extends THREE.Object3D {
+class Ovni extends THREE.Object3D {
   constructor(gui,titleGui) {
     super();
     
@@ -29,10 +29,10 @@ class Construccion extends THREE.Object3D {
     this.shape = new THREE.Shape(points);
     this.phiLength = 0; // Ángulo de revolución completo
 
-    this.construccion = this.createForma();
-    //this.construccion.position.set(this.guiControls.posX, this.guiControls.posY, this.guiControls.posZ);
+    this.ovni = this.createForma();
+    //this.ovni.position.set(this.guiControls.posX, this.guiControls.posY, this.guiControls.posZ);
     
-    this.add(this.construccion);
+    this.add(this.ovni);
   }
 
   createForma(){
@@ -56,7 +56,7 @@ class Construccion extends THREE.Object3D {
       angulo : 10,
     };
 
-    // Se crea una sección para los controles de la construccion
+    // Se crea una sección para los controles de la ovni
     var folder = gui.addFolder(titleGui);
 
     //Para que los valores se actualicen
@@ -66,11 +66,11 @@ class Construccion extends THREE.Object3D {
     // Las tres cifras indican un valor mínimo, un máximo y el incremento
     folder.add(this.guiControls, 'segmentos', 3, 64, 1)
         .name('Segmentos: ')
-        .onChange(function(){that.construccion.geometry = new THREE.LatheGeometry(that.shape.getPoints(), that.guiControls.segmentos, that.phiLength, that.guiControls.angulo)});
+        .onChange(function(){that.ovni.geometry = new THREE.LatheGeometry(that.shape.getPoints(), that.guiControls.segmentos, that.phiLength, that.guiControls.angulo)});
 
     folder.add(this.guiControls, 'angulo', 0, 2 * Math.PI +0.1, 0.01)
         .name('Ángulo: ')
-        .onChange(function(){that.construccion.geometry = new THREE.LatheGeometry(that.shape.getPoints(), that.guiControls.segmentos, that.phiLength, that.guiControls.angulo)});
+        .onChange(function(){that.ovni.geometry = new THREE.LatheGeometry(that.shape.getPoints(), that.guiControls.segmentos, that.phiLength, that.guiControls.angulo)});
   }
   
 
@@ -79,4 +79,4 @@ class Construccion extends THREE.Object3D {
   }
 }
 
-export { Construccion }
+export { Ovni }
