@@ -21,7 +21,6 @@ class Juego extends THREE.Object3D {
     this.material.needsUpdate = true;
 
     this.circuito = this.createCircuito();
-    //this.createCoche();
 
     // this.cubo = this.createCubo();
     this.puerta = this.createPuerta();
@@ -41,13 +40,11 @@ class Juego extends THREE.Object3D {
     // Comprueba qué tecla se ha presionado
     switch (event.keyCode) {
         case 37: // Tecla izquierda
-            // Realiza una acción si se presiona la tecla izquierda
             console.log("Se ha pulsado la tecla izquierda");
             // Ejecuta la función correspondiente
             this.setAnguloCoche(this.angulo-=(5*(Math.PI/180)));
             break;
         case 39: // Tecla derecha
-            // Realiza una acción si se presiona la tecla derecha
             console.log("Se ha pulsado la tecla derecha");
             // Ejecuta la función correspondiente
             this.setAnguloCoche(this.angulo+=(5*(Math.PI/180)));
@@ -303,13 +300,8 @@ class Juego extends THREE.Object3D {
 
   update() {
     TWEEN.update();
-    this.t += 0.001;
-    this.t = parseFloat(this.t.toFixed(3));
-    //this.posicionOrientacionCoche();
-    if (this.t >= 1) this.t = 0;
-    if (this.coche) {
-      this.avanzarCoche(this.t);
-    }
+    this.t = (this.t + 0.0005) % 1;
+    this.avanzarCoche(this.t);
     this.setAnguloCoche(this.angulo); 
   }
 }
