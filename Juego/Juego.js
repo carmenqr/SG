@@ -150,7 +150,6 @@ class Juego extends THREE.Object3D {
     var formaMesh = new THREE.Mesh(forma, this.material);
 
     formaMesh.position.set(0.1, 0.5, 0);
-    formaMesh.rotateY(this.guiControls.rotacion);
 
     PuertaIzq.position.x = -0.2;
     PuertaIzq.add(formaMesh);
@@ -168,7 +167,6 @@ class Juego extends THREE.Object3D {
     var formaMesh = new THREE.Mesh(forma, this.material);
 
     formaMesh.position.set(-0.1, 0.5, 0);
-    formaMesh.rotateY(this.guiControls.rotacion);
 
     PuertaDcha.position.x = 0.2;
     PuertaDcha.add(formaMesh);
@@ -206,7 +204,7 @@ class Juego extends THREE.Object3D {
     const duracion = 2500;
 
     var origen = {rotacion: 0};
-    var destino = {rotacion: Math.PI/2};
+    var destino = {rotacion: -Math.PI/2};
 
     var movimiento = new TWEEN.Tween(origen).to(destino, duracion).yoyo(true).repeat(Infinity);
 
@@ -238,18 +236,7 @@ class Juego extends THREE.Object3D {
  }
   
   createGUI (gui,titleGui) {
-    // Controles para el tamaño, la orientacion y la posicion de la caja
-    this.guiControls = {
-      rotacion : 0
-    } 
-    
-    // Se crea una sección para los controles de la caja
-    var folder = gui.addFolder (titleGui);
-    // Estas lineas son las que añaden los componentes de la interfaz
-    // Las tres cifras indican un valor mínimo, un máximo y el incremento
-    folder.add (this.guiControls, 'rotacion', -90*(Math.PI/180), 0, 0.1)
-      .name ('Apertura : ')
-      .onChange ( (value) => this.setAngulo (-value) );
+
   }
   
   update () {
