@@ -100,33 +100,9 @@ class Juego extends THREE.Object3D {
         objectLoader.load( '../models/coche2/LEGO_CAR_B2.obj' ,
           (object) => {
             object.scale.set(0.01, 0.01, 0.01);
-            this.coche = object; // almacenar una referencia al coche para actualizar su posición en update
+            this.coche = object; 
             this.add(this.coche); 
-            //object.position.set(-0.25, 0, -0.5);
-
-            /* var posIni = this.path.getPointAt(0.2);
-            object.position.copy(posIni);
-            var tangente = this.path.getTangentAt(0.2);
-
-            posIni.add(tangente);
-            var segmentoActual = Math.floor(0.2*this.segments);
-            object.up = this.tubeGeometry.binormals[segmentoActual];
-            object.lookAt(posIni); */
-
-            // var posIni = this.path.getPointAt(this.t); //0.6 es la t
-    
-            // var tangente = this.path.getTangentAt(this.t); //0.6 es la t
-            // var normal = new THREE.Vector3();
-            // normal.crossVectors(tangente, this.path.getTangentAt(this.t + 0.01)).normalize(); //0.01 para evitar división por 0 //0.6 es la t
-            // var offset = normal.clone().multiplyScalar(this.tubeRadius);
-            // posIni.add(offset);
-        
-            // object.position.copy(posIni);
-        
-            // object.up = normal;
-            // object.lookAt(posIni.clone().add(tangente));
-
-            // this.add(object);
+            
           }, null, null);
       });
   }
@@ -223,15 +199,6 @@ class Juego extends THREE.Object3D {
     puertas.up = normal;
     puertas.lookAt(posIni.clone().add(tangente));
 
-    // var posIni = this.path.getPointAt(0.2);
-    // puertas.position.copy(posIni);
-
-    // var tangente = this.path.getTangentAt(0.2);
-    // posIni.add(tangente);
-    // var segmentoActual = Math.floor(0.2*this.segments);
-    // puertas.up = this.tubeGeometry.binormals[segmentoActual];
-    // puertas.lookAt(posIni);
-
     return puertas;
   }
 
@@ -255,6 +222,20 @@ class Juego extends THREE.Object3D {
     this.pIzq.rotation.y = valor;
     this.pDcha.rotation.y = -valor;
   }
+
+  avanzarCoche(){
+    // asegurarse de que el coche se ha cargado antes de actualizar su posición
+     var posIni = this.path.getPointAt(this.t);
+     var tangente = this.path.getTangentAt(this.t);
+     var normal = new THREE.Vector3();
+     normal.crossVectors(tangente, this.path.getTangentAt(this.t + 0.001)).normalize();
+     var offset = normal.clone().multiplyScalar(this.tubeRadius);
+     posIni.add(offset);
+
+     this.coche.position.copy(posIni);
+     this.coche.up = normal;
+     this.coche.lookAt(posIni.clone().add(tangente));
+ }
   
   createGUI (gui,titleGui) {
     // Controles para el tamaño, la orientacion y la posicion de la caja
@@ -274,29 +255,11 @@ class Juego extends THREE.Object3D {
   update () {
     TWEEN.update();
     this.t += 0.001;
-
     this.t = parseFloat(this.t.toFixed(3));
-
-    if (this.t >= 1) {
-        this.t = 0; // Reinicia el parámetro t cuando alcanza el final de la curva
+    if (this.t >= 1) this.t = 0; 
+    if (this.coche) {
+      this.avanzarCoche();
     }
-    //Hazme un cout de los valores de this.t
-    console.log(this.t);
-
-    if (this.coche) { // asegurarse de que el coche se ha cargado antes de actualizar su posición
-      var posIni = this.path.getPointAt(this.t);
-      var tangente = this.path.getTangentAt(this.t);
-      var normal = new THREE.Vector3();
-      normal.crossVectors(tangente, this.path.getTangentAt(this.t + 0.001)).normalize();
-      var offset = normal.clone().multiplyScalar(this.tubeRadius);
-      posIni.add(offset);
-
-      this.coche.position.copy(posIni);
-      this.coche.up = normal;
-      this.coche.lookAt(posIni.clone().add(tangente));
-  }
-    // this.Puertas.rotateY(0.05);
-    // No hay nada que actualizar ya que la apertura de la grapadora se ha actualizado desde la interfaz
   }
 }
 
