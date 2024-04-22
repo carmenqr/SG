@@ -13,6 +13,7 @@ class Juego extends THREE.Object3D {
     // Se crea primero porque otros métodos usan las variables que se definen para la interfaz
     this.createGUI(gui, titleGui);
     this.t = 0.1;
+    this.angulo = 0;
 
     // El material se usa desde varios métodos. Por eso se alamacena en un atributo
     this.material = new THREE.MeshNormalMaterial();
@@ -31,6 +32,30 @@ class Juego extends THREE.Object3D {
     this.add(this.circuito);
 
     this.animacionPuertas();
+
+    this.onKeyDown = this.onKeyDown.bind(this);
+    addEventListener('keydown', this.onKeyDown, false);
+  }
+
+  onKeyDown(event) {
+    // Comprueba qué tecla se ha presionado
+    switch (event.keyCode) {
+        case 37: // Tecla izquierda
+            // Realiza una acción si se presiona la tecla izquierda
+            console.log("Se ha pulsado la tecla izquierda");
+            // Ejecuta la función correspondiente
+            this.setAnguloCoche(this.angulo-=(5*(Math.PI/180)));
+            break;
+        case 39: // Tecla derecha
+            // Realiza una acción si se presiona la tecla derecha
+            console.log("Se ha pulsado la tecla derecha");
+            // Ejecuta la función correspondiente
+            this.setAnguloCoche(this.angulo+=(5*(Math.PI/180)));
+            break;
+        default:
+            // No hacer nada si se presiona otra tecla
+            break;
+    }
   }
 
   createCubo() {
@@ -225,6 +250,10 @@ class Juego extends THREE.Object3D {
     this.pDcha.rotation.y = -valor;
   }
 
+  setAnguloCoche(valor) {
+    this.orCoche.rotation.z = valor;
+  }
+
   avanzarCoche(valor) {
     // asegurarse de que el coche se ha cargado antes de actualizar su posición
     var posTmp = this.path.getPointAt(valor);
@@ -249,14 +278,14 @@ class Juego extends THREE.Object3D {
   }
 
   orientacionCoche() {
-    var orCoche = new THREE.Object3D();
+    this.orCoche = new THREE.Object3D();
 
     var posicion = this.posicionCoche();
-    orCoche.add(posicion);
+    this.orCoche.add(posicion);
 
-    orCoche.rotation.z = 0 *(Math.PI / 180);
+    this.setAnguloCoche(this.angulo);
 
-    return orCoche;
+    return this.orCoche;
   }
 
   posicionCoche() {
@@ -281,7 +310,7 @@ class Juego extends THREE.Object3D {
     if (this.coche) {
       this.avanzarCoche(this.t);
     }
-    //this.posicionOrientacionCoche();
+    this.setAnguloCoche(this.angulo); 
   }
 }
 
