@@ -2,6 +2,8 @@
 import * as THREE from 'three'
 import { MTLLoader } from '../libs/MTLLoader.js'
 import { OBJLoader } from '../libs/OBJLoader.js'
+import { CSG } from '../libs/CSG-v2.js'
+import * as TWEEN from '../libs/tween.esm.js'
 
 class Juego extends THREE.Object3D {
   constructor(gui,titleGui) {
@@ -18,11 +20,14 @@ class Juego extends THREE.Object3D {
 
     this.circuito = this.createCircuito();
     this.createCoche();
-    this.cubo = this.createCubo();
+    // this.cubo = this.createCubo();
+    this.puerta = this.createPuerta();
     
     //this.add(this.cubo);
+    this.add(this.puerta);
     this.add(this.circuito);
 
+    this.animacionPuertas();
   }
 
   createCubo(){
@@ -70,7 +75,7 @@ class Juego extends THREE.Object3D {
     var resolution = 200;
 
     // Radio del tubo
-    this.tubeRadius = 0.2;
+    this.tubeRadius = 0.6;
 
     // Segmentos que forman el círculo alrededor de la curva
     this.segments = 20;
@@ -86,6 +91,7 @@ class Juego extends THREE.Object3D {
   }
 
   createCoche(){
+    this.t = 0;
     var materialLoader = new MTLLoader();
     var objectLoader = new OBJLoader();
     materialLoader.load( '../models/coche2/LEGO_CAR_B2.mtl' ,
@@ -93,7 +99,9 @@ class Juego extends THREE.Object3D {
         objectLoader.setMaterials(materials);
         objectLoader.load( '../models/coche2/LEGO_CAR_B2.obj' ,
           (object) => {
-            object.scale.set(0.01, 0.01, 0.01); 
+            object.scale.set(0.01, 0.01, 0.01);
+            this.coche = object; // almacenar una referencia al coche para actualizar su posición en update
+            this.add(this.coche); 
             //object.position.set(-0.25, 0, -0.5);
 
             /* var posIni = this.path.getPointAt(0.2);
@@ -105,31 +113,189 @@ class Juego extends THREE.Object3D {
             object.up = this.tubeGeometry.binormals[segmentoActual];
             object.lookAt(posIni); */
 
-            var posIni = this.path.getPointAt(0.6); //0.6 es la t
+            // var posIni = this.path.getPointAt(this.t); //0.6 es la t
     
-            var tangente = this.path.getTangentAt(0.6); //0.6 es la t
-            var normal = new THREE.Vector3();
-            normal.crossVectors(tangente, this.path.getTangentAt(0.6 + 0.01)).normalize(); //0.01 para evitar división por 0 //0.6 es la t
-            var offset = normal.clone().multiplyScalar(this.tubeRadius);
-            posIni.add(offset);
+            // var tangente = this.path.getTangentAt(this.t); //0.6 es la t
+            // var normal = new THREE.Vector3();
+            // normal.crossVectors(tangente, this.path.getTangentAt(this.t + 0.01)).normalize(); //0.01 para evitar división por 0 //0.6 es la t
+            // var offset = normal.clone().multiplyScalar(this.tubeRadius);
+            // posIni.add(offset);
         
-            object.position.copy(posIni);
+            // object.position.copy(posIni);
         
-            object.up = normal;
-            object.lookAt(posIni.clone().add(tangente));
+            // object.up = normal;
+            // object.lookAt(posIni.clone().add(tangente));
 
-            this.add(object);
+            // this.add(object);
           }, null, null);
       });
   }
-  
 
-  createGUI(gui, titleGui) {
+  createMarcos(){
+
+    var marcos = new THREE.Object3D();
+
+    var marco_lat = new THREE.BoxGeometry(0.05, 1, 0.05);
+    var marco_sup = new THREE.BoxGeometry(0.05, 0.5, 0.05);
+
+    this.material = new THREE.MeshNormalMaterial();
+    this.material.flatShading = true;
+    this.material.needsUpdate = true;
+    // var material = new THREE.MeshStandardMaterial({ color: 0xffff00, emissive: 0xffff00, emissiveIntensity: 0.2 }); // Amarillo
+
+    var marco_latdMesh = new THREE.Mesh(marco_lat, this.material);
+    var marco_latiMesh = new THREE.Mesh(marco_lat, this.material);
+    var marco_supMesh = new THREE.Mesh(marco_sup, this.material);
+
+    marco_latdMesh.position.set(0.225, 0.5, 0);
+    marco_latiMesh.position.set(-0.225, 0.5, 0);
+
+    marco_supMesh.rotation.set(0, 0, 90*(Math.PI/180));
+    marco_supMesh.position.set(0, 1, 0);
+
     
+    var csg = new CSG();
+    csg.union([marco_latdMesh, marco_latiMesh, marco_supMesh])
+
+    this.Puertas = csg.toMesh();
+
+    marcos.add(this.Puertas);
+
+    return marcos;
+  }
+
+
+  createPuertaIzq(){
+  
+    var PuertaIzq = new THREE.Object3D();
+
+    var forma = new THREE.BoxGeometry(0.2, 1, 0.05);
+
+    var formaMesh = new THREE.Mesh(forma, this.material);
+
+    formaMesh.position.set(0.1, 0.5, 0);
+    formaMesh.rotateY(this.guiControls.rotacion);
+
+    PuertaIzq.position.x = -0.2;
+    PuertaIzq.add(formaMesh);
+
+    return PuertaIzq;
+
+  }
+
+  createPuertaDcha(){
+  
+    var PuertaDcha = new THREE.Object3D();
+
+    var forma = new THREE.BoxGeometry(0.2, 1, 0.05);
+
+    var formaMesh = new THREE.Mesh(forma, this.material);
+
+    formaMesh.position.set(-0.1, 0.5, 0);
+    formaMesh.rotateY(this.guiControls.rotacion);
+
+    PuertaDcha.position.x = 0.2;
+    PuertaDcha.add(formaMesh);
+
+    return PuertaDcha;
+
+  }
+
+  createPuerta(){
+    var puertas = new THREE.Object3D();
+
+    var marc = this.createMarcos();
+    this.pIzq = this.createPuertaIzq();
+    this.pDcha = this.createPuertaDcha();
+
+    puertas.add(marc);
+    puertas.add(this.pIzq);
+    puertas.add(this.pDcha);
+
+    var posIni = this.path.getPointAt(0.2);
+    var tangente = this.path.getTangentAt(0.2);
+    var normal = new THREE.Vector3();
+    normal.crossVectors(tangente, this.path.getTangentAt(0.2 + 0.005)).normalize();
+    var offset = normal.clone().multiplyScalar(this.tubeRadius);
+    posIni.add(offset);
+
+    puertas.position.copy(posIni);
+    puertas.up = normal;
+    puertas.lookAt(posIni.clone().add(tangente));
+
+    // var posIni = this.path.getPointAt(0.2);
+    // puertas.position.copy(posIni);
+
+    // var tangente = this.path.getTangentAt(0.2);
+    // posIni.add(tangente);
+    // var segmentoActual = Math.floor(0.2*this.segments);
+    // puertas.up = this.tubeGeometry.binormals[segmentoActual];
+    // puertas.lookAt(posIni);
+
+    return puertas;
+  }
+
+  animacionPuertas(){
+    const duracion = 2500;
+
+    var origen = {rotacion: 0};
+    var destino = {rotacion: Math.PI/2};
+
+    var movimiento = new TWEEN.Tween(origen).to(destino, duracion).yoyo(true).repeat(Infinity);
+
+    movimiento.onUpdate(() => {
+      this.setAngulo(origen.rotacion);
+    });
+
+    movimiento.start();
+
+  }
+
+  setAngulo (valor) {
+    this.pIzq.rotation.y = valor;
+    this.pDcha.rotation.y = -valor;
   }
   
-
+  createGUI (gui,titleGui) {
+    // Controles para el tamaño, la orientacion y la posicion de la caja
+    this.guiControls = {
+      rotacion : 0
+    } 
+    
+    // Se crea una sección para los controles de la caja
+    var folder = gui.addFolder (titleGui);
+    // Estas lineas son las que añaden los componentes de la interfaz
+    // Las tres cifras indican un valor mínimo, un máximo y el incremento
+    folder.add (this.guiControls, 'rotacion', -90*(Math.PI/180), 0, 0.1)
+      .name ('Apertura : ')
+      .onChange ( (value) => this.setAngulo (-value) );
+  }
+  
   update () {
+    TWEEN.update();
+    this.t += 0.001;
+
+    this.t = parseFloat(this.t.toFixed(3));
+
+    if (this.t >= 1) {
+        this.t = 0; // Reinicia el parámetro t cuando alcanza el final de la curva
+    }
+    //Hazme un cout de los valores de this.t
+    console.log(this.t);
+
+    if (this.coche) { // asegurarse de que el coche se ha cargado antes de actualizar su posición
+      var posIni = this.path.getPointAt(this.t);
+      var tangente = this.path.getTangentAt(this.t);
+      var normal = new THREE.Vector3();
+      normal.crossVectors(tangente, this.path.getTangentAt(this.t + 0.001)).normalize();
+      var offset = normal.clone().multiplyScalar(this.tubeRadius);
+      posIni.add(offset);
+
+      this.coche.position.copy(posIni);
+      this.coche.up = normal;
+      this.coche.lookAt(posIni.clone().add(tangente));
+  }
+    // this.Puertas.rotateY(0.05);
     // No hay nada que actualizar ya que la apertura de la grapadora se ha actualizado desde la interfaz
   }
 }

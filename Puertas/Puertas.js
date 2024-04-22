@@ -1,5 +1,6 @@
 import * as THREE from 'three'
 import { CSG } from '../libs/CSG-v2.js'
+import * as TWEEN from '../libs/tween.esm.js'
 
 class Puertas extends THREE.Object3D {
   constructor(gui,titleGui) {
@@ -9,21 +10,14 @@ class Puertas extends THREE.Object3D {
     // Se crea primero porque otros métodos usan las variables que se definen para la interfaz
     this.createGUI(gui, titleGui);
 
-    // Puertas
-    var marc = this.createMarcos();
-    this.pIzq = this.createPuertaIzq();
-    this.pDcha = this.createPuertaDcha();
+    this.pIzq = null;
+    this.pDcha = null;
 
+    this.puertas = this.createPuertas();
 
-    this.add(marc);
-    this.add(this.pIzq);
-    this.add(this.pDcha);
-    // this.add(cilin_extMesh);
-    // this.add(cilin_cent1Mesh);
-    // this.add(cilin_cent2Mesh);
-    // this.add(ranura1Mesh);
-    // this.add(ranura2Mesh);
+    this.add(this.puertas);
 
+    this.animacionPuertas();    
   }
 
   createMarcos(){
@@ -96,6 +90,36 @@ class Puertas extends THREE.Object3D {
 
   }
 
+  createPuertas(){
+    var puertas = new THREE.Object3D();
+
+    var marc = this.createMarcos();
+    this.pIzq = this.createPuertaIzq();
+    this.pDcha = this.createPuertaDcha();
+
+    puertas.add(marc);
+    puertas.add(this.pIzq);
+    puertas.add(this.pDcha);
+
+    return puertas;
+  }
+
+  animacionPuertas(){
+    const duracion = 2500;
+
+    var origen = {rotacion: 0};
+    var destino = {rotacion: Math.PI/2};
+
+    var movimiento = new TWEEN.Tween(origen).to(destino, duracion).yoyo(true).repeat(Infinity);
+
+    movimiento.onUpdate(() => {
+      this.setAngulo(origen.rotacion);
+    });
+
+    movimiento.start();
+
+  }
+
   setAngulo (valor) {
     this.pIzq.rotation.y = valor;
     this.pDcha.rotation.y = -valor;
@@ -117,7 +141,7 @@ class Puertas extends THREE.Object3D {
   }
   
   update () {
-
+    TWEEN.update();
     // this.Puertas.rotateY(0.05);
     // No hay nada que actualizar ya que la apertura de la grapadora se ha actualizado desde la interfaz
   }
