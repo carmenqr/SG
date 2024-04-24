@@ -22,12 +22,17 @@ class Juego extends THREE.Object3D {
 
     this.circuito = this.createCircuito();
 
-    // this.cubo = this.createCubo();
+    this.cubo = this.createCubo();
     this.puerta = this.createPuerta();
-    
+    this.moneda = this.createMoneda();
+
+    this.add(this.posicionOrientacionObjeto(this.puerta, 90*(Math.PI/180), 0.2));
+    this.add(this.posicionOrientacionObjeto(this.moneda, 90*(Math.PI/180), 0.7));
+    // this.add(this.posicionOrientacionObjeto(this.cubo, 90*(Math.PI/180), 0.2));
+    this.createEscudo(90*(Math.PI/180), 0);
+    this.createEscudo(0*(Math.PI/180), 0.5);
     this.add(this.posicionOrientacionCoche());
-    //this.add(this.cubo);
-    this.add(this.puerta);
+    
     this.add(this.circuito);
 
     this.animacionPuertas();
@@ -133,6 +138,71 @@ class Juego extends THREE.Object3D {
       });
   }
 
+  createEscudo(angulo, posicion){
+    var materialLoader = new MTLLoader();
+    var objectLoader = new OBJLoader();
+    materialLoader.load( '../models/Escudo/13037_Buckler_Shield_v1_l3.mtl' ,
+      (materials) => {
+        objectLoader.setMaterials(materials);
+        objectLoader.load( '../models/Escudo/13037_Buckler_Shield_v1_l3.obj' ,
+          (object) => {
+            this.escudo = object;
+            this.escudo.scale.set(0.005, 0.005, 0.005); 
+            this.escudo.rotateY(180*(Math.PI/180)); 
+            this.escudo.rotateX(-Math.PI / 2); 
+            
+            this.add(this.posicionOrientacionObjeto(this.escudo, angulo, posicion));
+
+          }, null, null);
+      });
+  }
+  
+  createMoneda(){
+    var coin = new THREE.Object3D();
+
+    var cilin_ext = new THREE.CylinderGeometry(2, 2, 0.45, 40);
+    var cilin_cent1 = new THREE.CylinderGeometry(1.75, 1.75, 0.45, 40);
+    var cilin_cent2 = new THREE.CylinderGeometry(1.75, 1.75, 0.45, 40);
+    var ranura1 = new THREE.BoxGeometry(0.5, 1.5, 0.25);
+    var ranura2 = new THREE.BoxGeometry(0.5, 1.5, 0.25);
+
+    // var material = new THREE.MeshNormalMaterial();
+    // material.flatShading = true;
+    // material.needsUpdate = true;
+    var material = new THREE.MeshStandardMaterial({ color: 0xffff00, emissive: 0xffff00, emissiveIntensity: 0.2 }); // Amarillo
+
+    cilin_ext.rotateX(90*(Math.PI/180));
+    cilin_ext.translate(0,2,0);
+    cilin_cent1.rotateX(90*(Math.PI/180));
+    cilin_cent2.rotateX(90*(Math.PI/180));
+    cilin_cent1.translate(0, 2, 0.35);
+    cilin_cent2.translate(0, 2, -0.35);
+    
+    ranura1.translate(0, 2, 0.15);
+    ranura2.translate(0, 2, -0.15);
+    
+
+    var cilin_extMesh = new THREE.Mesh(cilin_ext, material);
+    var cilin_cent1Mesh = new THREE.Mesh(cilin_cent1, material);
+    var cilin_cent2Mesh = new THREE.Mesh(cilin_cent2, material);
+    var ranura1Mesh = new THREE.Mesh(ranura1, material);
+    var ranura2Mesh = new THREE.Mesh(ranura2, material);
+
+    var csg = new CSG();
+    csg.union([cilin_extMesh]);
+    csg.subtract([cilin_cent1Mesh, cilin_cent2Mesh]);
+    csg.subtract([ranura1Mesh, ranura2Mesh]);
+
+
+    this.moneda = csg.toMesh();
+
+    
+    this.moneda.scale.set(0.1, 0.1, 0.1);
+
+    coin.add(this.moneda);
+
+    return coin;
+  }
   createMarcos() {
 
     var marcos = new THREE.Object3D();
@@ -165,7 +235,6 @@ class Juego extends THREE.Object3D {
 
     return marcos;
   }
-
 
   createPuertaIzq() {
 
@@ -212,17 +281,6 @@ class Juego extends THREE.Object3D {
     puertas.add(this.pIzq);
     puertas.add(this.pDcha);
 
-    var posIni = this.path.getPointAt(0.2);
-    var tangente = this.path.getTangentAt(0.2);
-    var normal = new THREE.Vector3();
-    normal.crossVectors(tangente, this.path.getTangentAt(0.2 + 0.005)).normalize();
-    var offset = normal.clone().multiplyScalar(this.tubeRadius);
-    posIni.add(offset);
-
-    puertas.position.copy(posIni);
-    puertas.up = normal;
-    puertas.lookAt(posIni.clone().add(tangente));
-
     return puertas;
   }
 
@@ -247,9 +305,26 @@ class Juego extends THREE.Object3D {
     this.pDcha.rotation.y = -valor;
   }
 
+  setAnguloObjeto(valor){
+    this.orObjeto.rotation.z = valor;
+  }
+
+  posObjetoTubo(valor) {
+    var posTmp = this.path.getPointAt(valor);
+    this.posOrObjeto.position.copy(posTmp);
+  
+    var tangente = this.path.getTangentAt(valor);
+    posTmp.add(tangente);
+    var segmentoActual = Math.floor(valor*this.segments);
+    this.posOrObjeto.up = this.tubeGeometry.binormals[segmentoActual];
+    this.posOrObjeto.lookAt(posTmp);
+  }
+  
+  
   setAnguloCoche(valor) {
     this.orCoche.rotation.z = valor;
   }
+
 
   avanzarCoche(valor) {
     // asegurarse de que el coche se ha cargado antes de actualizar su posición
@@ -271,7 +346,6 @@ class Juego extends THREE.Object3D {
     this.posOrCoche.add(orientacion);
     this.avanzarCoche(this.t);
     return this.posOrCoche;
-
   }
 
   orientacionCoche() {
@@ -293,6 +367,36 @@ class Juego extends THREE.Object3D {
 
     return this.posCoche;
   }
+
+  posicionOrientacionObjeto(objeto, angulo, punto) {
+    this.posOrObjeto = new THREE.Object3D();
+
+    var orientacion = this.orientacionObjeto(objeto, angulo);
+
+    this.posOrObjeto.add(orientacion);
+    this.posObjetoTubo(punto);
+    return this.posOrObjeto;
+  }
+
+  orientacionObjeto(objeto, angulo) {
+    this.orObjeto = new THREE.Object3D();
+
+    var posicion = this.posicionObjeto(objeto);
+    this.orObjeto.add(posicion);
+
+    this.setAnguloObjeto(angulo);
+
+    return this.orObjeto;
+  }
+
+  posicionObjeto(objeto) {
+    this.posObjeto = new THREE.Object3D();
+    this.posObjeto.add(objeto);
+    this.posObjeto.position.y = this.tubeRadius;
+
+    return this.posObjeto;
+  }
+
 
   createGUI(gui, titleGui) {
 

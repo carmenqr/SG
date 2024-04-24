@@ -22,12 +22,14 @@ class Moneda extends THREE.Object3D {
     var material = new THREE.MeshStandardMaterial({ color: 0xffff00, emissive: 0xffff00, emissiveIntensity: 0.2 }); // Amarillo
 
     cilin_ext.rotateX(90*(Math.PI/180));
-    cilin_cent1.translate(0, 0.35, 0);
-    cilin_cent2.translate(0, -0.35, 0);
+    cilin_ext.translate(0,2,0);
     cilin_cent1.rotateX(90*(Math.PI/180));
     cilin_cent2.rotateX(90*(Math.PI/180));
-    ranura1.translate(0, 0, 0.15);
-    ranura2.translate(0, 0, -0.15);
+    cilin_cent1.translate(0, 2, 0.35);
+    cilin_cent2.translate(0, 2, -0.35);
+    
+    ranura1.translate(0, 2, 0.15);
+    ranura2.translate(0, 2, -0.15);
     
 
     var cilin_extMesh = new THREE.Mesh(cilin_ext, material);
@@ -45,11 +47,11 @@ class Moneda extends THREE.Object3D {
     this.moneda = csg.toMesh();
 
     this.add(this.moneda);
-    // this.add(cilin_extMesh);
-    // this.add(cilin_cent1Mesh);
-    // this.add(cilin_cent2Mesh);
-    // this.add(ranura1Mesh);
-    // this.add(ranura2Mesh);
+     /* this.add(cilin_extMesh);
+     this.add(cilin_cent1Mesh);
+     this.add(cilin_cent2Mesh);
+     this.add(ranura1Mesh);
+   this.add(ranura2Mesh); */
 
   }
   
@@ -92,7 +94,7 @@ class Moneda extends THREE.Object3D {
   
   update () {
 
-    this.moneda.rotateY(0.05);
+    //this.moneda.rotateY(0.05);
     // No hay nada que actualizar ya que la apertura de la grapadora se ha actualizado desde la interfaz
   }
 }
