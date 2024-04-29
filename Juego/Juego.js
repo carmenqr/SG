@@ -1,4 +1,3 @@
-
 import * as THREE from 'three'
 import { MTLLoader } from '../libs/MTLLoader.js'
 import { OBJLoader } from '../libs/OBJLoader.js'
@@ -26,13 +25,13 @@ class Juego extends THREE.Object3D {
     this.puerta = this.createPuerta();
     this.moneda = this.createMoneda();
 
-    this.add(this.posicionOrientacionObjeto(this.puerta, 90*(Math.PI/180), 0.2));
-    this.add(this.posicionOrientacionObjeto(this.moneda, 90*(Math.PI/180), 0.7));
+    this.add(this.posicionOrientacionObjeto(this.puerta, 90 * (Math.PI / 180), 0.2));
+    this.add(this.posicionOrientacionObjeto(this.moneda, 90 * (Math.PI / 180), 0.7));
     // this.add(this.posicionOrientacionObjeto(this.cubo, 90*(Math.PI/180), 0.2));
-    this.createEscudo(90*(Math.PI/180), 0);
-    this.createEscudo(0*(Math.PI/180), 0.5);
+    this.createEscudo(90 * (Math.PI / 180), 0);
+    this.createEscudo(0 * (Math.PI / 180), 0.5);
     this.add(this.posicionOrientacionCoche());
-    
+
     this.add(this.circuito);
 
     this.animacionPuertas();
@@ -44,19 +43,17 @@ class Juego extends THREE.Object3D {
   onKeyDown(event) {
     // Comprueba qué tecla se ha presionado
     switch (event.keyCode) {
-        case 37: // Tecla izquierda
-            console.log("Se ha pulsado la tecla izquierda");
-            // Ejecuta la función correspondiente
-            this.setAnguloCoche(this.angulo-=(5*(Math.PI/180)));
-            break;
-        case 39: // Tecla derecha
-            console.log("Se ha pulsado la tecla derecha");
-            // Ejecuta la función correspondiente
-            this.setAnguloCoche(this.angulo+=(5*(Math.PI/180)));
-            break;
-        default:
-            // No hacer nada si se presiona otra tecla
-            break;
+      case 37: // Tecla izquierda
+        // Ejecuta la función correspondiente
+        this.setAnguloCoche(this.angulo -= (5 * (Math.PI / 180)));
+        break;
+      case 39: // Tecla derecha
+        // Ejecuta la función correspondiente
+        this.setAnguloCoche(this.angulo += (5 * (Math.PI / 180)));
+        break;
+      default:
+        // No hacer nada si se presiona otra tecla
+        break;
     }
   }
 
@@ -138,31 +135,31 @@ class Juego extends THREE.Object3D {
       });
   }
 
-  createEscudo(angulo, posicion){
+  createEscudo(angulo, posicion) {
     var materialLoader = new MTLLoader();
     var objectLoader = new OBJLoader();
-    materialLoader.load( '../models/Escudo/13037_Buckler_Shield_v1_l3.mtl' ,
+    materialLoader.load('../models/Escudo/13037_Buckler_Shield_v1_l3.mtl',
       (materials) => {
         objectLoader.setMaterials(materials);
-        objectLoader.load( '../models/Escudo/13037_Buckler_Shield_v1_l3.obj' ,
+        objectLoader.load('../models/Escudo/13037_Buckler_Shield_v1_l3.obj',
           (object) => {
             this.escudo = object;
-            this.escudo.scale.set(0.005, 0.005, 0.005); 
-            this.escudo.rotateY(180*(Math.PI/180)); 
-            this.escudo.rotateX(-Math.PI / 2); 
-            
+            this.escudo.scale.set(0.005, 0.005, 0.005);
+            this.escudo.rotateY(180 * (Math.PI / 180));
+            this.escudo.rotateX(-Math.PI / 2);
+
             this.add(this.posicionOrientacionObjeto(this.escudo, angulo, posicion));
 
           }, null, null);
       });
   }
-  
-  createMoneda(){
+
+  createMoneda() {
     var coin = new THREE.Object3D();
 
-    var cilin_ext = new THREE.CylinderGeometry(2, 2, 0.45, 40);
-    var cilin_cent1 = new THREE.CylinderGeometry(1.75, 1.75, 0.45, 40);
-    var cilin_cent2 = new THREE.CylinderGeometry(1.75, 1.75, 0.45, 40);
+    var cilin_ext = new THREE.CylinderGeometry(2, 2, 0.45, 10);
+    var cilin_cent1 = new THREE.CylinderGeometry(1.75, 1.75, 0.45, 10);
+    var cilin_cent2 = new THREE.CylinderGeometry(1.75, 1.75, 0.45, 10);
     var ranura1 = new THREE.BoxGeometry(0.5, 1.5, 0.25);
     var ranura2 = new THREE.BoxGeometry(0.5, 1.5, 0.25);
 
@@ -171,16 +168,16 @@ class Juego extends THREE.Object3D {
     // material.needsUpdate = true;
     var material = new THREE.MeshStandardMaterial({ color: 0xffff00, emissive: 0xffff00, emissiveIntensity: 0.2 }); // Amarillo
 
-    cilin_ext.rotateX(90*(Math.PI/180));
-    cilin_ext.translate(0,2,0);
-    cilin_cent1.rotateX(90*(Math.PI/180));
-    cilin_cent2.rotateX(90*(Math.PI/180));
+    cilin_ext.rotateX(90 * (Math.PI / 180));
+    cilin_ext.translate(0, 2, 0);
+    cilin_cent1.rotateX(90 * (Math.PI / 180));
+    cilin_cent2.rotateX(90 * (Math.PI / 180));
     cilin_cent1.translate(0, 2, 0.35);
     cilin_cent2.translate(0, 2, -0.35);
-    
+
     ranura1.translate(0, 2, 0.15);
     ranura2.translate(0, 2, -0.15);
-    
+
 
     var cilin_extMesh = new THREE.Mesh(cilin_ext, material);
     var cilin_cent1Mesh = new THREE.Mesh(cilin_cent1, material);
@@ -196,7 +193,7 @@ class Juego extends THREE.Object3D {
 
     this.moneda = csg.toMesh();
 
-    
+
     this.moneda.scale.set(0.1, 0.1, 0.1);
 
     coin.add(this.moneda);
@@ -305,22 +302,22 @@ class Juego extends THREE.Object3D {
     this.pDcha.rotation.y = -valor;
   }
 
-  setAnguloObjeto(valor){
+  setAnguloObjeto(valor) {
     this.orObjeto.rotation.z = valor;
   }
 
   posObjetoTubo(valor) {
     var posTmp = this.path.getPointAt(valor);
     this.posOrObjeto.position.copy(posTmp);
-  
+
     var tangente = this.path.getTangentAt(valor);
     posTmp.add(tangente);
-    var segmentoActual = Math.floor(valor*this.segments);
+    var segmentoActual = Math.floor(valor * this.segments);
     this.posOrObjeto.up = this.tubeGeometry.binormals[segmentoActual];
     this.posOrObjeto.lookAt(posTmp);
   }
-  
-  
+
+
   setAnguloCoche(valor) {
     this.orCoche.rotation.z = valor;
   }
@@ -330,10 +327,10 @@ class Juego extends THREE.Object3D {
     // asegurarse de que el coche se ha cargado antes de actualizar su posición
     var posTmp = this.path.getPointAt(valor);
     this.posOrCoche.position.copy(posTmp);
-  
+
     var tangente = this.path.getTangentAt(valor);
     posTmp.add(tangente);
-    var segmentoActual = Math.floor(valor*this.segments);
+    var segmentoActual = Math.floor(valor * this.segments);
     this.posOrCoche.up = this.tubeGeometry.binormals[segmentoActual];
     this.posOrCoche.lookAt(posTmp);
   }
@@ -397,6 +394,32 @@ class Juego extends THREE.Object3D {
     return this.posObjeto;
   }
 
+  //Funcion para detectar las colisiones
+  colisiones() {
+    this.rayo = new THREE.Raycaster();
+
+    var tangente = this.path.getTangentAt(this.t);
+
+    this.posCoche.updateMatrixWorld();
+    var origenRayo = new THREE.Vector3();
+    origenRayo.setFromMatrixPosition(this.posCoche.matrixWorld);
+
+    var direccionMirada = this.posOrCoche.getWorldDirection(tangente);
+
+    this.rayo.set(origenRayo, direccionMirada, 0, 0.01);
+
+    var rayoVisual = new THREE.ArrowHelper(this.rayo.ray.direction, this.rayo.ray.origin, 0.5, 0xff0000);
+    // Agregar el objeto visual a la escena
+    this.add(rayoVisual);
+
+    var impactos = this.rayo.intersectObjects([this.puerta, this.moneda], true);
+
+    if (impactos.length > 0) {
+      console.log("Colisión detectada" + impactos[0].object);
+    }
+
+
+  }
 
   createGUI(gui, titleGui) {
 
@@ -406,7 +429,8 @@ class Juego extends THREE.Object3D {
     TWEEN.update();
     this.t = (this.t + 0.0005) % 1;
     this.avanzarCoche(this.t);
-    this.setAnguloCoche(this.angulo); 
+    this.setAnguloCoche(this.angulo);
+    this.colisiones();
   }
 }
 

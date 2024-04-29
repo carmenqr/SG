@@ -46,8 +46,8 @@ class Pinchos extends THREE.Object3D {
     return forma;
     */
 
-    var cilExt = new THREE.CylinderGeometry(1,1,1,60,1);
-    var cilInt = new THREE.CylinderGeometry(0.7,0.7,1,60,1);
+    var cilExt = new THREE.CylinderGeometry(1,1,1,10,1);
+    var cilInt = new THREE.CylinderGeometry(0.7,0.7,1,10,1);
     var corte = new THREE.BoxGeometry(3,1,3);
     
     
