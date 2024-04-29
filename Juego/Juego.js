@@ -25,8 +25,8 @@ class Juego extends THREE.Object3D {
     this.puerta = this.createPuerta();
     this.moneda = this.createMoneda();
 
-    this.add(this.posicionOrientacionObjeto(this.puerta, 90 * (Math.PI / 180), 0.2));
-    this.add(this.posicionOrientacionObjeto(this.moneda, 90 * (Math.PI / 180), 0.7));
+    this.add(this.posicionOrientacionObjeto(this.puerta, 0 * (Math.PI / 180), 0.25));
+    this.add(this.posicionOrientacionObjeto(this.moneda, 0 * (Math.PI / 180), 0.14));
     // this.add(this.posicionOrientacionObjeto(this.cubo, 90*(Math.PI/180), 0.2));
     this.createEscudo(90 * (Math.PI / 180), 0);
     this.createEscudo(0 * (Math.PI / 180), 0.5);
@@ -103,7 +103,7 @@ class Juego extends THREE.Object3D {
     var resolution = 200;
 
     // Radio del tubo
-    this.tubeRadius = 0.6;
+    this.tubeRadius = 1;
 
     // Segmentos que forman el círculo alrededor de la curva
     this.segments = 20;
@@ -222,7 +222,6 @@ class Juego extends THREE.Object3D {
     marco_supMesh.rotation.set(0, 0, 90 * (Math.PI / 180));
     marco_supMesh.position.set(0, 1, 0);
 
-
     var csg = new CSG();
     csg.union([marco_latdMesh, marco_latiMesh, marco_supMesh])
 
@@ -278,6 +277,7 @@ class Juego extends THREE.Object3D {
     puertas.add(this.pIzq);
     puertas.add(this.pDcha);
 
+    puertas.scale.set(2, 2, 2);
     return puertas;
   }
 
@@ -358,6 +358,18 @@ class Juego extends THREE.Object3D {
 
   posicionCoche() {
     this.posCoche = new THREE.Object3D();
+    //LANZADOR DE RAYOS
+    var rayo1 = new THREE.Object3D();
+    var rayo2 = new THREE.Object3D();
+    var rayo3 = new THREE.Object3D();
+
+    rayo1.position.x = 0.075;
+    rayo2.position.x = 0.15;
+    rayo3.position.set(0.075,0.05,0);
+
+    this.posCoche.add(rayo1);
+    this.posCoche.add(rayo2);
+    this.posCoche.add(rayo3);
 
     this.createCoche();
     this.posCoche.position.y = this.tubeRadius;
@@ -394,31 +406,34 @@ class Juego extends THREE.Object3D {
     return this.posObjeto;
   }
 
-  //Funcion para detectar las colisiones
+  // Funcion para detectar las colisiones
   colisiones() {
-    this.rayo = new THREE.Raycaster();
 
-    var tangente = this.path.getTangentAt(this.t);
+    for (var i = 0; i < this.posCoche.children.length; i++) {
+      var distancia = 0.4;
 
-    this.posCoche.updateMatrixWorld();
-    var origenRayo = new THREE.Vector3();
-    origenRayo.setFromMatrixPosition(this.posCoche.matrixWorld);
+      this.rayo = new THREE.Raycaster(new THREE.Vector3(), new THREE.Vector3(0, 0, 1), 0, distancia);
 
-    var direccionMirada = this.posOrCoche.getWorldDirection(tangente);
+      var tangente = this.path.getTangentAt(this.t);
 
-    this.rayo.set(origenRayo, direccionMirada, 0, 0.01);
+      this.posCoche.children[i].updateMatrixWorld();
+      var origenRayo = new THREE.Vector3();
+      origenRayo.setFromMatrixPosition(this.posCoche.children[i].matrixWorld);
 
-    var rayoVisual = new THREE.ArrowHelper(this.rayo.ray.direction, this.rayo.ray.origin, 0.5, 0xff0000);
-    // Agregar el objeto visual a la escena
-    this.add(rayoVisual);
+      var direccionMirada = this.posOrCoche.getWorldDirection(tangente);
 
-    var impactos = this.rayo.intersectObjects([this.puerta, this.moneda], true);
+      this.rayo.set(origenRayo, direccionMirada);
 
-    if (impactos.length > 0) {
-      console.log("Colisión detectada" + impactos[0].object);
+      var rayoVisual = new THREE.ArrowHelper(this.rayo.ray.direction, this.rayo.ray.origin, 0.5, 0xff0000);
+      // Agregar el objeto visual a la escena
+      this.add(rayoVisual);
+
+      var impactos = this.rayo.intersectObjects([this.puerta, this.moneda], true);
+
+      if (impactos.length > 0) {
+        console.log("Colisión detectada" + impactos[0].object);
+      }
     }
-
-
   }
 
   createGUI(gui, titleGui) {
