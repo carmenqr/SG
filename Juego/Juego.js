@@ -3,7 +3,6 @@ import { MTLLoader } from '../libs/MTLLoader.js'
 import { OBJLoader } from '../libs/OBJLoader.js'
 import { CSG } from '../libs/CSG-v2.js'
 import * as TWEEN from '../libs/tween.esm.js'
-import { MyScene } from './MyScene.js'
 
 
 class Juego extends THREE.Object3D {
@@ -34,6 +33,7 @@ class Juego extends THREE.Object3D {
     this.puerta = this.createPuerta();
     this.moneda = this.createMoneda();
     this.ovni = this.createOvni();  
+    this.createCorazon();
 
     this.add(this.posicionOrientacionObjeto(this.puerta, 0 * (Math.PI / 180), 0.25));
     this.add(this.posicionOrientacionObjeto(this.moneda, 0 * (Math.PI / 180), 0.14));
@@ -84,7 +84,7 @@ class Juego extends THREE.Object3D {
 
     raycaster.setFromCamera(mouse, this.camera); // Raycaster
 
-    var pickedObjects = raycaster.intersectObjects([this.ovni], true);
+    var pickedObjects = raycaster.intersectObjects([this.ovni, this.corazon], true);
 
     if (pickedObjects.length > 0) {
       var selectedObject = pickedObjects[0].object;
@@ -236,6 +236,7 @@ class Juego extends THREE.Object3D {
 
     return coin;
   }
+
   createMarcos() {
 
     var marcos = new THREE.Object3D();
@@ -356,7 +357,7 @@ class Juego extends THREE.Object3D {
   }
 
   createFormaOvni(){
-    var platillo = new THREE.Mesh (new THREE.LatheGeometry(this.shape.getPoints(), 64, this.phiLength, 2 * Math.PI +0.1), this.material);
+    var platillo = new THREE.Mesh (new THREE.LatheGeometry(this.shape.getPoints(), 15, this.phiLength, 2 * Math.PI +0.1), this.material);
     
     var formaEsfera = new THREE.SphereGeometry (0.5, 5, 5);
     formaEsfera.translate(0,0.4,0);
@@ -400,7 +401,7 @@ class Juego extends THREE.Object3D {
     // Parámetros para la animación
     var origen = { t: 0 };
     var destino = { t: 1 };
-    var tiempo = 4000;
+    var tiempo = 10000;
 
     // Crear animación con Tween
     var animacion = new TWEEN.Tween(origen).to(destino, tiempo).repeat(Infinity).onUpdate(() => {
@@ -415,7 +416,41 @@ class Juego extends THREE.Object3D {
 
     // Comenzar la animación
     animacion.start();
-}
+  }
+
+  createCorazon() {
+    // Corazon
+    var materialLoader = new MTLLoader();
+    var objectLoader = new OBJLoader();
+
+    var that = this;
+
+    materialLoader.load('../models/corazon/12190_Heart_v1_L3.mtl' ,
+      (materials) => {
+        objectLoader.setMaterials(materials);
+        objectLoader.load ('../models/corazon/12190_Heart_v1_L3.obj',
+        (object) => {
+          object.scale.set(0.025, 0.025, 0.025);
+          object.rotateX(-90*(Math.PI/180));
+          this.corazon = object;
+          that.add(object);
+        },null,null);
+    } ) ;
+  }
+
+  // animacionCorazon() {
+  //   var pts = [
+  //     new THREE.Vector3(-2, 10, -5), //2
+  //     new THREE.Vector3(),
+  //     new THREE.Vector3(), //3
+  //     new THREE.Vector3(), //4
+  //     new THREE.Vector3(), //5
+  //     new THREE.Vector3(), //8
+  //     new THREE.Vector3(), //6
+  //     new THREE.Vector3(), //7
+  //     new THREE.Vector3() //9
+  //   ];
+  // }
 
   setAngulo(valor) {
     this.pIzq.rotation.y = valor;
