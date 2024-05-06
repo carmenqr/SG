@@ -38,7 +38,7 @@ class Escudo extends THREE.Object3D {
     var geometry1 = new THREE.ExtrudeGeometry(shape, options);
 
     var forma = new THREE.Mesh(geometry1, this.material);
-    forma.scale(0.5,0.5,0.5);
+    forma.scale.set(0.5,0.5,0.5);
     return forma;
 
   }

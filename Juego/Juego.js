@@ -30,20 +30,34 @@ class Juego extends THREE.Object3D {
     this.circuito = this.createCircuito();
 
     this.cubo = this.createCubo();
-    this.puerta = this.createPuerta();
-    this.moneda = this.createMoneda();
-    this.ovni = this.createOvni();  
+    this.puerta1 = this.createPuerta();
+    this.moneda1 = this.createMoneda();
+    this.moneda2 = this.createMoneda();
+    this.moneda3 = this.createMoneda();
+    this.moneda4 = this.createMoneda();
+    this.ovni1 = this.createOvni();  
+    this.escudo1 = this.createEscudo();
+    this.escudo2 = this.createEscudo();
+    this.escudo3 = this.createEscudo();
+    this.pinchos1 = this.createPinchos();
+    this.pinchos2 = this.createPinchos();
     this.createCorazon();
 
-    this.add(this.posicionOrientacionObjeto(this.puerta, 0 * (Math.PI / 180), 0.25));
-    this.add(this.posicionOrientacionObjeto(this.moneda, 0 * (Math.PI / 180), 0.14));
+    this.add(this.posicionOrientacionObjeto(this.puerta1, 0 * (Math.PI / 180), 0.25));
+    this.add(this.posicionOrientacionObjeto(this.moneda1, 0 * (Math.PI / 180), 0.14));
+    this.add(this.posicionOrientacionObjeto(this.moneda2, 170 * (Math.PI / 180), 0.3));
+    this.add(this.posicionOrientacionObjeto(this.moneda3, 80 * (Math.PI / 180), 0.44));
+    this.add(this.posicionOrientacionObjeto(this.moneda4, 45 * (Math.PI / 180), 0.71));
+    this.add(this.posicionOrientacionObjeto(this.escudo1, 0 * (Math.PI / 180), 0.8));
+    this.add(this.posicionOrientacionObjeto(this.escudo2, 0 * (Math.PI / 180), 0.35));
+    this.add(this.posicionOrientacionObjeto(this.escudo3, 0 * (Math.PI / 180), 0.92));
+    this.add(this.posicionOrientacionObjeto(this.pinchos1, 180 * (Math.PI / 180), 0.4));
+    this.add(this.posicionOrientacionObjeto(this.pinchos2, 250 * (Math.PI / 180), 0.88));
     // this.add(this.posicionOrientacionObjeto(this.cubo, 90*(Math.PI/180), 0.2));
-    this.createEscudo(90 * (Math.PI / 180), 0);
-    this.createEscudo(0 * (Math.PI / 180), 0.5);
     this.add(this.posicionOrientacionCoche());
 
-    this.ovni.scale.set(0.3, 0.3, 0.3);
-    this.add(this.ovni);
+    
+    this.add(this.ovni1);
 
     // this.add(this.animacionOvni());
     this.add(this.circuito);
@@ -84,7 +98,7 @@ class Juego extends THREE.Object3D {
 
     raycaster.setFromCamera(mouse, this.camera); // Raycaster
 
-    var pickedObjects = raycaster.intersectObjects([this.ovni, this.corazon], true);
+    var pickedObjects = raycaster.intersectObjects([this.ovni1, this.corazon], true);
 
     if (pickedObjects.length > 0) {
       var selectedObject = pickedObjects[0].object;
@@ -171,23 +185,51 @@ class Juego extends THREE.Object3D {
       });
   }
 
-  createEscudo(angulo, posicion) {
-    var materialLoader = new MTLLoader();
-    var objectLoader = new OBJLoader();
-    materialLoader.load('../models/Escudo/13037_Buckler_Shield_v1_l3.mtl',
-      (materials) => {
-        objectLoader.setMaterials(materials);
-        objectLoader.load('../models/Escudo/13037_Buckler_Shield_v1_l3.obj',
-          (object) => {
-            this.escudo = object;
-            this.escudo.scale.set(0.005, 0.005, 0.005);
-            this.escudo.rotateY(180 * (Math.PI / 180));
-            this.escudo.rotateX(-Math.PI / 2);
+  createEscudo() {
+    var shape = new THREE.Shape();
+    shape.moveTo(0, 0);
+    shape.quadraticCurveTo(0.8, 0.3, 0.5, 1.2);
+    shape.quadraticCurveTo(0.2, 1, 0, 1.4);
+    shape.quadraticCurveTo(-0.2, 1, -0.5, 1.2);
+    shape.quadraticCurveTo(-0.8, 0.3, 0, 0);
+    
+    var options = { depth: 0.5, steps: 2, curveSegments: 10, bevelEnabled: false }; //etc
+    var geometry1 = new THREE.ExtrudeGeometry(shape, options);
 
-            this.add(this.posicionOrientacionObjeto(this.escudo, angulo, posicion));
+    var forma = new THREE.Mesh(geometry1, this.material);
+    forma.scale.set(0.5,0.5,0.5);
+    forma.position.y = -0.01;
+    return forma;
+  }
 
-          }, null, null);
-      });
+  createPinchos() {
+    var shape = new THREE.Shape();
+    shape.moveTo(-1, 0);
+    shape.quadraticCurveTo(0, 1.5, 1, 0);
+    shape.lineTo(1, 1.1);
+    shape.lineTo(0.85, 0.8);
+    shape.lineTo(0.7, 1.1);
+    shape.lineTo(0.55, 0.8);
+    shape.lineTo(0.4, 1.1);
+    shape.lineTo(0.25, 0.8);
+    shape.lineTo(0.15, 1.1);
+    shape.lineTo(0, 0.8);
+    shape.lineTo(-0.15, 1.1);
+    shape.lineTo(-0.25, 0.8);
+    shape.lineTo(-0.4, 1.1);
+    shape.lineTo(-0.55, 0.8);
+    shape.lineTo(-0.7, 1.1);
+    shape.lineTo(-0.85, 0.8);
+    shape.lineTo(-1, 1.1);
+
+
+    var options = { depth: 0.5, steps: 2, curveSegments: 10, bevelEnabled: false }; //etc
+    var geometry1 = new THREE.ExtrudeGeometry(shape, options);
+
+    var forma = new THREE.Mesh(geometry1, this.material);
+    forma.position.y = -0.8;
+    //forma.scale();
+    return forma;
   }
 
   createMoneda() {
@@ -352,6 +394,7 @@ class Juego extends THREE.Object3D {
     this.phiLength = 0; // Ángulo de revolución completo
 
     ov = this.createFormaOvni();
+    ov.scale.set(0.3, 0.3, 0.3);
 
     return ov;
   }
@@ -406,10 +449,10 @@ class Juego extends THREE.Object3D {
     // Crear animación con Tween
     var animacion = new TWEEN.Tween(origen).to(destino, tiempo).repeat(Infinity).onUpdate(() => {
         var posicion = splineAnillo.getPointAt(origen.t);
-        this.ovni.position.copy(posicion);
+        this.ovni1.position.copy(posicion);
         var tangente = splineAnillo.getTangentAt(origen.t);
         posicion.add(tangente);
-        this.ovni.up = binormales[Math.floor(origen.t * segmentos)];
+        this.ovni1.up = binormales[Math.floor(origen.t * segmentos)];
         // this.ovni.lookAt(posicion);
 
     });
@@ -583,7 +626,7 @@ class Juego extends THREE.Object3D {
       // // Agregar el objeto visual a la escena
       // this.add(rayoVisual);
 
-      var impactos = this.rayo.intersectObjects([this.puerta, this.moneda], true);
+      var impactos = this.rayo.intersectObjects([this.puerta1, this.moneda1, this.escudo1, this.pinchos1], true);
 
       if (impactos.length > 0) {
         console.log("Colisión detectada" + impactos[0].object);
