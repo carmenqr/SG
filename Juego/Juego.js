@@ -136,7 +136,7 @@ class Juego extends THREE.Object3D {
     this.path = new THREE.CatmullRomCurve3(pts, true);
 
     // Resolución del tubo
-    var resolution = 200;
+    var resolution = 100;
 
     // Radio del tubo
     this.tubeRadius = 1;
@@ -544,9 +544,9 @@ class Juego extends THREE.Object3D {
 
       this.rayo.set(origenRayo, direccionMirada);
 
-      var rayoVisual = new THREE.ArrowHelper(this.rayo.ray.direction, this.rayo.ray.origin, 0.5, 0xff0000);
-      // Agregar el objeto visual a la escena
-      this.add(rayoVisual);
+      // var rayoVisual = new THREE.ArrowHelper(this.rayo.ray.direction, this.rayo.ray.origin, 0.5, 0xff0000);
+      // // Agregar el objeto visual a la escena
+      // this.add(rayoVisual);
 
       var impactos = this.rayo.intersectObjects([this.puerta, this.moneda], true);
 
