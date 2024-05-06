@@ -35,7 +35,7 @@ class Juego extends THREE.Object3D {
     this.moneda2 = this.createMoneda();
     this.moneda3 = this.createMoneda();
     this.moneda4 = this.createMoneda();
-    this.ovni1 = this.createOvni();  
+    this.ovni1 = this.createOvni();
     this.escudo1 = this.createEscudo();
     this.escudo2 = this.createEscudo();
     this.escudo3 = this.createEscudo();
@@ -63,6 +63,7 @@ class Juego extends THREE.Object3D {
     this.add(this.circuito);
     
     this.animacionOvni();
+    //this.animacionCorazon();
     this.animacionPuertas();
 
     this.onKeyDown = this.onKeyDown.bind(this);
@@ -477,23 +478,57 @@ class Juego extends THREE.Object3D {
           object.rotateX(-90*(Math.PI/180));
           this.corazon = object;
           that.add(object);
+          // Llamar a animacionCorazon() después de cargar el modelo
+          this.animacionCorazon();
         },null,null);
     } ) ;
   }
 
-  // animacionCorazon() {
-  //   var pts = [
-  //     new THREE.Vector3(-2, 10, -5), //2
-  //     new THREE.Vector3(),
-  //     new THREE.Vector3(), //3
-  //     new THREE.Vector3(), //4
-  //     new THREE.Vector3(), //5
-  //     new THREE.Vector3(), //8
-  //     new THREE.Vector3(), //6
-  //     new THREE.Vector3(), //7
-  //     new THREE.Vector3() //9
-  //   ];
-  // }
+  animacionCorazon() {
+    var pts = [
+      new THREE.Vector3(-6, 4, 20),
+      new THREE.Vector3(-7, 4, 19),
+      new THREE.Vector3(-8, 4, 20),
+      new THREE.Vector3(-7, 4, 21),
+      new THREE.Vector3(-5, 4, 19),
+      new THREE.Vector3(-4, 4, 20),
+      new THREE.Vector3(-5, 4, 21)
+    ];
+
+    var splineen8 = new THREE.CatmullRomCurve3(pts, true);
+
+    // Se dibuja con esto
+    // var resolutionAnillo = 100;
+    // var geometryAnillo = new THREE.BufferGeometry().setFromPoints(splineAnillo.getPoints(resolutionAnillo));
+    // var materialAnillo = new THREE.LineBasicMaterial({ color: 0xff0000 });
+    // var splineMeshAnillo = new THREE.Line(geometryAnillo, materialAnillo);
+    // this.add(splineMeshAnillo);
+
+    var segmentos = 100;
+    var binormales = splineen8.computeFrenetFrames(segmentos, true).binormals;
+
+    // Parámetros para la animación
+    var origen = { t: 0 };
+    var destino = { t: 1 };
+    var tiempo = 10000;
+
+    
+    // Crear animación con Tween
+    var animacion = new TWEEN.Tween(origen).to(destino, tiempo).repeat(Infinity).onUpdate(() => {
+        var posicion = splineen8.getPointAt(origen.t);
+        this.corazon.position.copy(posicion);
+        var tangente = splineen8.getTangentAt(origen.t);
+        posicion.add(tangente);
+        this.corazon.up = binormales[Math.floor(origen.t * segmentos)];
+        // this.ovni.lookAt(posicion);
+
+    });
+
+    // Comenzar la animación
+    animacion.start();
+
+    
+  }
 
   setAngulo(valor) {
     this.pIzq.rotation.y = valor;
