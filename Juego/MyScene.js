@@ -16,7 +16,7 @@ import { Juego } from './Juego.js'
  * Usaremos una clase derivada de la clase Scene de Three.js para llevar el control de la escena y de todo lo que ocurre en ella.
  */
 
-class MyScene extends THREE.Scene {
+export class MyScene extends THREE.Scene {
   // Recibe el  div  que se ha creado en el  html  que va a ser el lienzo en el que mostrar
   // la visualización de la escena
   constructor (myCanvas) { 
@@ -47,7 +47,7 @@ class MyScene extends THREE.Scene {
     // Por último creamos el modelo.
     // El modelo puede incluir su parte de la interfaz gráfica de usuario. Le pasamos la referencia a 
     // la gui y el texto bajo el que se agruparán los controles de la interfaz que añada el modelo.
-    this.model = new Juego(this.gui, "Controles del Juego");
+    this.model = new Juego(this.gui, "Controles del Juego", this.camera);
     this.add (this.model);
   }
   

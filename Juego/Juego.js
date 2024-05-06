@@ -3,16 +3,25 @@ import { MTLLoader } from '../libs/MTLLoader.js'
 import { OBJLoader } from '../libs/OBJLoader.js'
 import { CSG } from '../libs/CSG-v2.js'
 import * as TWEEN from '../libs/tween.esm.js'
+import { MyScene } from './MyScene.js'
+
 
 class Juego extends THREE.Object3D {
-  constructor(gui, titleGui) {
+  constructor(gui, titleGui, camera) {
     super();
+
+    // const mySceneInstance = new MyScene(); // Crear una instancia de MyScene
+    // const camera = mySceneInstance.camera;
 
     // Se crea la parte de la interfaz que corresponde a la grapadora
     // Se crea primero porque otros métodos usan las variables que se definen para la interfaz
     this.createGUI(gui, titleGui);
     this.t = 0.1;
     this.angulo = 0;
+
+    this.camera = camera;
+
+    // camera = MyScene.camera;
 
     // El material se usa desde varios métodos. Por eso se alamacena en un atributo
     this.material = new THREE.MeshNormalMaterial();
@@ -24,6 +33,7 @@ class Juego extends THREE.Object3D {
     this.cubo = this.createCubo();
     this.puerta = this.createPuerta();
     this.moneda = this.createMoneda();
+    this.ovni = this.createOvni();  
 
     this.add(this.posicionOrientacionObjeto(this.puerta, 0 * (Math.PI / 180), 0.25));
     this.add(this.posicionOrientacionObjeto(this.moneda, 0 * (Math.PI / 180), 0.14));
@@ -32,12 +42,19 @@ class Juego extends THREE.Object3D {
     this.createEscudo(0 * (Math.PI / 180), 0.5);
     this.add(this.posicionOrientacionCoche());
 
-    this.add(this.circuito);
+    this.ovni.scale.set(0.3, 0.3, 0.3);
+    this.add(this.ovni);
 
+    // this.add(this.animacionOvni());
+    this.add(this.circuito);
+    
+    this.animacionOvni();
     this.animacionPuertas();
 
     this.onKeyDown = this.onKeyDown.bind(this);
     addEventListener('keydown', this.onKeyDown, false);
+    this.onDocumentMouseDown = this.onDocumentMouseDown.bind(this);
+    addEventListener('mousedown', this.onDocumentMouseDown, false);
   }
 
   onKeyDown(event) {
@@ -55,6 +72,25 @@ class Juego extends THREE.Object3D {
         // No hacer nada si se presiona otra tecla
         break;
     }
+  }
+
+  onDocumentMouseDown(event) {
+    var mouse = new THREE.Vector2();
+    var raycaster = new THREE.Raycaster();
+
+
+    mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+    mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+
+    raycaster.setFromCamera(mouse, this.camera); // Raycaster
+
+    var pickedObjects = raycaster.intersectObjects([this.ovni], true);
+
+    if (pickedObjects.length > 0) {
+      var selectedObject = pickedObjects[0].object;
+      console.log("Objeto seleccionado");
+    }
+
   }
 
   createCubo() {
@@ -296,6 +332,90 @@ class Juego extends THREE.Object3D {
     movimiento.start();
 
   }
+
+  createOvni() {
+    var ov = new THREE.Object3D();
+
+    var points = [];
+    points.push(new THREE.Vector2(0.001, -0.5)); // Punto en el plano XY con curvatura
+    points.push(new THREE.Vector2(0.8, -0.4)); // Punto en el eje X
+    points.push(new THREE.Vector2(1.0, -0.2)); // Punto en el eje X
+    points.push(new THREE.Vector2(1.5, -0.1)); // Punto en el plano XY
+    points.push(new THREE.Vector2(1.5, 0.1)); // Punto en el plano XY
+    points.push(new THREE.Vector2(1.0, 0.2)); // Punto en el eje X
+    points.push(new THREE.Vector2(0.8, 0.4)); // Punto en el eje X
+    points.push(new THREE.Vector2(0.001, 0.5)); // Punto base
+    
+
+    this.shape = new THREE.Shape(points);
+    this.phiLength = 0; // Ángulo de revolución completo
+
+    ov = this.createFormaOvni();
+
+    return ov;
+  }
+
+  createFormaOvni(){
+    var platillo = new THREE.Mesh (new THREE.LatheGeometry(this.shape.getPoints(), 64, this.phiLength, 2 * Math.PI +0.1), this.material);
+    
+    var formaEsfera = new THREE.SphereGeometry (0.5, 5, 5);
+    formaEsfera.translate(0,0.4,0);
+    var esfera = new THREE.Mesh (formaEsfera, this.material);
+
+    var forma = new CSG();
+    forma.union([platillo,esfera]);
+    return forma.toMesh();
+  }
+
+  animacionOvni() {
+    // Punto 7
+    var punto = new THREE.Vector3(-15, 8, 6);
+
+    // Radio del anillo
+    var radioAnillo = 4;
+
+    // Crear puntos para el spline del anillo
+    var puntosAnillo = [];
+    for (var i = 0; i < Math.PI * 2; i += 0.1) {
+        var x = punto.x + Math.cos(i) * radioAnillo;
+        var y = punto.y + Math.sin(i) * radioAnillo;
+        var z = punto.z;
+        puntosAnillo.push(new THREE.Vector3(x, y, z));
+    }
+
+    // Crear el spline cerrado del anillo
+    var splineAnillo = new THREE.CatmullRomCurve3(puntosAnillo, true);
+
+    // Se dibuja con esto
+    // var resolutionAnillo = 100;
+    // var geometryAnillo = new THREE.BufferGeometry().setFromPoints(splineAnillo.getPoints(resolutionAnillo));
+    // var materialAnillo = new THREE.LineBasicMaterial({ color: 0xff0000 });
+    // var splineMeshAnillo = new THREE.Line(geometryAnillo, materialAnillo);
+    // this.add(splineMeshAnillo);
+
+    // Se necesitan los binormales del spline
+    var segmentos = 100;
+    var binormales = splineAnillo.computeFrenetFrames(segmentos, true).binormals;
+
+    // Parámetros para la animación
+    var origen = { t: 0 };
+    var destino = { t: 1 };
+    var tiempo = 4000;
+
+    // Crear animación con Tween
+    var animacion = new TWEEN.Tween(origen).to(destino, tiempo).repeat(Infinity).onUpdate(() => {
+        var posicion = splineAnillo.getPointAt(origen.t);
+        this.ovni.position.copy(posicion);
+        var tangente = splineAnillo.getTangentAt(origen.t);
+        posicion.add(tangente);
+        this.ovni.up = binormales[Math.floor(origen.t * segmentos)];
+        // this.ovni.lookAt(posicion);
+
+    });
+
+    // Comenzar la animación
+    animacion.start();
+}
 
   setAngulo(valor) {
     this.pIzq.rotation.y = valor;
