@@ -13,52 +13,39 @@ class Escudo extends THREE.Object3D {
     this.createGUI(gui, titleGui);
 
     // El material se usa desde varios métodos. Por eso se alamacena en un atributo
-    this.material = new THREE.MeshNormalMaterial();
+    this.material = new THREE.MeshBasicMaterial({ color: 0xFF0000 }); // Rojo
     this.material.flatShading = true;
     this.material.needsUpdate = true;
 
-    var materialLoader = new MTLLoader();
-    var objectLoader = new OBJLoader();
-    materialLoader.load( '../models/Escudo/13037_Buckler_Shield_v1_l3.mtl' ,
-      (materials) => {
-        objectLoader.setMaterials(materials);
-        objectLoader.load( '../models/Escudo/13037_Buckler_Shield_v1_l3.obj' ,
-          (object) => {
-            this.scale.set(0.01, 0.01, 0.01); 
-            this.rotateX(-Math.PI / 2); 
-            this.add(object);
-          }, null, null);
-      });
 
+    this.pinchos = this.createForma();
+
+    this.add(this.pinchos);
   }
 
   createForma() {
+
+    var shape = new THREE.Shape();
+    shape.moveTo(0, 0);
+    shape.quadraticCurveTo(0.8, 0.3, 0.5, 1.2);
+    shape.quadraticCurveTo(0.2, 1, 0, 1.4);
+    shape.quadraticCurveTo(-0.2, 1, -0.5, 1.2);
+    shape.quadraticCurveTo(-0.8, 0.3, 0, 0);
+    
+
+
+    var options = { depth: 0.5, steps: 2, curveSegments: 10, bevelEnabled: false }; //etc
+    var geometry1 = new THREE.ExtrudeGeometry(shape, options);
+
+    var forma = new THREE.Mesh(geometry1, this.material);
+    forma.scale(0.5,0.5,0.5);
+    return forma;
 
   }
 
 
   createGUI(gui, titleGui) {
-    // Controles para el movimiento de la parte móvil
-    this.guiControls = {
-      segmentos: 3,
-      angulo: 10,
-    };
 
-    // Se crea una sección para los controles de la construccion
-    var folder = gui.addFolder(titleGui);
-
-    //Para que los valores se actualicen
-    var that = this;
-
-    // Estas líneas son las que añaden los componentes de la interfaz
-    // Las tres cifras indican un valor mínimo, un máximo y el incremento
-    folder.add(this.guiControls, 'segmentos', 3, 64, 1)
-      .name('Segmentos: ')
-      .onChange(function () { that.construccion.geometry = new THREE.LatheGeometry(that.shape.getPoints(), that.guiControls.segmentos, that.phiLength, that.guiControls.angulo) });
-
-    folder.add(this.guiControls, 'angulo', 0, 2 * Math.PI + 0.1, 0.01)
-      .name('Ángulo: ')
-      .onChange(function () { that.construccion.geometry = new THREE.LatheGeometry(that.shape.getPoints(), that.guiControls.segmentos, that.phiLength, that.guiControls.angulo) });
   }
 
 
