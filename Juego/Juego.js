@@ -58,8 +58,6 @@ class Juego extends THREE.Object3D {
 
     
     this.add(this.ovni1);
-
-    // this.add(this.animacionOvni());
     this.add(this.circuito);
     
     this.animacionOvni();
