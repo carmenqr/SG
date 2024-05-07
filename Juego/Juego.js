@@ -3,7 +3,6 @@ import { MTLLoader } from '../libs/MTLLoader.js'
 import { OBJLoader } from '../libs/OBJLoader.js'
 import { CSG } from '../libs/CSG-v2.js'
 import * as TWEEN from '../libs/tween.esm.js'
-import { MyScene } from './MyScene.js'
 
 
 class Juego extends THREE.Object3D {
@@ -59,7 +58,7 @@ class Juego extends THREE.Object3D {
     this.add(this.ovni1);
     this.add(this.circuito);
 
-    this.animacionOvni();
+    //this.animacionOvni();
     //this.animacionCorazon();
     this.animacionPuertas();
 
@@ -74,7 +73,7 @@ class Juego extends THREE.Object3D {
     this.camera = camara;
   }
 
-  getCamara(){
+  getCamara() {
     return this.camera;
   }
 
@@ -435,7 +434,7 @@ class Juego extends THREE.Object3D {
 
 
     this.shape = new THREE.Shape(points);
-    this.phiLength = 0; 
+    this.phiLength = 0;
 
     var platillo = new THREE.Mesh(new THREE.LatheGeometry(this.shape.getPoints(), 15, this.phiLength, 2 * Math.PI + 0.1), this.material);
 
@@ -447,12 +446,50 @@ class Juego extends THREE.Object3D {
     forma.union([platillo, esfera]);
     var ov = forma.toMesh();
     ov.scale.set(0.3, 0.3, 0.3);
+    ov.add(this.lanzarProyectil());
+
+    ov.position.set(-2, 13, 0);
     return ov;
   }
 
+  lanzarProyectil() {
+    this.proyectil = new THREE.Mesh(new THREE.SphereGeometry(1, 8, 8), new THREE.MeshBasicMaterial({ color: 0xff0000 }));
+
+    // Definir la trayectoria del proyectil
+    var puntosTrayectoria = [];
+    puntosTrayectoria.push(new THREE.Vector3(0, 0, 0)); // Punto inicial
+    puntosTrayectoria.push(new THREE.Vector3(0, -20, 0)); // Punto final
+
+    var trayectoria = new THREE.CatmullRomCurve3(puntosTrayectoria);
+
+    var segmentos = 100;
+    var binormales = trayectoria.computeFrenetFrames(segmentos, true).binormals;
+
+    // Crear animación con Tween para mover el proyectil
+    var origen = { t: 0 };
+    var destino = { t: 1 };
+    var tiempo = 1500; // Duración de la animación en milisegundos
+
+    var animacion = new TWEEN.Tween(origen).to(destino, tiempo).repeat(Infinity).onUpdate(() => {
+      var posicion = trayectoria.getPointAt(origen.t);
+      this.proyectil.position.copy(posicion);
+      var tangente = trayectoria.getTangentAt(origen.t);
+      posicion.add(tangente);
+      this.proyectil.up = binormales[Math.floor(origen.t * segmentos)];
+      this.proyectil.lookAt(posicion);
+
+    });
+
+    animacion.start();
+
+    return this.proyectil;
+  }
+
+
+
   animacionOvni() {
     // Punto 7
-    var punto = new THREE.Vector3(-15, 8, 6);
+    var punto = new THREE.Vector3(-2, 10, 0);
 
     // Radio del anillo
     var radioAnillo = 4;
@@ -714,15 +751,17 @@ class Juego extends THREE.Object3D {
 
       this.rayo.set(origenRayo, direccionMirada);
 
-      // var rayoVisual = new THREE.ArrowHelper(this.rayo.ray.direction, this.rayo.ray.origin, 0.5, 0xff0000);
-      // // Agregar el objeto visual a la escena
-      // this.add(rayoVisual);
+      if (this.posCoche.children[i] != this.cameraThirdPerson) {
+        var rayoVisual = new THREE.ArrowHelper(this.rayo.ray.direction, this.rayo.ray.origin, 0.5, 0xff0000);
+        // // Agregar el objeto visual a la escena
+        this.add(rayoVisual);
+        var impactos = this.rayo.intersectObjects([this.puerta1, this.moneda1, this.escudo1, this.pinchos1, this.proyectil], true);
 
-      var impactos = this.rayo.intersectObjects([this.puerta1, this.moneda1, this.escudo1, this.pinchos1], true);
-
-      if (impactos.length > 0) {
-        console.log("Colisión detectada" + impactos[0].object);
+        if (impactos.length > 0) {
+          console.log("Colisión detectada" + impactos[0].object);
+        }
       }
+
     }
   }
 
@@ -732,7 +771,7 @@ class Juego extends THREE.Object3D {
 
   update() {
     TWEEN.update();
-    this.t = (this.t + 0.0005) % 1;
+    this.t = (this.t + 0.0002) % 1;
     this.avanzarCoche(this.t);
     this.setAnguloCoche(this.angulo);
     this.colisiones();

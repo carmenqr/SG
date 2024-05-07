@@ -1,6 +1,9 @@
 
 import * as THREE from 'three'
 import { CSG } from '../libs/CSG-v2.js'
+import { MTLLoader } from '../libs/MTLLoader.js'
+import { OBJLoader } from '../libs/OBJLoader.js'
+import * as TWEEN from '../libs/tween.esm.js'
 
 class Ovni extends THREE.Object3D {
   constructor(gui,titleGui) {
@@ -15,6 +18,13 @@ class Ovni extends THREE.Object3D {
     this.material.flatShading = true;
     this.material.needsUpdate = true;
 
+    this.ovni = this.createOvni();
+    //this.ovni.position.set(this.guiControls.posX, this.guiControls.posY, this.guiControls.posZ);
+    
+    this.add(this.ovni);
+  }
+
+  createOvni() {
     var points = [];
     points.push(new THREE.Vector2(0.001, -0.5)); // Punto en el plano XY con curvatura
     points.push(new THREE.Vector2(0.8, -0.4)); // Punto en el eje X
@@ -24,29 +34,56 @@ class Ovni extends THREE.Object3D {
     points.push(new THREE.Vector2(1.0, 0.2)); // Punto en el eje X
     points.push(new THREE.Vector2(0.8, 0.4)); // Punto en el eje X
     points.push(new THREE.Vector2(0.001, 0.5)); // Punto base
-    
 
     this.shape = new THREE.Shape(points);
-    this.phiLength = 0; // Ángulo de revolución completo
+    this.phiLength = 0;
 
-    this.ovni = this.createForma();
-    //this.ovni.position.set(this.guiControls.posX, this.guiControls.posY, this.guiControls.posZ);
-    
-    this.add(this.ovni);
-  }
+    var platillo = new THREE.Mesh(new THREE.LatheGeometry(this.shape.getPoints(), 15, this.phiLength, 2 * Math.PI + 0.1), this.material);
 
-  createForma(){
-
-    var platillo = new THREE.Mesh (new THREE.LatheGeometry(this.shape.getPoints(), 64, this.phiLength, 2 * Math.PI +0.1), this.material);
-    
-    var formaEsfera = new THREE.SphereGeometry (0.5, 20, 20);
-    formaEsfera.translate(0,0.4,0);
-    var esfera = new THREE.Mesh (formaEsfera, this.material);
+    var formaEsfera = new THREE.SphereGeometry(0.5, 5, 5);
+    formaEsfera.translate(0, -0.4, 0);
+    var esfera = new THREE.Mesh(formaEsfera, this.material);
 
     var forma = new CSG();
-    forma.union([platillo,esfera]);
-    return forma.toMesh();
-  }
+    forma.union([platillo, esfera]);
+    var ov = forma.toMesh();
+    ov.scale.set(0.3, 0.3, 0.3);
+
+    // Crear proyectil
+    this.proyectil = new THREE.Mesh(new THREE.SphereGeometry(0.1, 8, 8), new THREE.MeshBasicMaterial({ color: 0xff0000 }));
+    ov.add(this.proyectil);
+
+    // Definir la trayectoria del proyectil
+    var puntosTrayectoria = [];
+    puntosTrayectoria.push(new THREE.Vector3(0, 0, 0)); // Punto inicial
+    puntosTrayectoria.push(new THREE.Vector3(0, 4, 0)); // Punto final
+
+    var trayectoria = new THREE.CatmullRomCurve3(puntosTrayectoria);
+
+    var segmentos = 100;
+    var binormales = trayectoria.computeFrenetFrames(segmentos, true).binormals;
+
+    // Crear animación con Tween para mover el proyectil
+    var origen = { t: 0 };
+    var destino = { t: 1 };
+    var tiempo = 1000; // Duración de la animación en milisegundos
+
+    var animacion = new TWEEN.Tween(origen).to(destino, tiempo).repeat(Infinity).onUpdate(() => {
+      var posicion = trayectoria.getPointAt(origen.t);
+      this.proyectil.position.copy(posicion);
+      var tangente = trayectoria.getTangentAt(origen.t);
+      posicion.add(tangente);
+      this.proyectil.up = binormales[Math.floor(origen.t * segmentos)];
+      this.proyectil.lookAt(posicion);
+
+    });
+
+    animacion.start();
+
+    return ov;
+}
+
+
   
 
   createGUI(gui, titleGui) {
@@ -75,6 +112,7 @@ class Ovni extends THREE.Object3D {
   
 
   update () {
+    TWEEN.update();
     // No hay nada que actualizar ya que la apertura de la grapadora se ha actualizado desde la interfaz
   }
 }
