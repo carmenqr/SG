@@ -101,27 +101,42 @@ export class MyScene extends THREE.Scene {
     // Crear una cámara en tercera persona
     this.cameraThirdPerson = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
     // Definir posición relativa al coche
-    this.cameraThirdPerson.position.set(0, 1, -0.5); // Ejemplo de posición relativa
+    this.cameraThirdPerson.position.set(this.model.getPosOrCoche().position.add(new THREE.Vector3(0, 4, -2))); // Ejemplo de posición relativa
 
     // Agregar la cámara al escenario
     this.add(this.cameraThirdPerson);
 
     // No configurar controles de cámara para la cámara en tercera persona, simplemente sigue al coche
     // Asignar el objetivo de la cámara al coche
-    this.cameraThirdPerson.lookAt(this.model.getPosOrCoche());
+    this.cameraThirdPerson.lookAt(this.model.getPosCoche());
 
   }
 
   updateThirdPersonCamera() {
-    // Actualizar la posición de la cámara para que esté detrás y un poco por encima del coche
-    const distanciaDetras = -0.5; // Distancia detrás del coche
-    const altura = 1; // Altura sobre el coche
+    // Obtener la posición y la dirección actual del coche
     const posicionCoche = this.model.getPosOrCoche().position;
-    //this.cameraThirdPerson.position.copy(posicionCoche).add(new THREE.Vector3(0, altura, 0));
+    const direccionCoche = this.model.getPosOrCoche().getWorldDirection(new THREE.Vector3());
 
-    // Actualizar la dirección de la cámara para que esté siempre mirando hacia el coche
-    this.cameraThirdPerson.lookAt(posicionCoche);
+    // Definir la distancia detrás y la altura de la cámara
+    const distanciaDetras = -4; // Distancia detrás del coche
+    const altura = 5; // Altura sobre el coche
+
+    // Calcular el punto hacia el que la cámara debe mirar
+    const puntoMirada = new THREE.Vector3();
+    puntoMirada.copy(posicionCoche).add(direccionCoche);
+
+    // Calcular la nueva posición de la cámara
+    const nuevaPosicion = new THREE.Vector3();
+    nuevaPosicion.copy(posicionCoche).addScaledVector(direccionCoche, distanciaDetras).add(new THREE.Vector3(0, altura, 0));
+
+    // Actualizar la posición de la cámara
+    this.cameraThirdPerson.position.copy(nuevaPosicion);
+
+    // Actualizar la dirección de la cámara para que mire hacia el punto calculado
+    this.cameraThirdPerson.lookAt(puntoMirada);
 }
+
+
 
 
   createGUI() {

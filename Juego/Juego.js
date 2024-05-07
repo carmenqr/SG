@@ -626,6 +626,10 @@ class Juego extends THREE.Object3D {
     return this.orCoche;
   }
 
+  getPosCoche(){
+    return this.posCoche;
+  }
+
   posicionCoche() {
     this.posCoche = new THREE.Object3D();
     //LANZADOR DE RAYOS
