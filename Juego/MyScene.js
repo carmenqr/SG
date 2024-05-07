@@ -40,7 +40,6 @@ export class MyScene extends THREE.Scene {
 
     // Tendremos una cámara con un control de movimiento con el ratón
     this.createCamera();
-    this.camera = this.cameraN;
 
     this.model.asignarCamara(this.camera);
 
@@ -50,10 +49,6 @@ export class MyScene extends THREE.Scene {
     this.axis = new THREE.AxesHelper(10);
     this.add(this.axis);
 
-    this.onKeyDown = this.onKeyDown.bind(this);
-    addEventListener('keydown', this.onKeyDown, false);
-
-
     // Por último creamos el modelo.
     // El modelo puede incluir su parte de la interfaz gráfica de usuario. Le pasamos la referencia a 
     // la gui y el texto bajo el que se agruparán los controles de la interfaz que añada el modelo.
@@ -61,35 +56,21 @@ export class MyScene extends THREE.Scene {
     this.add(this.model);
   }
 
-  onKeyDown(event) {
-    // Comprueba qué tecla se ha presionado
-    switch (event.keyCode) {
-      case 32: // Tecla izquierda
-        this.cambio = !this.cambio;
-        if(this.cambio) this.camera = this.cameraN;
-        else this.camera = this.cameraThirdPerson;
-        break;
-      default:
-        // No hacer nada si se presiona otra tecla
-        break;
-    }
-  }
-
   createCamera() {
     // Para crear una cámara le indicamos
     //   El ángulo del campo de visión vértical en grados sexagesimales
     //   La razón de aspecto ancho/alto
     //   Los planos de recorte cercano y lejano
-    this.cameraN = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
+    this.camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
     // También se indica dónde se coloca
-    this.cameraN.position.set(0.8, 0.05, 40);
+    this.camera.position.set(0.8, 0.05, 40);
     // Y hacia dónde mira
     var look = new THREE.Vector3(0, 0, 0);
-    this.cameraN.lookAt(look);
-    this.add(this.cameraN);
+    this.camera.lookAt(look);
+    this.add(this.camera);
 
     // Para el control de cámara usamos una clase que ya tiene implementado los movimientos de órbita
-    this.cameraControl = new TrackballControls(this.cameraN, this.renderer.domElement);
+    this.cameraControl = new TrackballControls(this.camera, this.renderer.domElement);
 
     // Se configuran las velocidades de los movimientos
     this.cameraControl.rotateSpeed = 5;
@@ -98,46 +79,7 @@ export class MyScene extends THREE.Scene {
     // Debe orbitar con respecto al punto de mira de la cámara
     this.cameraControl.target = look;
 
-    // Crear una cámara en tercera persona
-    this.cameraThirdPerson = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
-    // Definir posición relativa al coche
-    this.cameraThirdPerson.position.set(this.model.getPosOrCoche().position.add(new THREE.Vector3(0, 4, -2))); // Ejemplo de posición relativa
-
-    // Agregar la cámara al escenario
-    this.add(this.cameraThirdPerson);
-
-    // No configurar controles de cámara para la cámara en tercera persona, simplemente sigue al coche
-    // Asignar el objetivo de la cámara al coche
-    this.cameraThirdPerson.lookAt(this.model.getPosCoche());
-
   }
-
-  updateThirdPersonCamera() {
-    // Obtener la posición y la dirección actual del coche
-    const posicionCoche = this.model.getPosOrCoche().position;
-    const direccionCoche = this.model.getPosOrCoche().getWorldDirection(new THREE.Vector3());
-
-    // Definir la distancia detrás y la altura de la cámara
-    const distanciaDetras = -4; // Distancia detrás del coche
-    const altura = 5; // Altura sobre el coche
-
-    // Calcular el punto hacia el que la cámara debe mirar
-    const puntoMirada = new THREE.Vector3();
-    puntoMirada.copy(posicionCoche).add(direccionCoche);
-
-    // Calcular la nueva posición de la cámara
-    const nuevaPosicion = new THREE.Vector3();
-    nuevaPosicion.copy(posicionCoche).addScaledVector(direccionCoche, distanciaDetras).add(new THREE.Vector3(0, altura, 0));
-
-    // Actualizar la posición de la cámara
-    this.cameraThirdPerson.position.copy(nuevaPosicion);
-
-    // Actualizar la dirección de la cámara para que mire hacia el punto calculado
-    this.cameraThirdPerson.lookAt(puntoMirada);
-}
-
-
-
 
   createGUI() {
     // Se crea la interfaz gráfica de usuario
@@ -248,13 +190,10 @@ export class MyScene extends THREE.Scene {
 
   update() {
     // Le decimos al renderizador "visualiza la escena que te indico usando la cámara que te estoy pasando"
-    this.renderer.render(this, this.getCamera());
+    this.renderer.render(this, this.model.getCamara());
 
     // Se actualiza la posición de la cámara según su controlador
     this.cameraControl.update();
-
-    this.updateThirdPersonCamera();
-
 
     // Se actualiza el resto del modelo
     this.model.update();

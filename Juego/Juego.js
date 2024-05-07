@@ -18,6 +18,7 @@ class Juego extends THREE.Object3D {
     this.createGUI(gui, titleGui);
     this.t = 0.1;
     this.angulo = 0;
+    this.cambio = true;
 
 
     // El material se usa desde varios métodos. Por eso se alamacena en un atributo
@@ -54,10 +55,10 @@ class Juego extends THREE.Object3D {
     // this.add(this.posicionOrientacionObjeto(this.cubo, 90*(Math.PI/180), 0.2));
     this.add(this.posicionOrientacionCoche());
 
-    
+
     this.add(this.ovni1);
     this.add(this.circuito);
-    
+
     this.animacionOvni();
     //this.animacionCorazon();
     this.animacionPuertas();
@@ -68,8 +69,13 @@ class Juego extends THREE.Object3D {
     addEventListener('mousedown', this.onDocumentMouseDown, false);
   }
 
-  asignarCamara(camara){
+  asignarCamara(camara) {
+    this.cameraN = camara;
     this.camera = camara;
+  }
+
+  getCamara(){
+    return this.camera;
   }
 
   onKeyDown(event) {
@@ -82,6 +88,12 @@ class Juego extends THREE.Object3D {
       case 39: // Tecla derecha
         // Ejecuta la función correspondiente
         this.setAnguloCoche(this.angulo += (5 * (Math.PI / 180)));
+        break;
+      case 32: // Tecla espacio
+        this.cambio = !this.cambio;
+        console.log("cambio");
+        if (this.cambio) this.camera = this.cameraN;
+        else this.camera = this.cameraThirdPerson;
         break;
       default:
         // No hacer nada si se presiona otra tecla
@@ -104,8 +116,8 @@ class Juego extends THREE.Object3D {
     if (pickedObjects.length > 0) {
       var selectedObject = pickedObjects[0].object;
       this.disparar(selectedObject);
-      if(selectedObject == this.ovni1) console.log("Ovni seleccionado");
-      else if (selectedObject == this.corazon)  console.log("Corazon seleccionado");
+      if (selectedObject == this.ovni1) console.log("Ovni seleccionado");
+      else console.log("Corazon seleccionado");
     }
 
   }
@@ -132,13 +144,13 @@ class Juego extends THREE.Object3D {
     var duracionAnimacion = distancia / velocidad;
 
     var tween = new TWEEN.Tween(bala.position)
-        .to(posicionObjetoSeleccionado, duracionAnimacion)
-        .onComplete(() => {
-            // Eliminar la bala de la escena al finalizar la animación
-            this.remove(bala);
-        })
-        .start();
-}
+      .to(posicionObjetoSeleccionado, duracionAnimacion)
+      .onComplete(() => {
+        // Eliminar la bala de la escena al finalizar la animación
+        this.remove(bala);
+      })
+      .start();
+  }
 
 
   createCubo() {
@@ -226,12 +238,12 @@ class Juego extends THREE.Object3D {
     shape.quadraticCurveTo(0.2, 1, 0, 1.4);
     shape.quadraticCurveTo(-0.2, 1, -0.5, 1.2);
     shape.quadraticCurveTo(-0.8, 0.3, 0, 0);
-    
+
     var options = { depth: 0.5, steps: 2, curveSegments: 10, bevelEnabled: false }; //etc
     var geometry1 = new THREE.ExtrudeGeometry(shape, options);
 
     var forma = new THREE.Mesh(geometry1, this.material);
-    forma.scale.set(0.5,0.5,0.5);
+    forma.scale.set(0.5, 0.5, 0.5);
     forma.position.y = -0.01;
     return forma;
   }
@@ -411,8 +423,6 @@ class Juego extends THREE.Object3D {
   }
 
   createOvni() {
-    var ov = new THREE.Object3D();
-
     var points = [];
     points.push(new THREE.Vector2(0.001, -0.5)); // Punto en el plano XY con curvatura
     points.push(new THREE.Vector2(0.8, -0.4)); // Punto en el eje X
@@ -422,27 +432,22 @@ class Juego extends THREE.Object3D {
     points.push(new THREE.Vector2(1.0, 0.2)); // Punto en el eje X
     points.push(new THREE.Vector2(0.8, 0.4)); // Punto en el eje X
     points.push(new THREE.Vector2(0.001, 0.5)); // Punto base
-    
+
 
     this.shape = new THREE.Shape(points);
-    this.phiLength = 0; // Ángulo de revolución completo
+    this.phiLength = 0; 
 
-    ov = this.createFormaOvni();
-    ov.scale.set(0.3, 0.3, 0.3);
+    var platillo = new THREE.Mesh(new THREE.LatheGeometry(this.shape.getPoints(), 15, this.phiLength, 2 * Math.PI + 0.1), this.material);
 
-    return ov;
-  }
-
-  createFormaOvni(){
-    var platillo = new THREE.Mesh (new THREE.LatheGeometry(this.shape.getPoints(), 15, this.phiLength, 2 * Math.PI +0.1), this.material);
-    
-    var formaEsfera = new THREE.SphereGeometry (0.5, 5, 5);
-    formaEsfera.translate(0,0.4,0);
-    var esfera = new THREE.Mesh (formaEsfera, this.material);
+    var formaEsfera = new THREE.SphereGeometry(0.5, 5, 5);
+    formaEsfera.translate(0, -0.4, 0);
+    var esfera = new THREE.Mesh(formaEsfera, this.material);
 
     var forma = new CSG();
-    forma.union([platillo,esfera]);
-    return forma.toMesh();
+    forma.union([platillo, esfera]);
+    var ov = forma.toMesh();
+    ov.scale.set(0.3, 0.3, 0.3);
+    return ov;
   }
 
   animacionOvni() {
@@ -455,10 +460,10 @@ class Juego extends THREE.Object3D {
     // Crear puntos para el spline del anillo
     var puntosAnillo = [];
     for (var i = 0; i < Math.PI * 2; i += 0.1) {
-        var x = punto.x + Math.cos(i) * radioAnillo;
-        var y = punto.y + Math.sin(i) * radioAnillo;
-        var z = punto.z;
-        puntosAnillo.push(new THREE.Vector3(x, y, z));
+      var x = punto.x + Math.cos(i) * radioAnillo;
+      var y = punto.y + Math.sin(i) * radioAnillo;
+      var z = punto.z;
+      puntosAnillo.push(new THREE.Vector3(x, y, z));
     }
 
     // Crear el spline cerrado del anillo
@@ -482,12 +487,12 @@ class Juego extends THREE.Object3D {
 
     // Crear animación con Tween
     var animacion = new TWEEN.Tween(origen).to(destino, tiempo).repeat(Infinity).onUpdate(() => {
-        var posicion = splineAnillo.getPointAt(origen.t);
-        this.ovni1.position.copy(posicion);
-        var tangente = splineAnillo.getTangentAt(origen.t);
-        posicion.add(tangente);
-        this.ovni1.up = binormales[Math.floor(origen.t * segmentos)];
-        // this.ovni.lookAt(posicion);
+      var posicion = splineAnillo.getPointAt(origen.t);
+      this.ovni1.position.copy(posicion);
+      var tangente = splineAnillo.getTangentAt(origen.t);
+      posicion.add(tangente);
+      this.ovni1.up = binormales[Math.floor(origen.t * segmentos)];
+      this.ovni1.lookAt(posicion);
 
     });
 
@@ -502,19 +507,19 @@ class Juego extends THREE.Object3D {
 
     var that = this;
 
-    materialLoader.load('../models/corazon/12190_Heart_v1_L3.mtl' ,
+    materialLoader.load('../models/corazon/12190_Heart_v1_L3.mtl',
       (materials) => {
         objectLoader.setMaterials(materials);
-        objectLoader.load ('../models/corazon/12190_Heart_v1_L3.obj',
-        (object) => {
-          object.scale.set(0.025, 0.025, 0.025);
-          object.rotateX(-90*(Math.PI/180));
-          this.corazon = object;
-          that.add(object);
-          // Llamar a animacionCorazon() después de cargar el modelo
-          this.animacionCorazon();
-        },null,null);
-    } ) ;
+        objectLoader.load('../models/corazon/12190_Heart_v1_L3.obj',
+          (object) => {
+            object.scale.set(0.025, 0.025, 0.025);
+            object.rotateX(-90 * (Math.PI / 180));
+            this.corazon = object;
+            that.add(object);
+            // Llamar a animacionCorazon() después de cargar el modelo
+            this.animacionCorazon();
+          }, null, null);
+      });
   }
 
   animacionCorazon() {
@@ -545,22 +550,22 @@ class Juego extends THREE.Object3D {
     var destino = { t: 1 };
     var tiempo = 10000;
 
-    
+
     // Crear animación con Tween
     var animacion = new TWEEN.Tween(origen).to(destino, tiempo).repeat(Infinity).onUpdate(() => {
-        var posicion = splineen8.getPointAt(origen.t);
-        this.corazon.position.copy(posicion);
-        var tangente = splineen8.getTangentAt(origen.t);
-        posicion.add(tangente);
-        this.corazon.up = binormales[Math.floor(origen.t * segmentos)];
-        // this.ovni.lookAt(posicion);
+      var posicion = splineen8.getPointAt(origen.t);
+      this.corazon.position.copy(posicion);
+      var tangente = splineen8.getTangentAt(origen.t);
+      posicion.add(tangente);
+      this.corazon.up = binormales[Math.floor(origen.t * segmentos)];
+      // this.ovni.lookAt(posicion);
 
     });
 
     // Comenzar la animación
     animacion.start();
 
-    
+
   }
 
   setAngulo(valor) {
@@ -601,7 +606,7 @@ class Juego extends THREE.Object3D {
     this.posOrCoche.lookAt(posTmp);
   }
 
-  getPosOrCoche(){
+  getPosOrCoche() {
     return this.posOrCoche;
   }
 
@@ -626,7 +631,7 @@ class Juego extends THREE.Object3D {
     return this.orCoche;
   }
 
-  getPosCoche(){
+  getPosCoche() {
     return this.posCoche;
   }
 
@@ -639,11 +644,22 @@ class Juego extends THREE.Object3D {
 
     rayo1.position.x = 0.075;
     rayo2.position.x = 0.15;
-    rayo3.position.set(0.075,0.05,0);
+    rayo3.position.set(0.075, 0.05, 0);
 
     this.posCoche.add(rayo1);
     this.posCoche.add(rayo2);
     this.posCoche.add(rayo3);
+    //FIN RAYOS
+
+    //CAMÁRA 3ª PERSONA
+    this.cameraThirdPerson = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
+    // Definir posición relativa al coche
+    this.cameraThirdPerson.position.set(0.125, 1, -2); // Posición con respecto al coche
+    this.cameraThirdPerson.lookAt(0, 0, 1);
+
+    // Agregar la cámara al escenario
+    this.posCoche.add(this.cameraThirdPerson);
+    //FIN CAMÁRA 3ª PERSONA
 
     this.createCoche();
     this.posCoche.position.y = this.tubeRadius;
