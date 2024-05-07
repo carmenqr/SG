@@ -3,10 +3,11 @@ import { MTLLoader } from '../libs/MTLLoader.js'
 import { OBJLoader } from '../libs/OBJLoader.js'
 import { CSG } from '../libs/CSG-v2.js'
 import * as TWEEN from '../libs/tween.esm.js'
+import { MyScene } from './MyScene.js'
 
 
 class Juego extends THREE.Object3D {
-  constructor(gui, titleGui, camera) {
+  constructor(gui, titleGui) {
     super();
 
     // const mySceneInstance = new MyScene(); // Crear una instancia de MyScene
@@ -18,9 +19,6 @@ class Juego extends THREE.Object3D {
     this.t = 0.1;
     this.angulo = 0;
 
-    this.camera = camera;
-
-    // camera = MyScene.camera;
 
     // El material se usa desde varios métodos. Por eso se alamacena en un atributo
     this.material = new THREE.MeshNormalMaterial();
@@ -70,6 +68,10 @@ class Juego extends THREE.Object3D {
     addEventListener('mousedown', this.onDocumentMouseDown, false);
   }
 
+  asignarCamara(camara){
+    this.camera = camara;
+  }
+
   onKeyDown(event) {
     // Comprueba qué tecla se ha presionado
     switch (event.keyCode) {
@@ -101,10 +103,43 @@ class Juego extends THREE.Object3D {
 
     if (pickedObjects.length > 0) {
       var selectedObject = pickedObjects[0].object;
-      console.log("Objeto seleccionado");
+      this.disparar(selectedObject);
+      if(selectedObject == this.ovni1) console.log("Ovni seleccionado");
+      else if (selectedObject == this.corazon)  console.log("Corazon seleccionado");
     }
 
   }
+
+  disparar(objeto) {
+    // Obtener la posición actual del coche
+    var posicionCoche = this.posOrCoche.getWorldPosition(new THREE.Vector3());
+
+    // Obtener la posición del objeto seleccionado con el ratón
+    var posicionObjetoSeleccionado = objeto.getWorldPosition(new THREE.Vector3());;
+
+    // Crear una instancia del objeto 3D con forma de bala
+    var bala = new THREE.Mesh(new THREE.SphereGeometry(0.1, 8, 8), new THREE.MeshBasicMaterial({ color: 0xff0000 }));
+    bala.position.copy(posicionCoche);
+
+    // Añadir la bala a la escena
+    this.add(bala);
+
+    // Animar el objeto bala desde la posición del coche hasta la posición del objeto seleccionado
+    var velocidad = 0.05; // ajusta la velocidad de la bala según lo necesites
+    var direccion = posicionObjetoSeleccionado.clone().sub(posicionCoche).normalize();
+    var distancia = posicionCoche.distanceTo(posicionObjetoSeleccionado);
+
+    var duracionAnimacion = distancia / velocidad;
+
+    var tween = new TWEEN.Tween(bala.position)
+        .to(posicionObjetoSeleccionado, duracionAnimacion)
+        .onComplete(() => {
+            // Eliminar la bala de la escena al finalizar la animación
+            this.remove(bala);
+        })
+        .start();
+}
+
 
   createCubo() {
     this.cuboGeometry = new THREE.BoxGeometry(0.5, 0.5, 0.5);
@@ -564,6 +599,10 @@ class Juego extends THREE.Object3D {
     var segmentoActual = Math.floor(valor * this.segments);
     this.posOrCoche.up = this.tubeGeometry.binormals[segmentoActual];
     this.posOrCoche.lookAt(posTmp);
+  }
+
+  getPosOrCoche(){
+    return this.posOrCoche;
   }
 
   posicionOrientacionCoche() {
