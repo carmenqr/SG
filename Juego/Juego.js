@@ -18,6 +18,7 @@ class Juego extends THREE.Object3D {
     this.t = 0.1;
     this.angulo = 0;
     this.cambio = true;
+    this.objetos = [];
 
 
     // El material se usa desde varios métodos. Por eso se alamacena en un atributo
@@ -27,18 +28,18 @@ class Juego extends THREE.Object3D {
 
     this.circuito = this.createCircuito();
 
-    this.cubo = this.createCubo();
-    this.puerta1 = this.createPuerta();
-    this.moneda1 = this.createMoneda();
-    this.moneda2 = this.createMoneda();
-    this.moneda3 = this.createMoneda();
-    this.moneda4 = this.createMoneda();
+    this.cubo = this.createCubo(); 
+    this.puerta1 = this.createPuerta(); this.objetos.push(this.puerta1);
+    this.moneda1 = this.createMoneda(); this.objetos.push(this.moneda1);
+    this.moneda2 = this.createMoneda(); this.objetos.push(this.moneda2);
+    this.moneda3 = this.createMoneda(); this.objetos.push(this.moneda3);
+    this.moneda4 = this.createMoneda(); this.objetos.push(this.moneda4);
     this.ovni1 = this.createOvni();
-    this.escudo1 = this.createEscudo();
-    this.escudo2 = this.createEscudo();
-    this.escudo3 = this.createEscudo();
-    this.pinchos1 = this.createPinchos();
-    this.pinchos2 = this.createPinchos();
+    this.escudo1 = this.createEscudo(); this.objetos.push(this.escudo1);
+    this.escudo2 = this.createEscudo(); this.objetos.push(this.escudo2);
+    this.escudo3 = this.createEscudo(); this.objetos.push(this.escudo3);
+    this.pinchos1 = this.createPinchos(); this.objetos.push(this.pinchos1);
+    this.pinchos2 = this.createPinchos(); this.objetos.push(this.pinchos2);
     this.createCorazon();
 
     this.add(this.posicionOrientacionObjeto(this.puerta1, 0 * (Math.PI / 180), 0.25));
@@ -58,7 +59,7 @@ class Juego extends THREE.Object3D {
     this.add(this.ovni1);
     this.add(this.circuito);
 
-    //this.animacionOvni();
+    this.animacionOvni();
     //this.animacionCorazon();
     this.animacionPuertas();
 
@@ -448,17 +449,18 @@ class Juego extends THREE.Object3D {
     ov.scale.set(0.3, 0.3, 0.3);
     ov.add(this.lanzarProyectil());
 
-    ov.position.set(-2, 13, 0);
+    //ov.position.set(-2, 13, -5);
     return ov;
   }
 
   lanzarProyectil() {
     this.proyectil = new THREE.Mesh(new THREE.SphereGeometry(1, 8, 8), new THREE.MeshBasicMaterial({ color: 0xff0000 }));
+    this.objetos.push(this.proyectil);
 
     // Definir la trayectoria del proyectil
     var puntosTrayectoria = [];
     puntosTrayectoria.push(new THREE.Vector3(0, 0, 0)); // Punto inicial
-    puntosTrayectoria.push(new THREE.Vector3(0, -20, 0)); // Punto final
+    puntosTrayectoria.push(new THREE.Vector3(0, 20, 0)); // Punto final
 
     var trayectoria = new THREE.CatmullRomCurve3(puntosTrayectoria);
 
@@ -485,11 +487,9 @@ class Juego extends THREE.Object3D {
     return this.proyectil;
   }
 
-
-
   animacionOvni() {
     // Punto 7
-    var punto = new THREE.Vector3(-2, 10, 0);
+    var punto = new THREE.Vector3(-15, 10, 6);
 
     // Radio del anillo
     var radioAnillo = 4;
@@ -752,10 +752,10 @@ class Juego extends THREE.Object3D {
       this.rayo.set(origenRayo, direccionMirada);
 
       if (this.posCoche.children[i] != this.cameraThirdPerson) {
-        var rayoVisual = new THREE.ArrowHelper(this.rayo.ray.direction, this.rayo.ray.origin, 0.5, 0xff0000);
+        /* var rayoVisual = new THREE.ArrowHelper(this.rayo.ray.direction, this.rayo.ray.origin, 0.5, 0xff0000);
         // // Agregar el objeto visual a la escena
-        this.add(rayoVisual);
-        var impactos = this.rayo.intersectObjects([this.puerta1, this.moneda1, this.escudo1, this.pinchos1, this.proyectil], true);
+        this.add(rayoVisual); */
+        var impactos = this.rayo.intersectObjects(this.objetos, true);
 
         if (impactos.length > 0) {
           console.log("Colisión detectada" + impactos[0].object);
