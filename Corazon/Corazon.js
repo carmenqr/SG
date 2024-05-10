@@ -1,6 +1,7 @@
 import * as THREE from 'three'
 import { MTLLoader } from '../libs/MTLLoader.js'
 import { OBJLoader } from '../libs/OBJLoader.js'
+import * as TWEEN from '../libs/tween.esm.js'
 
 class Corazon extends THREE.Object3D {
   constructor(gui,titleGui) {
@@ -10,66 +11,85 @@ class Corazon extends THREE.Object3D {
     // Se crea primero porque otros métodos usan las variables que se definen para la interfaz
     this.createGUI(gui, titleGui);
 
+    this.corazon = this.createCorazon();
+
+    return this.corazon;
+
+  }
+
+  createCorazon() {
     // Corazon
     var materialLoader = new MTLLoader();
     var objectLoader = new OBJLoader();
 
     var that = this;
 
-    materialLoader.load('../models/corazon/12190_Heart_v1_L3.mtl' ,
+    materialLoader.load('../models/corazon/12190_Heart_v1_L3.mtl',
       (materials) => {
         objectLoader.setMaterials(materials);
-        objectLoader.load ('../models/corazon/12190_Heart_v1_L3.obj',
-        (object) => {
-          that.add(object);
-        },null,null);
-    } ) ;
+        objectLoader.load('../models/corazon/12190_Heart_v1_L3.obj',
+          (object) => {
+            object.scale.set(0.025, 0.025, 0.025);
+            object.rotateX(-90 * (Math.PI / 180));
+            this.corazon = object;
+            that.add(object);
+            // Llamar a animacionCorazon() después de cargar el modelo
+            this.animacionCorazon();
+          }, null, null);
+      });
+  }
 
-    that.rotateX(-90*(Math.PI/180));
-    that.scale.set(0.15, 0.15, 0.15);
+  animacionCorazon() {
+    var pts = [
+      new THREE.Vector3(-6, 4, 20),
+      new THREE.Vector3(-7, 4, 19),
+      new THREE.Vector3(-8, 4, 20),
+      new THREE.Vector3(-7, 4, 21),
+      new THREE.Vector3(-5, 4, 19),
+      new THREE.Vector3(-4, 4, 20),
+      new THREE.Vector3(-5, 4, 21)
+    ];
 
+    var splineen8 = new THREE.CatmullRomCurve3(pts, true);
+
+    // Se dibuja con esto
+    // var resolutionAnillo = 100;
+    // var geometryAnillo = new THREE.BufferGeometry().setFromPoints(splineAnillo.getPoints(resolutionAnillo));
+    // var materialAnillo = new THREE.LineBasicMaterial({ color: 0xff0000 });
+    // var splineMeshAnillo = new THREE.Line(geometryAnillo, materialAnillo);
+    // this.add(splineMeshAnillo);
+
+    var segmentos = 100;
+    var binormales = splineen8.computeFrenetFrames(segmentos, true).binormals;
+
+    // Parámetros para la animación
+    var origen = { t: 0 };
+    var destino = { t: 1 };
+    var tiempo = 10000;
+
+
+    // Crear animación con Tween
+    var animacion = new TWEEN.Tween(origen).to(destino, tiempo).repeat(Infinity).onUpdate(() => {
+      var posicion = splineen8.getPointAt(origen.t);
+      this.corazon.position.copy(posicion);
+      var tangente = splineen8.getTangentAt(origen.t);
+      posicion.add(tangente);
+      this.corazon.up = binormales[Math.floor(origen.t * segmentos)];
+      // this.ovni.lookAt(posicion);
+
+    });
+
+    // Comenzar la animación
+    animacion.start();
   }
   
   createGUI (gui,titleGui) {
-    // Controles para el tamaño, la orientacion y la posicion de la caja
-    this.guiControls = new function() {
-      this.numRev = 3;
-
-      this.posX = 0.0;
-      this.posY = 0.0;
-      this.posZ = 0.0;
-
-      //Un boton para dejarlo todo en su posicion inicial 
-      //Cuando se pulse se ejecutara esta funcion
-      this.reset = function(){
-        this.numRev = 3;
-      }
-    } 
-    
-    var that = this;
-    // Se crea una sección para los controles de la caja
-    var folder = gui.addFolder (titleGui);
-    // Estas lineas son las que añaden los componentes de la interfaz
-    // Las tres cifras indican un valor mínimo, un máximo y el incremento
-    // El metodo listen() permite que si se cambia el valor de la variable en el codigo,
-    // el deslizador de la interfaz se actualice
-    folder.add (this.guiControls, 'numRev', 3, 30, 1)
-    .name('Numero de Corazones: ')
-    .onChange(function(){
-      that.box.geometry = new THREE.LatheGeometry(that.puntos,
-        that.guiControls.numRev,
-        0,
-        Math.PI *2,);
-    });
-
-    folder.add(this.guiControls, 'reset')
-    .name('[Reset]');
 
   }
   
   update () {
 
-    // this.rotateZ(0.05);
+    //this.rotateZ(0.05);
     // No hay nada que actualizar ya que la apertura de la grapadora se ha actualizado desde la interfaz
   }
 }

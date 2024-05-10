@@ -16,13 +16,12 @@ class Pinchos extends THREE.Object3D {
     this.material.needsUpdate = true;
 
 
-    this.pinchos = this.createForma();
+    this.pinchos = this.createPinchos();
 
     this.add(this.pinchos);
   }
 
-  createForma() {
-
+  createPinchos() {
     var shape = new THREE.Shape();
     shape.moveTo(-1, 0);
     shape.quadraticCurveTo(0, 1.5, 1, 0);
@@ -50,9 +49,7 @@ class Pinchos extends THREE.Object3D {
     forma.position.y = -0.8;
     //forma.scale();
     return forma;
-
   }
-
 
   createGUI(gui, titleGui) {
 

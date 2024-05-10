@@ -14,15 +14,15 @@ class Circuito extends THREE.Object3D {
     this.material.flatShading = true;
     this.material.needsUpdate = true;
 
-    this.circuito = this.createForma();
+    this.circuito = this.createCircuito();
     
     this.add(this.circuito);
   }
 
-  createForma(){
+  createCircuito() {
 
     var pts = [
-      new THREE.Vector3(-5, -2, 15), 
+      new THREE.Vector3(-5, -2, 15),
       new THREE.Vector3(1, -2, 10), //1
       new THREE.Vector3(-2, 10, -5), //2
       new THREE.Vector3(3, -1, -7),
@@ -36,25 +36,30 @@ class Circuito extends THREE.Object3D {
     ];
 
     // Crear la curva de Catmull-Rom cerrada
-    var path = new THREE.CatmullRomCurve3(pts, true);
+    this.path = new THREE.CatmullRomCurve3(pts, true);
 
     // Resolución del tubo
-    var resolution = 200;
+    var resolution = 100;
 
     // Radio del tubo
-    var tubeRadius = 0.5;
+    this.tubeRadius = 1;
 
     // Segmentos que forman el círculo alrededor de la curva
-    var segments = 20;
+    this.segments = 20;
 
     // Crear la geometría del tubo cerrado
-    var tubeGeometry = new THREE.TubeGeometry(path, resolution, tubeRadius, segments, true);
+    this.tubeGeometry = new THREE.TubeGeometry(this.path, resolution, this.tubeRadius, this.segments, true);
 
 
     // Crear una malla utilizando la geometría y el material
-    var forma = new THREE.Mesh(tubeGeometry, this.material);
+    var forma = new THREE.Mesh(this.tubeGeometry, this.material);
     return forma;
 
+  }
+
+  getVariablesTubo(){
+    var variables = [this.path,this.tubeRadius,this.segments,this.tubeGeometry];
+    return variables;
   }
   
 

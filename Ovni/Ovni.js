@@ -35,6 +35,7 @@ class Ovni extends THREE.Object3D {
     points.push(new THREE.Vector2(0.8, 0.4)); // Punto en el eje X
     points.push(new THREE.Vector2(0.001, 0.5)); // Punto base
 
+
     this.shape = new THREE.Shape(points);
     this.phiLength = 0;
 
@@ -48,15 +49,19 @@ class Ovni extends THREE.Object3D {
     forma.union([platillo, esfera]);
     var ov = forma.toMesh();
     ov.scale.set(0.3, 0.3, 0.3);
+    // ov.add(this.lanzarProyectil());
 
-    // Crear proyectil
-    this.proyectil = new THREE.Mesh(new THREE.SphereGeometry(0.1, 8, 8), new THREE.MeshBasicMaterial({ color: 0xff0000 }));
-    ov.add(this.proyectil);
+    //ov.position.set(-2, 13, -5);
+    return ov;
+  }
+
+  lanzarProyectil1() {
+    this.proyectil = new THREE.Mesh(new THREE.SphereGeometry(1, 8, 8), new THREE.MeshBasicMaterial({ color: 0xff0000 }));
 
     // Definir la trayectoria del proyectil
     var puntosTrayectoria = [];
     puntosTrayectoria.push(new THREE.Vector3(0, 0, 0)); // Punto inicial
-    puntosTrayectoria.push(new THREE.Vector3(0, 4, 0)); // Punto final
+    puntosTrayectoria.push(new THREE.Vector3(0, 14, 0)); // Punto final
 
     var trayectoria = new THREE.CatmullRomCurve3(puntosTrayectoria);
 
@@ -66,7 +71,7 @@ class Ovni extends THREE.Object3D {
     // Crear animación con Tween para mover el proyectil
     var origen = { t: 0 };
     var destino = { t: 1 };
-    var tiempo = 1000; // Duración de la animación en milisegundos
+    var tiempo = 1500; // Duración de la animación en milisegundos
 
     var animacion = new TWEEN.Tween(origen).to(destino, tiempo).repeat(Infinity).onUpdate(() => {
       var posicion = trayectoria.getPointAt(origen.t);
@@ -80,34 +85,147 @@ class Ovni extends THREE.Object3D {
 
     animacion.start();
 
-    return ov;
-}
+    return this.proyectil;
+  }
 
+  lanzarProyectil2() {
+    this.proyectil2 = new THREE.Mesh(new THREE.SphereGeometry(1, 8, 8), new THREE.MeshBasicMaterial({ color: 0xff0000 }));
 
+    // Definir la trayectoria del proyectil
+    var puntosTrayectoria = [];
+    puntosTrayectoria.push(new THREE.Vector3(0, 0, 0)); // Punto inicial
+    puntosTrayectoria.push(new THREE.Vector3(0, 14, 0)); // Punto final
+
+    var trayectoria = new THREE.CatmullRomCurve3(puntosTrayectoria);
+
+    var segmentos = 100;
+    var binormales = trayectoria.computeFrenetFrames(segmentos, true).binormals;
+
+    // Crear animación con Tween para mover el proyectil
+    var origen = { t: 0 };
+    var destino = { t: 1 };
+    var tiempo = 1500; // Duración de la animación en milisegundos
+
+    var animacion = new TWEEN.Tween(origen).to(destino, tiempo).repeat(Infinity).onUpdate(() => {
+      var posicion = trayectoria.getPointAt(origen.t);
+      this.proyectil2.position.copy(posicion);
+      var tangente = trayectoria.getTangentAt(origen.t);
+      posicion.add(tangente);
+      this.proyectil2.up = binormales[Math.floor(origen.t * segmentos)];
+      this.proyectil2.lookAt(posicion);
+
+    });
+
+    animacion.start();
+
+    return this.proyectil2;
+  }
+
+  animar1() {
+    // Punto 7
+    var punto = new THREE.Vector3(1, -2, 10);
+
+    this.ovni.add(this.lanzarProyectil1());
+
+    // Radio del anillo
+    var radioAnillo = 4;
+
+    // Crear puntos para el spline del anillo
+    var puntosAnillo = [];
+    for (var i = 0; i < Math.PI * 2; i += 0.1) {
+      var x = punto.x + Math.cos(i) * radioAnillo;
+      var y = punto.y + Math.sin(i) * radioAnillo;
+      var z = punto.z;
+      puntosAnillo.push(new THREE.Vector3(x, y, z));
+    }
+
+    // Crear el spline cerrado del anillo
+    var splineAnillo = new THREE.CatmullRomCurve3(puntosAnillo, true);
+
+    // Se dibuja con esto
+    // var resolutionAnillo = 100;
+    // var geometryAnillo = new THREE.BufferGeometry().setFromPoints(splineAnillo.getPoints(resolutionAnillo));
+    // var materialAnillo = new THREE.LineBasicMaterial({ color: 0xff0000 });
+    // var splineMeshAnillo = new THREE.Line(geometryAnillo, materialAnillo);
+    // this.add(splineMeshAnillo);
+
+    // Se necesitan los binormales del spline
+    var segmentos = 100;
+    var binormales = splineAnillo.computeFrenetFrames(segmentos, true).binormals;
+
+    // Parámetros para la animación
+    var origen = { t: 0 };
+    var destino = { t: 1 };
+    var tiempo = 10000;
+
+    // Crear animación con Tween
+    var animacion = new TWEEN.Tween(origen).to(destino, tiempo).repeat(Infinity).onUpdate(() => {
+      var posicion = splineAnillo.getPointAt(origen.t);
+      this.ovni.position.copy(posicion);
+      var tangente = splineAnillo.getTangentAt(origen.t);
+      posicion.add(tangente);
+      this.ovni.up = binormales[Math.floor(origen.t * segmentos)];
+      this.ovni.lookAt(posicion);
+
+    });
+
+    // Comenzar la animación
+    animacion.start();
+  }
+
+  animar2() {
+    // Punto 7
+    var punto = new THREE.Vector3(1, -2, 10);
+
+    this.ovni.add(this.lanzarProyectil2());
+
+    var puntos = [
+      new THREE.Vector3(4, -2, 0),
+      // new THREE.Vector3(-7, 4, 19),
+      // new THREE.Vector3(-8, 4, 20),
+      // new THREE.Vector3(-7, 4, 21),
+      // new THREE.Vector3(-5, 4, 19),
+      // new THREE.Vector3(-4, 4, 20),
+      // new THREE.Vector3(-5, 4, 21)
+    ];
+
+    // Crear el spline cerrado del anillo
+    var splineAnillo = new THREE.CatmullRomCurve3(puntos, true);
+
+    // Se dibuja con esto
+    // var resolutionAnillo = 100;
+    // var geometryAnillo = new THREE.BufferGeometry().setFromPoints(splineAnillo.getPoints(resolutionAnillo));
+    // var materialAnillo = new THREE.LineBasicMaterial({ color: 0xff0000 });
+    // var splineMeshAnillo = new THREE.Line(geometryAnillo, materialAnillo);
+    // this.add(splineMeshAnillo);
+
+    // Se necesitan los binormales del spline
+    var segmentos = 100;
+    var binormales = splineAnillo.computeFrenetFrames(segmentos, true).binormals;
+
+    // Parámetros para la animación
+    var origen = { t: 0 };
+    var destino = { t: 1 };
+    var tiempo = 10000;
+
+    // Crear animación con Tween
+    var animacion = new TWEEN.Tween(origen).to(destino, tiempo).repeat(Infinity).onUpdate(() => {
+      var posicion = splineAnillo.getPointAt(origen.t);
+      this.ovni.position.copy(posicion);
+      var tangente = splineAnillo.getTangentAt(origen.t);
+      posicion.add(tangente);
+      this.ovni.up = binormales[Math.floor(origen.t * segmentos)];
+      this.ovni.lookAt(posicion);
+
+    });
+
+    // Comenzar la animación
+    animacion.start();
+  }
   
 
   createGUI(gui, titleGui) {
-    // Controles para el movimiento de la parte móvil
-    this.guiControls = {
-      segmentos : 3,
-      angulo : 10,
-    };
-
-    // Se crea una sección para los controles de la ovni
-    var folder = gui.addFolder(titleGui);
-
-    //Para que los valores se actualicen
-    var that = this;
-
-    // Estas líneas son las que añaden los componentes de la interfaz
-    // Las tres cifras indican un valor mínimo, un máximo y el incremento
-    folder.add(this.guiControls, 'segmentos', 3, 64, 1)
-        .name('Segmentos: ')
-        .onChange(function(){that.ovni.geometry = new THREE.LatheGeometry(that.shape.getPoints(), that.guiControls.segmentos, that.phiLength, that.guiControls.angulo)});
-
-    folder.add(this.guiControls, 'angulo', 0, 2 * Math.PI +0.1, 0.01)
-        .name('Ángulo: ')
-        .onChange(function(){that.ovni.geometry = new THREE.LatheGeometry(that.shape.getPoints(), that.guiControls.segmentos, that.phiLength, that.guiControls.angulo)});
+  
   }
   
 

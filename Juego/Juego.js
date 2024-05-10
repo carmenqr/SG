@@ -3,6 +3,13 @@ import { MTLLoader } from '../libs/MTLLoader.js'
 import { OBJLoader } from '../libs/OBJLoader.js'
 import { CSG } from '../libs/CSG-v2.js'
 import * as TWEEN from '../libs/tween.esm.js'
+import { Escudo } from '../Escudo/Escudo.js'
+import { Ovni } from '../Ovni/Ovni.js'
+import { Pinchos } from '../Pinchos/Pinchos.js'
+import { Moneda } from '../Moneda/Moneda.js'
+import { Circuito } from '../Circuito/Circuito.js'
+import { Puertas } from '../Puertas/Puertas.js'
+import { Corazon } from '../Corazon/Corazon.js'
 
 
 class Juego extends THREE.Object3D {
@@ -26,22 +33,27 @@ class Juego extends THREE.Object3D {
     this.material.flatShading = true;
     this.material.needsUpdate = true;
 
-    this.circuito = this.createCircuito();
+    this.circuito = new Circuito();
+    var variablesTubo = this.circuito.getVariablesTubo();
+    //Variables del tubo
+    this.path = variablesTubo[0];
+    this.tubeRadius = variablesTubo[1];
+    this.segments = variablesTubo[2];
+    this.tubeGeometry = variablesTubo[3];
 
-    this.cubo = this.createCubo(); 
-    this.puerta1 = this.createPuerta(); this.objetos.push(this.puerta1);
-    this.moneda1 = this.createMoneda(); this.objetos.push(this.moneda1);
-    this.moneda2 = this.createMoneda(); this.objetos.push(this.moneda2);
-    this.moneda3 = this.createMoneda(); this.objetos.push(this.moneda3);
-    this.moneda4 = this.createMoneda(); this.objetos.push(this.moneda4);
-    this.ovni1 = this.createOvni();
-    this.ovni2 = this.createOvni();
-    this.escudo1 = this.createEscudo(); this.objetos.push(this.escudo1);
-    this.escudo2 = this.createEscudo(); this.objetos.push(this.escudo2);
-    this.escudo3 = this.createEscudo(); this.objetos.push(this.escudo3);
-    this.pinchos1 = this.createPinchos(); this.objetos.push(this.pinchos1);
-    this.pinchos2 = this.createPinchos(); this.objetos.push(this.pinchos2);
-    this.createCorazon();
+    this.puerta1 = new Puertas(); this.objetos.push(this.puerta1);
+    this.moneda1 = new Moneda(); this.objetos.push(this.moneda1);
+    this.moneda2 = new Moneda(); this.objetos.push(this.moneda2);
+    this.moneda3 = new Moneda(); this.objetos.push(this.moneda3);
+    this.moneda4 = new Moneda(); this.objetos.push(this.moneda4);
+    this.ovni1 = new Ovni();
+    this.ovni2 = new Ovni();
+    this.escudo1 = new Escudo(); this.objetos.push(this.escudo1);
+    this.escudo2 = new Escudo(); this.objetos.push(this.escudo2);
+    this.escudo3 = new Escudo(); this.objetos.push(this.escudo3);
+    this.pinchos1 = new Pinchos(); this.objetos.push(this.pinchos1);
+    this.pinchos2 = new Pinchos(); this.objetos.push(this.pinchos2);
+    this.corazon1 = new Corazon();
     this.createCorazon1();
 
     this.add(this.posicionOrientacionObjeto(this.puerta1, 0 * (Math.PI / 180), 0.25));
@@ -54,23 +66,18 @@ class Juego extends THREE.Object3D {
     this.add(this.posicionOrientacionObjeto(this.escudo3, 0 * (Math.PI / 180), 0.92));
     this.add(this.posicionOrientacionObjeto(this.pinchos1, 180 * (Math.PI / 180), 0.4));
     this.add(this.posicionOrientacionObjeto(this.pinchos2, 250 * (Math.PI / 180), 0.88));
-    // this.add(this.posicionOrientacionObjeto(this.cubo, 90*(Math.PI/180), 0.2));
     this.add(this.posicionOrientacionCoche());
 
 
     this.add(this.ovni1);
-    this.ovni1.add(this.lanzarProyectil());
     this.add(this.ovni2);
-    this.ovni2.add(this.lanzarProyectil1());
+    this.add(this.corazon1);
 
     this.add(this.circuito);
 
-    this.animacionOvni1();
-    this.animacionOvni2();
-
-    
-    //this.animacionCorazon();
-    this.animacionPuertas();
+    this.ovni1.animar1();
+    this.ovni2.animar2();
+    this.puerta1.animar();
 
     this.onKeyDown = this.onKeyDown.bind(this);
     addEventListener('keydown', this.onKeyDown, false);
@@ -120,7 +127,7 @@ class Juego extends THREE.Object3D {
 
     raycaster.setFromCamera(mouse, this.camera); // Raycaster
 
-    var pickedObjects = raycaster.intersectObjects([this.ovni1, this.corazon], true);
+    var pickedObjects = raycaster.intersectObjects([this.ovni1, this.corazon1], true);
 
     if (pickedObjects.length > 0) {
       var selectedObject = pickedObjects[0].object;
@@ -161,68 +168,6 @@ class Juego extends THREE.Object3D {
       .start();
   }
 
-
-  createCubo() {
-    this.cuboGeometry = new THREE.BoxGeometry(0.5, 0.5, 0.5);
-    var material = new THREE.MeshStandardMaterial({ color: 0xffff00, emissive: 0xffff00, emissiveIntensity: 0.2 }); // Amarillo
-    var cubo = new THREE.Mesh(this.cuboGeometry, material);
-    cubo.position.y = 0.25;
-
-    /* var posIni = this.path.getPointAt(0.2);
-    
-    var tangente = this.path.getTangentAt(0.2);
-    var normal = new THREE.Vector3();
-    normal.crossVectors(tangente, this.path.getTangentAt(0.2 + 0.01)).normalize();
-    var offset = normal.clone().multiplyScalar(this.tubeRadius + 0.25);
-    posIni.add(offset);
-
-    cubo.position.copy(posIni);
-
-    cubo.up = normal;
-    cubo.lookAt(posIni.clone().add(tangente)); */
-
-    return cubo;
-
-  }
-
-  createCircuito() {
-
-    var pts = [
-      new THREE.Vector3(-5, -2, 15),
-      new THREE.Vector3(1, -2, 10), //1
-      new THREE.Vector3(-2, 10, -5), //2
-      new THREE.Vector3(3, -1, -7),
-      new THREE.Vector3(3, -5, 0), //3
-      new THREE.Vector3(-3, 3, 6), //4
-      new THREE.Vector3(-6, 2, 20), //5
-      new THREE.Vector3(3, -3, 15), //8
-      new THREE.Vector3(7, 3, 10), //6
-      new THREE.Vector3(-15, 10, 8), //7
-      new THREE.Vector3(-10, 3, 2) //9
-    ];
-
-    // Crear la curva de Catmull-Rom cerrada
-    this.path = new THREE.CatmullRomCurve3(pts, true);
-
-    // Resolución del tubo
-    var resolution = 100;
-
-    // Radio del tubo
-    this.tubeRadius = 1;
-
-    // Segmentos que forman el círculo alrededor de la curva
-    this.segments = 20;
-
-    // Crear la geometría del tubo cerrado
-    this.tubeGeometry = new THREE.TubeGeometry(this.path, resolution, this.tubeRadius, this.segments, true);
-
-
-    // Crear una malla utilizando la geometría y el material
-    var forma = new THREE.Mesh(this.tubeGeometry, this.material);
-    return forma;
-
-  }
-
   createCoche() {
     var materialLoader = new MTLLoader();
     var objectLoader = new OBJLoader();
@@ -238,461 +183,6 @@ class Juego extends THREE.Object3D {
 
           }, null, null);
       });
-  }
-
-  createEscudo() {
-    var shape = new THREE.Shape();
-    shape.moveTo(0, 0);
-    shape.quadraticCurveTo(0.8, 0.3, 0.5, 1.2);
-    shape.quadraticCurveTo(0.2, 1, 0, 1.4);
-    shape.quadraticCurveTo(-0.2, 1, -0.5, 1.2);
-    shape.quadraticCurveTo(-0.8, 0.3, 0, 0);
-
-    var options = { depth: 0.5, steps: 2, curveSegments: 10, bevelEnabled: false }; //etc
-    var geometry1 = new THREE.ExtrudeGeometry(shape, options);
-
-    var forma = new THREE.Mesh(geometry1, this.material);
-    forma.scale.set(0.5, 0.5, 0.5);
-    forma.position.y = -0.01;
-    return forma;
-  }
-
-  createPinchos() {
-    var shape = new THREE.Shape();
-    shape.moveTo(-1, 0);
-    shape.quadraticCurveTo(0, 1.5, 1, 0);
-    shape.lineTo(1, 1.1);
-    shape.lineTo(0.85, 0.8);
-    shape.lineTo(0.7, 1.1);
-    shape.lineTo(0.55, 0.8);
-    shape.lineTo(0.4, 1.1);
-    shape.lineTo(0.25, 0.8);
-    shape.lineTo(0.15, 1.1);
-    shape.lineTo(0, 0.8);
-    shape.lineTo(-0.15, 1.1);
-    shape.lineTo(-0.25, 0.8);
-    shape.lineTo(-0.4, 1.1);
-    shape.lineTo(-0.55, 0.8);
-    shape.lineTo(-0.7, 1.1);
-    shape.lineTo(-0.85, 0.8);
-    shape.lineTo(-1, 1.1);
-
-
-    var options = { depth: 0.5, steps: 2, curveSegments: 10, bevelEnabled: false }; //etc
-    var geometry1 = new THREE.ExtrudeGeometry(shape, options);
-
-    var forma = new THREE.Mesh(geometry1, this.material);
-    forma.position.y = -0.8;
-    //forma.scale();
-    return forma;
-  }
-
-  createMoneda() {
-    var coin = new THREE.Object3D();
-
-    var cilin_ext = new THREE.CylinderGeometry(2, 2, 0.45, 10);
-    var cilin_cent1 = new THREE.CylinderGeometry(1.75, 1.75, 0.45, 10);
-    var cilin_cent2 = new THREE.CylinderGeometry(1.75, 1.75, 0.45, 10);
-    var ranura1 = new THREE.BoxGeometry(0.5, 1.5, 0.25);
-    var ranura2 = new THREE.BoxGeometry(0.5, 1.5, 0.25);
-
-    // var material = new THREE.MeshNormalMaterial();
-    // material.flatShading = true;
-    // material.needsUpdate = true;
-    var material = new THREE.MeshStandardMaterial({ color: 0xffff00, emissive: 0xffff00, emissiveIntensity: 0.2 }); // Amarillo
-
-    cilin_ext.rotateX(90 * (Math.PI / 180));
-    cilin_ext.translate(0, 2, 0);
-    cilin_cent1.rotateX(90 * (Math.PI / 180));
-    cilin_cent2.rotateX(90 * (Math.PI / 180));
-    cilin_cent1.translate(0, 2, 0.35);
-    cilin_cent2.translate(0, 2, -0.35);
-
-    ranura1.translate(0, 2, 0.15);
-    ranura2.translate(0, 2, -0.15);
-
-
-    var cilin_extMesh = new THREE.Mesh(cilin_ext, material);
-    var cilin_cent1Mesh = new THREE.Mesh(cilin_cent1, material);
-    var cilin_cent2Mesh = new THREE.Mesh(cilin_cent2, material);
-    var ranura1Mesh = new THREE.Mesh(ranura1, material);
-    var ranura2Mesh = new THREE.Mesh(ranura2, material);
-
-    var csg = new CSG();
-    csg.union([cilin_extMesh]);
-    csg.subtract([cilin_cent1Mesh, cilin_cent2Mesh]);
-    csg.subtract([ranura1Mesh, ranura2Mesh]);
-
-
-    this.moneda = csg.toMesh();
-
-
-    this.moneda.scale.set(0.1, 0.1, 0.1);
-
-    coin.add(this.moneda);
-
-    return coin;
-  }
-
-  createMarcos() {
-
-    var marcos = new THREE.Object3D();
-
-    var marco_lat = new THREE.BoxGeometry(0.05, 1, 0.05);
-    var marco_sup = new THREE.BoxGeometry(0.05, 0.5, 0.05);
-
-    this.material = new THREE.MeshNormalMaterial();
-    this.material.flatShading = true;
-    this.material.needsUpdate = true;
-    // var material = new THREE.MeshStandardMaterial({ color: 0xffff00, emissive: 0xffff00, emissiveIntensity: 0.2 }); // Amarillo
-
-    var marco_latdMesh = new THREE.Mesh(marco_lat, this.material);
-    var marco_latiMesh = new THREE.Mesh(marco_lat, this.material);
-    var marco_supMesh = new THREE.Mesh(marco_sup, this.material);
-
-    marco_latdMesh.position.set(0.225, 0.5, 0);
-    marco_latiMesh.position.set(-0.225, 0.5, 0);
-
-    marco_supMesh.rotation.set(0, 0, 90 * (Math.PI / 180));
-    marco_supMesh.position.set(0, 1, 0);
-
-    var csg = new CSG();
-    csg.union([marco_latdMesh, marco_latiMesh, marco_supMesh])
-
-    this.Puertas = csg.toMesh();
-
-    marcos.add(this.Puertas);
-
-    return marcos;
-  }
-
-  createPuertaIzq() {
-
-    var PuertaIzq = new THREE.Object3D();
-
-    var forma = new THREE.BoxGeometry(0.2, 1, 0.05);
-
-    var formaMesh = new THREE.Mesh(forma, this.material);
-
-    formaMesh.position.set(0.1, 0.5, 0);
-
-    PuertaIzq.position.x = -0.2;
-    PuertaIzq.add(formaMesh);
-
-    return PuertaIzq;
-
-  }
-
-  createPuertaDcha() {
-
-    var PuertaDcha = new THREE.Object3D();
-
-    var forma = new THREE.BoxGeometry(0.2, 1, 0.05);
-
-    var formaMesh = new THREE.Mesh(forma, this.material);
-
-    formaMesh.position.set(-0.1, 0.5, 0);
-
-    PuertaDcha.position.x = 0.2;
-    PuertaDcha.add(formaMesh);
-
-    return PuertaDcha;
-
-  }
-
-  createPuerta() {
-    var puertas = new THREE.Object3D();
-
-    var marc = this.createMarcos();
-    this.pIzq = this.createPuertaIzq();
-    this.pDcha = this.createPuertaDcha();
-
-    puertas.add(marc);
-    puertas.add(this.pIzq);
-    puertas.add(this.pDcha);
-
-    puertas.scale.set(2, 2, 2);
-    return puertas;
-  }
-
-  animacionPuertas() {
-    const duracion = 2500;
-
-    var origen = { rotacion: 0 };
-    var destino = { rotacion: -Math.PI / 2 };
-
-    var movimiento = new TWEEN.Tween(origen).to(destino, duracion).yoyo(true).repeat(Infinity);
-
-    movimiento.onUpdate(() => {
-      this.setAngulo(origen.rotacion);
-    });
-
-    movimiento.start();
-
-  }
-
-  createOvni() {
-    var points = [];
-    points.push(new THREE.Vector2(0.001, -0.5)); // Punto en el plano XY con curvatura
-    points.push(new THREE.Vector2(0.8, -0.4)); // Punto en el eje X
-    points.push(new THREE.Vector2(1.0, -0.2)); // Punto en el eje X
-    points.push(new THREE.Vector2(1.5, -0.1)); // Punto en el plano XY
-    points.push(new THREE.Vector2(1.5, 0.1)); // Punto en el plano XY
-    points.push(new THREE.Vector2(1.0, 0.2)); // Punto en el eje X
-    points.push(new THREE.Vector2(0.8, 0.4)); // Punto en el eje X
-    points.push(new THREE.Vector2(0.001, 0.5)); // Punto base
-
-
-    this.shape = new THREE.Shape(points);
-    this.phiLength = 0;
-
-    var platillo = new THREE.Mesh(new THREE.LatheGeometry(this.shape.getPoints(), 15, this.phiLength, 2 * Math.PI + 0.1), this.material);
-
-    var formaEsfera = new THREE.SphereGeometry(0.5, 5, 5);
-    formaEsfera.translate(0, -0.4, 0);
-    var esfera = new THREE.Mesh(formaEsfera, this.material);
-
-    var forma = new CSG();
-    forma.union([platillo, esfera]);
-    var ov = forma.toMesh();
-    ov.scale.set(0.3, 0.3, 0.3);
-    // ov.add(this.lanzarProyectil());
-
-    //ov.position.set(-2, 13, -5);
-    return ov;
-  }
-
-  lanzarProyectil() {
-    this.proyectil = new THREE.Mesh(new THREE.SphereGeometry(1, 8, 8), new THREE.MeshBasicMaterial({ color: 0xff0000 }));
-    this.objetos.push(this.proyectil);
-
-    // Definir la trayectoria del proyectil
-    var puntosTrayectoria = [];
-    puntosTrayectoria.push(new THREE.Vector3(0, 0, 0)); // Punto inicial
-    puntosTrayectoria.push(new THREE.Vector3(0, 14, 0)); // Punto final
-
-    var trayectoria = new THREE.CatmullRomCurve3(puntosTrayectoria);
-
-    var segmentos = 100;
-    var binormales = trayectoria.computeFrenetFrames(segmentos, true).binormals;
-
-    // Crear animación con Tween para mover el proyectil
-    var origen = { t: 0 };
-    var destino = { t: 1 };
-    var tiempo = 1500; // Duración de la animación en milisegundos
-
-    var animacion = new TWEEN.Tween(origen).to(destino, tiempo).repeat(Infinity).onUpdate(() => {
-      var posicion = trayectoria.getPointAt(origen.t);
-      this.proyectil.position.copy(posicion);
-      var tangente = trayectoria.getTangentAt(origen.t);
-      posicion.add(tangente);
-      this.proyectil.up = binormales[Math.floor(origen.t * segmentos)];
-      this.proyectil.lookAt(posicion);
-
-    });
-
-    animacion.start();
-
-    return this.proyectil;
-  }
-
-  animacionOvni1() {
-    // Punto 7
-    var punto = new THREE.Vector3(1, -2, 10);
-
-    // Radio del anillo
-    var radioAnillo = 4;
-
-    // Crear puntos para el spline del anillo
-    var puntosAnillo = [];
-    for (var i = 0; i < Math.PI * 2; i += 0.1) {
-      var x = punto.x + Math.cos(i) * radioAnillo;
-      var y = punto.y + Math.sin(i) * radioAnillo;
-      var z = punto.z;
-      puntosAnillo.push(new THREE.Vector3(x, y, z));
-    }
-
-    // Crear el spline cerrado del anillo
-    var splineAnillo = new THREE.CatmullRomCurve3(puntosAnillo, true);
-
-    // Se dibuja con esto
-    // var resolutionAnillo = 100;
-    // var geometryAnillo = new THREE.BufferGeometry().setFromPoints(splineAnillo.getPoints(resolutionAnillo));
-    // var materialAnillo = new THREE.LineBasicMaterial({ color: 0xff0000 });
-    // var splineMeshAnillo = new THREE.Line(geometryAnillo, materialAnillo);
-    // this.add(splineMeshAnillo);
-
-    // Se necesitan los binormales del spline
-    var segmentos = 100;
-    var binormales = splineAnillo.computeFrenetFrames(segmentos, true).binormals;
-
-    // Parámetros para la animación
-    var origen = { t: 0 };
-    var destino = { t: 1 };
-    var tiempo = 10000;
-
-    // Crear animación con Tween
-    var animacion = new TWEEN.Tween(origen).to(destino, tiempo).repeat(Infinity).onUpdate(() => {
-      var posicion = splineAnillo.getPointAt(origen.t);
-      this.ovni1.position.copy(posicion);
-      var tangente = splineAnillo.getTangentAt(origen.t);
-      posicion.add(tangente);
-      this.ovni1.up = binormales[Math.floor(origen.t * segmentos)];
-      this.ovni1.lookAt(posicion);
-
-    });
-
-    // Comenzar la animación
-    animacion.start();
-  }
-
-
-  lanzarProyectil1() {
-    this.proyectil1 = new THREE.Mesh(new THREE.SphereGeometry(1, 8, 8), new THREE.MeshBasicMaterial({ color: 0xff0000 }));
-    this.objetos.push(this.proyectil1);
-
-    // Definir la trayectoria del proyectil
-    var puntosTrayectoria = [];
-    puntosTrayectoria.push(new THREE.Vector3(0, 0, 0)); // Punto inicial
-    puntosTrayectoria.push(new THREE.Vector3(0, 14, 0)); // Punto final
-
-    var trayectoria = new THREE.CatmullRomCurve3(puntosTrayectoria);
-
-    var segmentos = 100;
-    var binormales = trayectoria.computeFrenetFrames(segmentos, true).binormals;
-
-    // Crear animación con Tween para mover el proyectil
-    var origen = { t: 0 };
-    var destino = { t: 1 };
-    var tiempo = 1500; // Duración de la animación en milisegundos
-
-    var animacion = new TWEEN.Tween(origen).to(destino, tiempo).repeat(Infinity).onUpdate(() => {
-      var posicion = trayectoria.getPointAt(origen.t);
-      this.proyectil1.position.copy(posicion);
-      var tangente = trayectoria.getTangentAt(origen.t);
-      posicion.add(tangente);
-      this.proyectil1.up = binormales[Math.floor(origen.t * segmentos)];
-      this.proyectil1.lookAt(posicion);
-
-    });
-
-    animacion.start();
-
-    return this.proyectil1;
-  }
-
-  animacionOvni2() {
-    // Punto 7
-    var punto = new THREE.Vector3(1, -2, 10);
-
-    var puntos = [
-      new THREE.Vector3(4, -2, 0),
-      // new THREE.Vector3(-7, 4, 19),
-      // new THREE.Vector3(-8, 4, 20),
-      // new THREE.Vector3(-7, 4, 21),
-      // new THREE.Vector3(-5, 4, 19),
-      // new THREE.Vector3(-4, 4, 20),
-      // new THREE.Vector3(-5, 4, 21)
-    ];
-
-    // Crear el spline cerrado del anillo
-    var splineAnillo = new THREE.CatmullRomCurve3(puntos, true);
-
-    // Se dibuja con esto
-    // var resolutionAnillo = 100;
-    // var geometryAnillo = new THREE.BufferGeometry().setFromPoints(splineAnillo.getPoints(resolutionAnillo));
-    // var materialAnillo = new THREE.LineBasicMaterial({ color: 0xff0000 });
-    // var splineMeshAnillo = new THREE.Line(geometryAnillo, materialAnillo);
-    // this.add(splineMeshAnillo);
-
-    // Se necesitan los binormales del spline
-    var segmentos = 100;
-    var binormales = splineAnillo.computeFrenetFrames(segmentos, true).binormals;
-
-    // Parámetros para la animación
-    var origen = { t: 0 };
-    var destino = { t: 1 };
-    var tiempo = 10000;
-
-    // Crear animación con Tween
-    var animacion = new TWEEN.Tween(origen).to(destino, tiempo).repeat(Infinity).onUpdate(() => {
-      var posicion = splineAnillo.getPointAt(origen.t);
-      this.ovni2.position.copy(posicion);
-      var tangente = splineAnillo.getTangentAt(origen.t);
-      posicion.add(tangente);
-      this.ovni2.up = binormales[Math.floor(origen.t * segmentos)];
-      this.ovni2.lookAt(posicion);
-
-    });
-
-    // Comenzar la animación
-    animacion.start();
-  }
-
-  createCorazon() {
-    // Corazon
-    var materialLoader = new MTLLoader();
-    var objectLoader = new OBJLoader();
-
-    var that = this;
-
-    materialLoader.load('../models/corazon/12190_Heart_v1_L3.mtl',
-      (materials) => {
-        objectLoader.setMaterials(materials);
-        objectLoader.load('../models/corazon/12190_Heart_v1_L3.obj',
-          (object) => {
-            object.scale.set(0.025, 0.025, 0.025);
-            object.rotateX(-90 * (Math.PI / 180));
-            this.corazon = object;
-            that.add(object);
-            // Llamar a animacionCorazon() después de cargar el modelo
-            this.animacionCorazon();
-          }, null, null);
-      });
-  }
-
-  animacionCorazon() {
-    var pts = [
-      new THREE.Vector3(-6, 4, 20),
-      new THREE.Vector3(-7, 4, 19),
-      new THREE.Vector3(-8, 4, 20),
-      new THREE.Vector3(-7, 4, 21),
-      new THREE.Vector3(-5, 4, 19),
-      new THREE.Vector3(-4, 4, 20),
-      new THREE.Vector3(-5, 4, 21)
-    ];
-
-    var splineen8 = new THREE.CatmullRomCurve3(pts, true);
-
-    // Se dibuja con esto
-    // var resolutionAnillo = 100;
-    // var geometryAnillo = new THREE.BufferGeometry().setFromPoints(splineAnillo.getPoints(resolutionAnillo));
-    // var materialAnillo = new THREE.LineBasicMaterial({ color: 0xff0000 });
-    // var splineMeshAnillo = new THREE.Line(geometryAnillo, materialAnillo);
-    // this.add(splineMeshAnillo);
-
-    var segmentos = 100;
-    var binormales = splineen8.computeFrenetFrames(segmentos, true).binormals;
-
-    // Parámetros para la animación
-    var origen = { t: 0 };
-    var destino = { t: 1 };
-    var tiempo = 10000;
-
-
-    // Crear animación con Tween
-    var animacion = new TWEEN.Tween(origen).to(destino, tiempo).repeat(Infinity).onUpdate(() => {
-      var posicion = splineen8.getPointAt(origen.t);
-      this.corazon.position.copy(posicion);
-      var tangente = splineen8.getTangentAt(origen.t);
-      posicion.add(tangente);
-      this.corazon.up = binormales[Math.floor(origen.t * segmentos)];
-      // this.ovni.lookAt(posicion);
-
-    });
-
-    // Comenzar la animación
-    animacion.start();
   }
 
   createCorazon1() {
@@ -929,6 +419,12 @@ class Juego extends THREE.Object3D {
 
   update() {
     TWEEN.update();
+    this.ovni1.update();
+    this.ovni2.update();
+    this.moneda1.update();
+    this.moneda2.update();
+    this.moneda3.update();
+    this.moneda4.update();
     this.t = (this.t + 0.0002) % 1;
     this.avanzarCoche(this.t);
     this.setAnguloCoche(this.angulo);

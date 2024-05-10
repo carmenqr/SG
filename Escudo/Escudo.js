@@ -18,29 +18,26 @@ class Escudo extends THREE.Object3D {
     this.material.needsUpdate = true;
 
 
-    this.pinchos = this.createForma();
+    this.escudo = this.createEscudo();
 
-    this.add(this.pinchos);
+    this.add(this.escudo);
   }
 
-  createForma() {
-
+  createEscudo() {
     var shape = new THREE.Shape();
     shape.moveTo(0, 0);
     shape.quadraticCurveTo(0.8, 0.3, 0.5, 1.2);
     shape.quadraticCurveTo(0.2, 1, 0, 1.4);
     shape.quadraticCurveTo(-0.2, 1, -0.5, 1.2);
     shape.quadraticCurveTo(-0.8, 0.3, 0, 0);
-    
-
 
     var options = { depth: 0.5, steps: 2, curveSegments: 10, bevelEnabled: false }; //etc
     var geometry1 = new THREE.ExtrudeGeometry(shape, options);
 
     var forma = new THREE.Mesh(geometry1, this.material);
-    forma.scale.set(0.5,0.5,0.5);
+    forma.scale.set(0.5, 0.5, 0.5);
+    forma.position.y = -0.01;
     return forma;
-
   }
 
 
