@@ -47,9 +47,9 @@ class Juego extends THREE.Object3D {
     this.moneda4 = new Moneda(); this.objetos.push(this.moneda4);
     this.ovni1 = new Ovni();
     this.ovni2 = new Ovni();
-    this.escudo1 = new Escudo(); this.objetos.push(this.escudo1);
-    this.escudo2 = new Escudo(); this.objetos.push(this.escudo2);
-    this.escudo3 = new Escudo(); this.objetos.push(this.escudo3);
+    this.escudo1 = new Escudo(variablesTubo); this.objetos.push(this.escudo1);
+    this.escudo2 = new Escudo(variablesTubo); this.objetos.push(this.escudo2);
+    this.escudo3 = new Escudo(variablesTubo); this.objetos.push(this.escudo3);
     this.pinchos1 = new Pinchos(); this.objetos.push(this.pinchos1);
     this.pinchos2 = new Pinchos(); this.objetos.push(this.pinchos2);
     this.corazon1 = new Corazon();
@@ -62,9 +62,9 @@ class Juego extends THREE.Object3D {
     this.add(this.posicionOrientacionObjeto(this.moneda2, 170 * (Math.PI / 180), 0.3));
     this.add(this.posicionOrientacionObjeto(this.moneda3, 80 * (Math.PI / 180), 0.44));
     this.add(this.posicionOrientacionObjeto(this.moneda4, 45 * (Math.PI / 180), 0.71));
-    this.add(this.posicionOrientacionObjeto(this.escudo1, 0 * (Math.PI / 180), 0.8));
-    this.add(this.posicionOrientacionObjeto(this.escudo2, 0 * (Math.PI / 180), 0.35));
-    this.add(this.posicionOrientacionObjeto(this.escudo3, 0 * (Math.PI / 180), 0.92));
+    this.add(this.escudo1.posicionOrientacionObjeto(0 * (Math.PI / 180), 0.8));
+    this.add(this.escudo2.posicionOrientacionObjeto(0 * (Math.PI / 180), 0.35));
+    this.add(this.escudo3.posicionOrientacionObjeto(0 * (Math.PI / 180), 0.92));
     this.add(this.posicionOrientacionObjeto(this.pinchos1, 180 * (Math.PI / 180), 0.4));
     this.add(this.posicionOrientacionObjeto(this.pinchos2, 250 * (Math.PI / 180), 0.88));
 

@@ -9,9 +9,6 @@ class Coche extends THREE.Object3D {
   constructor(variablesTubo){
     super();
 
-    // Se crea la parte de la interfaz que corresponde a la grapadora
-    // Se crea primero porque otros métodos usan las variables que se definen para la interfaz
-
     this.coche = this.createCoche();
 
     this.t = 0.1;
@@ -122,7 +119,6 @@ class Coche extends THREE.Object3D {
     this.t = (this.t + 0.0002) % 1;
     this.avanzarCoche(this.t);
     this.setAnguloCoche(this.angulo);
-    // No hay nada que actualizar ya que la apertura de la grapadora se ha actualizado desde la interfaz
   }
 }
 
