@@ -10,17 +10,14 @@ import { Moneda } from '../Moneda/Moneda.js'
 import { Circuito } from '../Circuito/Circuito.js'
 import { Puertas } from '../Puertas/Puertas.js'
 import { Corazon } from '../Corazon/Corazon.js'
+import { Coche } from '../Coche/Coche.js'
 
 
 class Juego extends THREE.Object3D {
   constructor(gui, titleGui) {
     super();
 
-    // const mySceneInstance = new MyScene(); // Crear una instancia de MyScene
-    // const camera = mySceneInstance.camera;
-
-    // Se crea la parte de la interfaz que corresponde a la grapadora
-    // Se crea primero porque otros métodos usan las variables que se definen para la interfaz
+    //Inicialización de variables
     this.createGUI(gui, titleGui);
     this.t = 0.1;
     this.angulo = 0;
@@ -28,11 +25,12 @@ class Juego extends THREE.Object3D {
     this.objetos = [];
 
 
-    // El material se usa desde varios métodos. Por eso se alamacena en un atributo
+    // Creación del material
     this.material = new THREE.MeshNormalMaterial();
     this.material.flatShading = true;
     this.material.needsUpdate = true;
 
+    //Creación del circuito y recogida de sus variables
     this.circuito = new Circuito();
     var variablesTubo = this.circuito.getVariablesTubo();
     //Variables del tubo
@@ -41,6 +39,7 @@ class Juego extends THREE.Object3D {
     this.segments = variablesTubo[2];
     this.tubeGeometry = variablesTubo[3];
 
+    //Creación de objetos
     this.puerta1 = new Puertas(); this.objetos.push(this.puerta1);
     this.moneda1 = new Moneda(); this.objetos.push(this.moneda1);
     this.moneda2 = new Moneda(); this.objetos.push(this.moneda2);
@@ -54,8 +53,10 @@ class Juego extends THREE.Object3D {
     this.pinchos1 = new Pinchos(); this.objetos.push(this.pinchos1);
     this.pinchos2 = new Pinchos(); this.objetos.push(this.pinchos2);
     this.corazon1 = new Corazon();
-    this.createCorazon1();
+    this.corazon2 = new Corazon();
+    this.coche = new Coche(variablesTubo);
 
+    //Añadir los objetos al circuito (a la escena)
     this.add(this.posicionOrientacionObjeto(this.puerta1, 0 * (Math.PI / 180), 0.25));
     this.add(this.posicionOrientacionObjeto(this.moneda1, 0 * (Math.PI / 180), 0.14));
     this.add(this.posicionOrientacionObjeto(this.moneda2, 170 * (Math.PI / 180), 0.3));
@@ -66,50 +67,58 @@ class Juego extends THREE.Object3D {
     this.add(this.posicionOrientacionObjeto(this.escudo3, 0 * (Math.PI / 180), 0.92));
     this.add(this.posicionOrientacionObjeto(this.pinchos1, 180 * (Math.PI / 180), 0.4));
     this.add(this.posicionOrientacionObjeto(this.pinchos2, 250 * (Math.PI / 180), 0.88));
-    this.add(this.posicionOrientacionCoche());
 
+    this.add(this.coche.posicionOrientacionCoche());//AÑADIR A LA ESCENA EL COCHE
 
     this.add(this.ovni1);
     this.add(this.ovni2);
     this.add(this.corazon1);
+    this.add(this.corazon2);
 
     this.add(this.circuito);
 
+    //Funciones específicas de los objetos
     this.ovni1.animar1();
     this.ovni2.animar2();
     this.puerta1.animar();
+    this.corazon1.animar1();
+    this.corazon2.animar2();
 
+    //Gestión de eventos de reatón y teclado
     this.onKeyDown = this.onKeyDown.bind(this);
     addEventListener('keydown', this.onKeyDown, false);
     this.onDocumentMouseDown = this.onDocumentMouseDown.bind(this);
     addEventListener('mousedown', this.onDocumentMouseDown, false);
   }
 
+  //Cambio de cámaras
   asignarCamara(camara) {
     this.cameraN = camara;
     this.camera = camara;
   }
 
+  //Decuelve la cámara activa
   getCamara() {
     return this.camera;
   }
 
+  //Pulsaciones de teclado
   onKeyDown(event) {
     // Comprueba qué tecla se ha presionado
     switch (event.keyCode) {
       case 37: // Tecla izquierda
         // Ejecuta la función correspondiente
-        this.setAnguloCoche(this.angulo -= (5 * (Math.PI / 180)));
+        this.coche.setAnguloCoche(this.coche.angulo -= (5 * (Math.PI / 180)));
         break;
       case 39: // Tecla derecha
         // Ejecuta la función correspondiente
-        this.setAnguloCoche(this.angulo += (5 * (Math.PI / 180)));
+        this.coche.setAnguloCoche(this.coche.angulo += (5 * (Math.PI / 180)));
         break;
       case 32: // Tecla espacio
         this.cambio = !this.cambio;
         console.log("cambio");
         if (this.cambio) this.camera = this.cameraN;
-        else this.camera = this.cameraThirdPerson;
+        else this.camera = this.coche.getCamara3P();
         break;
       default:
         // No hacer nada si se presiona otra tecla
@@ -117,6 +126,7 @@ class Juego extends THREE.Object3D {
     }
   }
 
+  //Pulsaciones de ratón
   onDocumentMouseDown(event) {
     var mouse = new THREE.Vector2();
     var raycaster = new THREE.Raycaster();
@@ -127,7 +137,7 @@ class Juego extends THREE.Object3D {
 
     raycaster.setFromCamera(mouse, this.camera); // Raycaster
 
-    var pickedObjects = raycaster.intersectObjects([this.ovni1, this.corazon1], true);
+    var pickedObjects = raycaster.intersectObjects([this.ovni1, this.corazon1, this.corazon2], true);
 
     if (pickedObjects.length > 0) {
       var selectedObject = pickedObjects[0].object;
@@ -140,7 +150,7 @@ class Juego extends THREE.Object3D {
 
   disparar(objeto) {
     // Obtener la posición actual del coche
-    var posicionCoche = this.posOrCoche.getWorldPosition(new THREE.Vector3());
+    var posicionCoche = this.coche.posOrCoche.getWorldPosition(new THREE.Vector3());
 
     // Obtener la posición del objeto seleccionado con el ratón
     var posicionObjetoSeleccionado = objeto.getWorldPosition(new THREE.Vector3());;
@@ -168,91 +178,6 @@ class Juego extends THREE.Object3D {
       .start();
   }
 
-  createCoche() {
-    var materialLoader = new MTLLoader();
-    var objectLoader = new OBJLoader();
-    materialLoader.load('../models/coche2/LEGO_CAR_B2.mtl',
-      (materials) => {
-        objectLoader.setMaterials(materials);
-        objectLoader.load('../models/coche2/LEGO_CAR_B2.obj',
-          (object) => {
-            object.scale.set(0.01, 0.01, 0.01);
-            this.coche = object;
-
-            this.posCoche.add(this.coche);
-
-          }, null, null);
-      });
-  }
-
-  createCorazon1() {
-    // Corazon
-    var materialLoader = new MTLLoader();
-    var objectLoader = new OBJLoader();
-
-    var that = this;
-
-    materialLoader.load('../models/corazon/12190_Heart_v1_L3.mtl',
-      (materials) => {
-        objectLoader.setMaterials(materials);
-        objectLoader.load('../models/corazon/12190_Heart_v1_L3.obj',
-          (object) => {
-            object.scale.set(0.025, 0.025, 0.025);
-            object.rotateX(-90 * (Math.PI / 180));
-            this.corazon1 = object;
-            that.add(object);
-            // Llamar a animacionCorazon() después de cargar el modelo
-            this.animacionCorazon1();
-          }, null, null);
-      });
-  }
-
-  animacionCorazon1() {
-    var pts = [
-      new THREE.Vector3(-6, 10, 9),
-      new THREE.Vector3(-2, 9, 9),
-      //new THREE.Vector3(-7, 4, 19),
-      // new THREE.Vector3(-8, 4, 20),
-      // new THREE.Vector3(-7, 4, 21),
-      // new THREE.Vector3(-5, 4, 19),
-      // new THREE.Vector3(-4, 4, 20),
-      // new THREE.Vector3(-5, 4, 21)
-    ];
-
-    var splineen8 = new THREE.CatmullRomCurve3(pts, true);
-
-    // Se dibuja con esto
-    // var resolutionAnillo = 100;
-    // var geometryAnillo = new THREE.BufferGeometry().setFromPoints(splineAnillo.getPoints(resolutionAnillo));
-    // var materialAnillo = new THREE.LineBasicMaterial({ color: 0xff0000 });
-    // var splineMeshAnillo = new THREE.Line(geometryAnillo, materialAnillo);
-    // this.add(splineMeshAnillo);
-
-    var segmentos = 100;
-    var binormales = splineen8.computeFrenetFrames(segmentos, true).binormals;
-
-    // Parámetros para la animación
-    var origen = { t: 0 };
-    var destino = { t: 1 };
-    var tiempo = 5000;
-
-
-    // Crear animación con Tween
-    var animacion = new TWEEN.Tween(origen).to(destino, tiempo).repeat(Infinity).onUpdate(() => {
-      var posicion = splineen8.getPointAt(origen.t);
-      this.corazon1.position.copy(posicion);
-      var tangente = splineen8.getTangentAt(origen.t);
-      posicion.add(tangente);
-      this.corazon1.up = binormales[Math.floor(origen.t * segmentos)];
-      // this.ovni.lookAt(posicion);
-
-    });
-
-    // Comenzar la animación
-    animacion.start();
-  }
-
-
   setAngulo(valor) {
     this.pIzq.rotation.y = valor;
     this.pDcha.rotation.y = -valor;
@@ -271,85 +196,6 @@ class Juego extends THREE.Object3D {
     var segmentoActual = Math.floor(valor * this.segments);
     this.posOrObjeto.up = this.tubeGeometry.binormals[segmentoActual];
     this.posOrObjeto.lookAt(posTmp);
-  }
-
-
-  setAnguloCoche(valor) {
-    this.orCoche.rotation.z = valor;
-  }
-
-
-  avanzarCoche(valor) {
-    // asegurarse de que el coche se ha cargado antes de actualizar su posición
-    var posTmp = this.path.getPointAt(valor);
-    this.posOrCoche.position.copy(posTmp);
-
-    var tangente = this.path.getTangentAt(valor);
-    posTmp.add(tangente);
-    var segmentoActual = Math.floor(valor * this.segments);
-    this.posOrCoche.up = this.tubeGeometry.binormals[segmentoActual];
-    this.posOrCoche.lookAt(posTmp);
-  }
-
-  getPosOrCoche() {
-    return this.posOrCoche;
-  }
-
-  posicionOrientacionCoche() {
-    this.posOrCoche = new THREE.Object3D();
-
-    var orientacion = this.orientacionCoche();
-
-    this.posOrCoche.add(orientacion);
-    this.avanzarCoche(this.t);
-    return this.posOrCoche;
-  }
-
-  orientacionCoche() {
-    this.orCoche = new THREE.Object3D();
-
-    var posicion = this.posicionCoche();
-    this.orCoche.add(posicion);
-
-    this.setAnguloCoche(this.angulo);
-
-    return this.orCoche;
-  }
-
-  getPosCoche() {
-    return this.posCoche;
-  }
-
-  posicionCoche() {
-    this.posCoche = new THREE.Object3D();
-    //LANZADOR DE RAYOS
-    var rayo1 = new THREE.Object3D();
-    var rayo2 = new THREE.Object3D();
-    var rayo3 = new THREE.Object3D();
-
-    rayo1.position.x = 0.075;
-    rayo2.position.x = 0.15;
-    rayo3.position.set(0.075, 0.05, 0);
-
-    this.posCoche.add(rayo1);
-    this.posCoche.add(rayo2);
-    this.posCoche.add(rayo3);
-    //FIN RAYOS
-
-    //CAMÁRA 3ª PERSONA
-    this.cameraThirdPerson = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
-    // Definir posición relativa al coche
-    this.cameraThirdPerson.position.set(0.125, 1, -2); // Posición con respecto al coche
-    this.cameraThirdPerson.lookAt(0, 0, 1);
-
-    // Agregar la cámara al escenario
-    this.posCoche.add(this.cameraThirdPerson);
-    //FIN CAMÁRA 3ª PERSONA
-
-    this.createCoche();
-    this.posCoche.position.y = this.tubeRadius;
-
-    return this.posCoche;
   }
 
   posicionOrientacionObjeto(objeto, angulo, punto) {
@@ -384,22 +230,22 @@ class Juego extends THREE.Object3D {
   // Funcion para detectar las colisiones
   colisiones() {
 
-    for (var i = 0; i < this.posCoche.children.length; i++) {
+    for (var i = 0; i < this.coche.posCoche.children.length; i++) {
       var distancia = 0.4;
 
       this.rayo = new THREE.Raycaster(new THREE.Vector3(), new THREE.Vector3(0, 0, 1), 0, distancia);
 
       var tangente = this.path.getTangentAt(this.t);
 
-      this.posCoche.children[i].updateMatrixWorld();
+      this.coche.posCoche.children[i].updateMatrixWorld();
       var origenRayo = new THREE.Vector3();
-      origenRayo.setFromMatrixPosition(this.posCoche.children[i].matrixWorld);
+      origenRayo.setFromMatrixPosition(this.coche.posCoche.children[i].matrixWorld);
 
-      var direccionMirada = this.posOrCoche.getWorldDirection(tangente);
+      var direccionMirada = this.coche.posOrCoche.getWorldDirection(tangente);
 
       this.rayo.set(origenRayo, direccionMirada);
 
-      if (this.posCoche.children[i] != this.cameraThirdPerson) {
+      if (this.coche.posCoche.children[i] != this.cameraThirdPerson) {
         /* var rayoVisual = new THREE.ArrowHelper(this.rayo.ray.direction, this.rayo.ray.origin, 0.5, 0xff0000);
         // // Agregar el objeto visual a la escena
         this.add(rayoVisual); */
@@ -425,9 +271,7 @@ class Juego extends THREE.Object3D {
     this.moneda2.update();
     this.moneda3.update();
     this.moneda4.update();
-    this.t = (this.t + 0.0002) % 1;
-    this.avanzarCoche(this.t);
-    this.setAnguloCoche(this.angulo);
+    this.coche.update();
     this.colisiones();
   }
 }
