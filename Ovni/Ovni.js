@@ -56,7 +56,7 @@ class Ovni extends THREE.Object3D {
   }
 
   lanzarProyectil1() {
-    this.proyectil = new THREE.Mesh(new THREE.SphereGeometry(1, 8, 8), new THREE.MeshBasicMaterial({ color: 0xff0000 }));
+    this.proyectil = new THREE.Mesh(new THREE.SphereGeometry(0.5, 8, 8), new THREE.MeshBasicMaterial({ color: 0xff0000 }));
 
     // Definir la trayectoria del proyectil
     var puntosTrayectoria = [];

@@ -106,11 +106,11 @@ class Juego extends THREE.Object3D {
   onKeyDown(event) {
     // Comprueba qué tecla se ha presionado
     switch (event.keyCode) {
-      case 37: // Tecla izquierda
+      case 65: // Tecla izquierda
         // Ejecuta la función correspondiente
         this.coche.setAnguloCoche(this.coche.angulo -= (5 * (Math.PI / 180)));
         break;
-      case 39: // Tecla derecha
+      case 68: // Tecla derecha
         // Ejecuta la función correspondiente
         this.coche.setAnguloCoche(this.coche.angulo += (5 * (Math.PI / 180)));
         break;
@@ -147,7 +147,7 @@ class Juego extends THREE.Object3D {
     }
 
   }
-  
+
   //función para disparar a los objetos voladores
   disparar(objeto) {
     // Obtener la posición actual del coche
