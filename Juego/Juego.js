@@ -40,33 +40,33 @@ class Juego extends THREE.Object3D {
     this.tubeGeometry = variablesTubo[3];
 
     //Creación de objetos
-    this.puerta1 = new Puertas(); this.objetos.push(this.puerta1);
-    this.moneda1 = new Moneda(); this.objetos.push(this.moneda1);
-    this.moneda2 = new Moneda(); this.objetos.push(this.moneda2);
-    this.moneda3 = new Moneda(); this.objetos.push(this.moneda3);
-    this.moneda4 = new Moneda(); this.objetos.push(this.moneda4);
+    this.puerta1 = new Puertas(variablesTubo); this.objetos.push(this.puerta1);
+    this.moneda1 = new Moneda(variablesTubo); this.objetos.push(this.moneda1);
+    this.moneda2 = new Moneda(variablesTubo); this.objetos.push(this.moneda2);
+    this.moneda3 = new Moneda(variablesTubo); this.objetos.push(this.moneda3);
+    this.moneda4 = new Moneda(variablesTubo); this.objetos.push(this.moneda4);
     this.ovni1 = new Ovni();
     this.ovni2 = new Ovni();
     this.escudo1 = new Escudo(variablesTubo); this.objetos.push(this.escudo1);
     this.escudo2 = new Escudo(variablesTubo); this.objetos.push(this.escudo2);
     this.escudo3 = new Escudo(variablesTubo); this.objetos.push(this.escudo3);
-    this.pinchos1 = new Pinchos(); this.objetos.push(this.pinchos1);
-    this.pinchos2 = new Pinchos(); this.objetos.push(this.pinchos2);
+    this.pinchos1 = new Pinchos(variablesTubo); this.objetos.push(this.pinchos1);
+    this.pinchos2 = new Pinchos(variablesTubo); this.objetos.push(this.pinchos2);
     this.corazon1 = new Corazon();
     this.corazon2 = new Corazon();
     this.coche = new Coche(variablesTubo);
 
     //Añadir los objetos al circuito (a la escena)
-    this.add(this.posicionOrientacionObjeto(this.puerta1, 0 * (Math.PI / 180), 0.25));
-    this.add(this.posicionOrientacionObjeto(this.moneda1, 0 * (Math.PI / 180), 0.14));
-    this.add(this.posicionOrientacionObjeto(this.moneda2, 170 * (Math.PI / 180), 0.3));
-    this.add(this.posicionOrientacionObjeto(this.moneda3, 80 * (Math.PI / 180), 0.44));
-    this.add(this.posicionOrientacionObjeto(this.moneda4, 45 * (Math.PI / 180), 0.71));
+    this.add(this.puerta1.posicionOrientacionObjeto( 0 * (Math.PI / 180), 0.25));
+    this.add(this.moneda1.posicionOrientacionObjeto( 0 * (Math.PI / 180), 0.14));
+    this.add(this.moneda2.posicionOrientacionObjeto( 170 * (Math.PI / 180), 0.3));
+    this.add(this.moneda3.posicionOrientacionObjeto( 80 * (Math.PI / 180), 0.44));
+    this.add(this.moneda4.posicionOrientacionObjeto( 45 * (Math.PI / 180), 0.71));
     this.add(this.escudo1.posicionOrientacionObjeto(0 * (Math.PI / 180), 0.8));
     this.add(this.escudo2.posicionOrientacionObjeto(0 * (Math.PI / 180), 0.35));
     this.add(this.escudo3.posicionOrientacionObjeto(0 * (Math.PI / 180), 0.92));
-    this.add(this.posicionOrientacionObjeto(this.pinchos1, 180 * (Math.PI / 180), 0.4));
-    this.add(this.posicionOrientacionObjeto(this.pinchos2, 250 * (Math.PI / 180), 0.88));
+    this.add(this.pinchos1.posicionOrientacionObjeto(180 * (Math.PI / 180), 0.4));
+    this.add(this.pinchos2.posicionOrientacionObjeto(250 * (Math.PI / 180), 0.88));
 
     this.add(this.coche.posicionOrientacionCoche());//AÑADIR A LA ESCENA EL COCHE
 
@@ -147,7 +147,8 @@ class Juego extends THREE.Object3D {
     }
 
   }
-
+  
+  //función para disparar a los objetos voladores
   disparar(objeto) {
     // Obtener la posición actual del coche
     var posicionCoche = this.coche.posOrCoche.getWorldPosition(new THREE.Vector3());
@@ -176,55 +177,6 @@ class Juego extends THREE.Object3D {
         this.remove(bala);
       })
       .start();
-  }
-
-  setAngulo(valor) {
-    this.pIzq.rotation.y = valor;
-    this.pDcha.rotation.y = -valor;
-  }
-
-  setAnguloObjeto(valor) {
-    this.orObjeto.rotation.z = valor;
-  }
-
-  posObjetoTubo(valor) {
-    var posTmp = this.path.getPointAt(valor);
-    this.posOrObjeto.position.copy(posTmp);
-
-    var tangente = this.path.getTangentAt(valor);
-    posTmp.add(tangente);
-    var segmentoActual = Math.floor(valor * this.segments);
-    this.posOrObjeto.up = this.tubeGeometry.binormals[segmentoActual];
-    this.posOrObjeto.lookAt(posTmp);
-  }
-
-  posicionOrientacionObjeto(objeto, angulo, punto) {
-    this.posOrObjeto = new THREE.Object3D();
-
-    var orientacion = this.orientacionObjeto(objeto, angulo);
-
-    this.posOrObjeto.add(orientacion);
-    this.posObjetoTubo(punto);
-    return this.posOrObjeto;
-  }
-
-  orientacionObjeto(objeto, angulo) {
-    this.orObjeto = new THREE.Object3D();
-
-    var posicion = this.posicionObjeto(objeto);
-    this.orObjeto.add(posicion);
-
-    this.setAnguloObjeto(angulo);
-
-    return this.orObjeto;
-  }
-
-  posicionObjeto(objeto) {
-    this.posObjeto = new THREE.Object3D();
-    this.posObjeto.add(objeto);
-    this.posObjeto.position.y = this.tubeRadius;
-
-    return this.posObjeto;
   }
 
   // Funcion para detectar las colisiones

@@ -3,12 +3,14 @@ import { CSG } from '../libs/CSG-v2.js'
 import * as TWEEN from '../libs/tween.esm.js'
 
 class Puertas extends THREE.Object3D {
-  constructor(gui, titleGui) {
+  constructor(variablesTubo) {
     super();
 
-    // Se crea la parte de la hPuertas interfaz que corresponde a la grapadora
-    // Se crea primero porque otros métodos usan las variables que se definen para la interfaz
-    this.createGUI(gui, titleGui);
+    this.path = variablesTubo[0];
+    this.tubeRadius = variablesTubo[1];
+    this.segments = variablesTubo[2];
+    this.tubeGeometry = variablesTubo[3];
+
 
     this.pIzq = null;
     this.pDcha = null;
@@ -120,9 +122,50 @@ class Puertas extends THREE.Object3D {
     this.pDcha.rotation.y = -valor;
   }
 
-  createGUI(gui, titleGui) {
-
+  setAnguloObjeto(valor) {
+    this.orObjeto.rotation.z = valor;
   }
+
+  posObjetoTubo(valor) {
+    var posTmp = this.path.getPointAt(valor);
+    this.posOrObjeto.position.copy(posTmp);
+
+    var tangente = this.path.getTangentAt(valor);
+    posTmp.add(tangente);
+    var segmentoActual = Math.floor(valor * this.segments);
+    this.posOrObjeto.up = this.tubeGeometry.binormals[segmentoActual];
+    this.posOrObjeto.lookAt(posTmp);
+  }
+
+  posicionOrientacionObjeto(angulo, punto) {
+    this.posOrObjeto = new THREE.Object3D();
+
+    var orientacion = this.orientacionObjeto(angulo);
+
+    this.posOrObjeto.add(orientacion);
+    this.posObjetoTubo(punto);
+    return this.posOrObjeto;
+  }
+
+  orientacionObjeto(angulo) {
+    this.orObjeto = new THREE.Object3D();
+
+    var posicion = this.posicionObjeto();
+    this.orObjeto.add(posicion);
+
+    this.setAnguloObjeto(angulo);
+
+    return this.orObjeto;
+  }
+
+  posicionObjeto() {
+    this.posObjeto = new THREE.Object3D();
+    this.posObjeto.add(this);
+    this.posObjeto.position.y = this.tubeRadius;
+
+    return this.posObjeto;
+  }
+
 
   update() {
     TWEEN.update();

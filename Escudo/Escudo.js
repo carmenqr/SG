@@ -40,11 +40,6 @@ class Escudo extends THREE.Object3D {
     return forma;
   }
 
-  setAngulo(valor) {
-    this.pIzq.rotation.y = valor;
-    this.pDcha.rotation.y = -valor;
-  }
-
   setAnguloObjeto(valor) {
     this.orObjeto.rotation.z = valor;
   }
