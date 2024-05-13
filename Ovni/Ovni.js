@@ -93,7 +93,7 @@ class Ovni extends THREE.Object3D {
 
     // Definir la trayectoria del proyectil
     var puntosTrayectoria = [];
-    puntosTrayectoria.push(new THREE.Vector3(0, 0, 0)); // Punto inicial
+    puntosTrayectoria.push(new THREE.Vector3(0, 1, 0)); // Punto inicial
     puntosTrayectoria.push(new THREE.Vector3(0, 10, 0)); // Punto final
 
     var trayectoria = new THREE.CatmullRomCurve3(puntosTrayectoria);
