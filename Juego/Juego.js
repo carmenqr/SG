@@ -67,7 +67,7 @@ class Juego extends THREE.Object3D {
     this.add(this.escudo2.posicionOrientacionObjeto(0 * (Math.PI / 180), 0.35));
     this.add(this.escudo3.posicionOrientacionObjeto(0 * (Math.PI / 180), 0.92));
     this.add(this.pinchos1.posicionOrientacionObjeto(180 * (Math.PI / 180), 0.4));
-    this.add(this.pinchos2.posicionOrientacionObjeto(250 * (Math.PI / 180), 0.88));
+    this.add(this.pinchos2.posicionOrientacionObjeto(0 * (Math.PI / 180), 0.88));
 
     this.add(this.coche.posicionOrientacionCoche());//AÑADIR A LA ESCENA EL COCHE
 

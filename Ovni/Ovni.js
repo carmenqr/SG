@@ -94,7 +94,7 @@ class Ovni extends THREE.Object3D {
     // Definir la trayectoria del proyectil
     var puntosTrayectoria = [];
     puntosTrayectoria.push(new THREE.Vector3(0, 0, 0)); // Punto inicial
-    puntosTrayectoria.push(new THREE.Vector3(0, 14, 0)); // Punto final
+    puntosTrayectoria.push(new THREE.Vector3(0, 10, 0)); // Punto final
 
     var trayectoria = new THREE.CatmullRomCurve3(puntosTrayectoria);
 
@@ -178,6 +178,7 @@ class Ovni extends THREE.Object3D {
     var punto = new THREE.Vector3(1, -2, 10);
 
     this.ovni.add(this.lanzarProyectil2());
+    this.ovni.rotation.x = 150 * (Math.PI / 180);
     
 
     var puntos = [
@@ -216,7 +217,7 @@ class Ovni extends THREE.Object3D {
       var tangente = splineAnillo.getTangentAt(origen.t);
       posicion.add(tangente);
       this.ovni.up = binormales[Math.floor(origen.t * segmentos)];
-      this.ovni.lookAt(posicion);
+      //this.ovni.lookAt(posicion);
 
     });
 
