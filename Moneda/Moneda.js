@@ -4,6 +4,8 @@ import { CSG } from '../libs/CSG-v2.js'
 class Moneda extends THREE.Object3D {
   constructor(variablesTubo) {
     super();
+
+    this.nombre;
     
     this.path = variablesTubo[0];
     this.tubeRadius = variablesTubo[1];
@@ -14,6 +16,14 @@ class Moneda extends THREE.Object3D {
 
     this.add(this.moneda);
 
+  }
+
+  setNombre(nombre) {
+    this.nombre = nombre;
+  }
+
+  getNombre() {
+    return this.nombre;
   }
 
   createMoneda() {

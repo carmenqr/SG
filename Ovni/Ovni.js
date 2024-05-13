@@ -178,15 +178,16 @@ class Ovni extends THREE.Object3D {
     var punto = new THREE.Vector3(1, -2, 10);
 
     this.ovni.add(this.lanzarProyectil2());
+    
 
     var puntos = [
-      new THREE.Vector3(4, -2, 0),
-      // new THREE.Vector3(-7, 4, 19),
-      // new THREE.Vector3(-8, 4, 20),
-      // new THREE.Vector3(-7, 4, 21),
-      // new THREE.Vector3(-5, 4, 19),
-      // new THREE.Vector3(-4, 4, 20),
-      // new THREE.Vector3(-5, 4, 21)
+      new THREE.Vector3(-14, 11, 4),
+      new THREE.Vector3(-15, 10.5, 3),
+      new THREE.Vector3(-14, 10, 2),
+      new THREE.Vector3(-13, 10.5, 3),
+      new THREE.Vector3(-15, 11.5, 5),
+      new THREE.Vector3(-14, 12, 6),
+      new THREE.Vector3(-13, 11.5, 5),
     ];
 
     // Crear el spline cerrado del anillo

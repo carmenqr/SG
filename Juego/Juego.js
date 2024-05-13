@@ -42,6 +42,7 @@ class Juego extends THREE.Object3D {
     //Creación de objetos
     this.puerta1 = new Puertas(variablesTubo); this.objetos.push(this.puerta1);
     this.moneda1 = new Moneda(variablesTubo); this.objetos.push(this.moneda1);
+    this.moneda1.setNombre("Moneda 1");
     this.moneda2 = new Moneda(variablesTubo); this.objetos.push(this.moneda2);
     this.moneda3 = new Moneda(variablesTubo); this.objetos.push(this.moneda3);
     this.moneda4 = new Moneda(variablesTubo); this.objetos.push(this.moneda4);
@@ -179,6 +180,10 @@ class Juego extends THREE.Object3D {
       .start();
   }
 
+  getObject(Object3D){
+    return Object3D;
+  }
+
   // Funcion para detectar las colisiones
   colisiones() {
 
@@ -205,6 +210,37 @@ class Juego extends THREE.Object3D {
 
         if (impactos.length > 0) {
           console.log("Colisión detectada" + impactos[0].object);
+          if(impactos[0].object == this.moneda1){
+            console.log("Moneda 1");
+          }
+          if(impactos[0].object == this.moneda2){
+            console.log("Moneda 2");
+          }
+          if(impactos[0].object == this.moneda3){
+            console.log("Moneda 3");
+          }
+          if(impactos[0].object == this.moneda4){
+            console.log("Moneda 4");
+          }
+          if(impactos[0].object == this.escudo1){
+            console.log("Escudo 1");
+          }
+          if(impactos[0].object == this.escudo2){
+            console.log("Escudo 2");
+          }
+          if(impactos[0].object == this.escudo3){
+            console.log("Escudo 3");
+          }
+          if(impactos[0].object == this.pinchos1){
+            console.log("Pinchos 1");
+          }
+          if(impactos[0].object == this.pinchos2){
+            console.log("Pinchos 2");
+          }
+          if(impactos[0].object == this.puerta1){
+            console.log("Puerta 1");
+          }
+
         }
       }
 
