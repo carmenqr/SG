@@ -133,7 +133,7 @@ class Corazon extends THREE.Object3D {
   
   update () {
 
-    //this.rotateZ(0.05);
+    this.rotateY(0.05);
     // No hay nada que actualizar ya que la apertura de la grapadora se ha actualizado desde la interfaz
   }
 }

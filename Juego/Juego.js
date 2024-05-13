@@ -46,8 +46,8 @@ class Juego extends THREE.Object3D {
     this.moneda2 = new Moneda(variablesTubo); this.objetos.push(this.moneda2);
     this.moneda3 = new Moneda(variablesTubo); this.objetos.push(this.moneda3);
     this.moneda4 = new Moneda(variablesTubo); this.objetos.push(this.moneda4);
-    this.ovni1 = new Ovni();
-    this.ovni2 = new Ovni();
+    this.ovni1 = new Ovni(); this.objetos.push(this.ovni1.proyectil);
+    this.ovni2 = new Ovni(); this.objetos.push(this.ovni2.proyectil2);
     this.escudo1 = new Escudo(variablesTubo); this.objetos.push(this.escudo1);
     this.escudo2 = new Escudo(variablesTubo); this.objetos.push(this.escudo2);
     this.escudo3 = new Escudo(variablesTubo); this.objetos.push(this.escudo3);
@@ -107,17 +107,18 @@ class Juego extends THREE.Object3D {
   onKeyDown(event) {
     // Comprueba qué tecla se ha presionado
     switch (event.keyCode) {
+      case 37:
       case 65: // Tecla izquierda
         // Ejecuta la función correspondiente
         this.coche.setAnguloCoche(this.coche.angulo -= (5 * (Math.PI / 180)));
         break;
+      case 39:
       case 68: // Tecla derecha
         // Ejecuta la función correspondiente
         this.coche.setAnguloCoche(this.coche.angulo += (5 * (Math.PI / 180)));
         break;
       case 32: // Tecla espacio
         this.cambio = !this.cambio;
-        console.log("cambio");
         if (this.cambio) this.camera = this.cameraN;
         else this.camera = this.coche.getCamara3P();
         break;
@@ -138,7 +139,7 @@ class Juego extends THREE.Object3D {
 
     raycaster.setFromCamera(mouse, this.camera); // Raycaster
 
-    var pickedObjects = raycaster.intersectObjects([this.ovni1, this.corazon1, this.corazon2], true);
+    var pickedObjects = raycaster.intersectObjects([this.ovni1, this.corazon1, this.corazon2, this.ovni2], true);
 
     if (pickedObjects.length > 0) {
       var selectedObject = pickedObjects[0].object;
@@ -166,7 +167,7 @@ class Juego extends THREE.Object3D {
 
     // Animar el objeto bala desde la posición del coche hasta la posición del objeto seleccionado
     var velocidad = 0.05; // ajusta la velocidad de la bala según lo necesites
-    var direccion = posicionObjetoSeleccionado.clone().sub(posicionCoche).normalize();
+    //var direccion = posicionObjetoSeleccionado.clone().sub(posicionCoche).normalize();
     var distancia = posicionCoche.distanceTo(posicionObjetoSeleccionado);
 
     var duracionAnimacion = distancia / velocidad;
@@ -259,6 +260,8 @@ class Juego extends THREE.Object3D {
     this.moneda2.update();
     this.moneda3.update();
     this.moneda4.update();
+    this.corazon1.update();
+    this.corazon2.update();
     this.coche.update();
     this.colisiones();
   }

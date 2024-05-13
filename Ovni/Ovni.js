@@ -49,6 +49,8 @@ class Ovni extends THREE.Object3D {
     forma.union([platillo, esfera]);
     var ov = forma.toMesh();
     ov.scale.set(0.3, 0.3, 0.3);
+    this.proyectil = new THREE.Mesh(new THREE.SphereGeometry(0.5, 8, 8), new THREE.MeshBasicMaterial({ color: 0xff0000 }));
+    this.proyectil2 = new THREE.Mesh(new THREE.SphereGeometry(1, 8, 8), new THREE.MeshBasicMaterial({ color: 0xff0000 }));
     // ov.add(this.lanzarProyectil());
 
     //ov.position.set(-2, 13, -5);
@@ -56,7 +58,7 @@ class Ovni extends THREE.Object3D {
   }
 
   lanzarProyectil1() {
-    this.proyectil = new THREE.Mesh(new THREE.SphereGeometry(0.5, 8, 8), new THREE.MeshBasicMaterial({ color: 0xff0000 }));
+    
 
     // Definir la trayectoria del proyectil
     var puntosTrayectoria = [];
@@ -89,11 +91,11 @@ class Ovni extends THREE.Object3D {
   }
 
   lanzarProyectil2() {
-    this.proyectil2 = new THREE.Mesh(new THREE.SphereGeometry(1, 8, 8), new THREE.MeshBasicMaterial({ color: 0xff0000 }));
+    
 
     // Definir la trayectoria del proyectil
     var puntosTrayectoria = [];
-    puntosTrayectoria.push(new THREE.Vector3(0, 0, 0)); // Punto inicial
+    puntosTrayectoria.push(new THREE.Vector3(0, 1, 0)); // Punto inicial
     puntosTrayectoria.push(new THREE.Vector3(0, 10, 0)); // Punto final
 
     var trayectoria = new THREE.CatmullRomCurve3(puntosTrayectoria);
