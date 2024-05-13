@@ -41,8 +41,9 @@ class Juego extends THREE.Object3D {
 
     //Creación de objetos
     this.puerta1 = new Puertas(variablesTubo); this.objetos.push(this.puerta1);
+    this.puerta1.userData = { nombre: "Puerta1" };
     this.moneda1 = new Moneda(variablesTubo); this.objetos.push(this.moneda1);
-    this.moneda1.setNombre("Moneda 1");
+    this.moneda1.userData = { nombre: "Moneda1" };
     this.moneda2 = new Moneda(variablesTubo); this.objetos.push(this.moneda2);
     this.moneda3 = new Moneda(variablesTubo); this.objetos.push(this.moneda3);
     this.moneda4 = new Moneda(variablesTubo); this.objetos.push(this.moneda4);
@@ -58,11 +59,11 @@ class Juego extends THREE.Object3D {
     this.coche = new Coche(variablesTubo);
 
     //Añadir los objetos al circuito (a la escena)
-    this.add(this.puerta1.posicionOrientacionObjeto( 0 * (Math.PI / 180), 0.25));
-    this.add(this.moneda1.posicionOrientacionObjeto( 0 * (Math.PI / 180), 0.14));
-    this.add(this.moneda2.posicionOrientacionObjeto( 170 * (Math.PI / 180), 0.3));
-    this.add(this.moneda3.posicionOrientacionObjeto( 80 * (Math.PI / 180), 0.44));
-    this.add(this.moneda4.posicionOrientacionObjeto( 45 * (Math.PI / 180), 0.71));
+    this.add(this.puerta1.posicionOrientacionObjeto(0 * (Math.PI / 180), 0.25));
+    this.add(this.moneda1.posicionOrientacionObjeto(0 * (Math.PI / 180), 0.14));
+    this.add(this.moneda2.posicionOrientacionObjeto(170 * (Math.PI / 180), 0.3));
+    this.add(this.moneda3.posicionOrientacionObjeto(80 * (Math.PI / 180), 0.44));
+    this.add(this.moneda4.posicionOrientacionObjeto(45 * (Math.PI / 180), 0.71));
     this.add(this.escudo1.posicionOrientacionObjeto(0 * (Math.PI / 180), 0.8));
     this.add(this.escudo2.posicionOrientacionObjeto(0 * (Math.PI / 180), 0.35));
     this.add(this.escudo3.posicionOrientacionObjeto(0 * (Math.PI / 180), 0.92));
@@ -181,7 +182,7 @@ class Juego extends THREE.Object3D {
       .start();
   }
 
-  getObject(Object3D){
+  getObject(Object3D) {
     return Object3D;
   }
 
@@ -207,39 +208,22 @@ class Juego extends THREE.Object3D {
         /* var rayoVisual = new THREE.ArrowHelper(this.rayo.ray.direction, this.rayo.ray.origin, 0.5, 0xff0000);
         // // Agregar el objeto visual a la escena
         this.add(rayoVisual); */
-        var impactos = this.rayo.intersectObjects(this.objetos, true);
+        this.impactos = this.rayo.intersectObjects(this.objetos, true);
 
-        if (impactos.length > 0) {
-          console.log("Colisión detectada" + impactos[0].object);
-          if(impactos[0].object == this.moneda1){
+        //console.log(this.objetos[1].userData.nombre);
+
+        if (this.impactos.length > 0) {
+          let object = this.impactos[0].object;
+          while (object.parent && object.parent.parent && !(object instanceof Moneda || object instanceof Pinchos || object instanceof Escudo || object instanceof Puertas)) object = object.parent;
+          const originalObject = object;
+          console.log(originalObject.userData.nombre);
+          //console.log("Colisión detectada" + this.impactos[0].object);
+          //console.log(originalObject);
+          if (this.impactos[0].object.userData.nombre === "Moneda1") {
             console.log("Moneda 1");
           }
-          if(impactos[0].object == this.moneda2){
-            console.log("Moneda 2");
-          }
-          if(impactos[0].object == this.moneda3){
-            console.log("Moneda 3");
-          }
-          if(impactos[0].object == this.moneda4){
-            console.log("Moneda 4");
-          }
-          if(impactos[0].object == this.escudo1){
-            console.log("Escudo 1");
-          }
-          if(impactos[0].object == this.escudo2){
-            console.log("Escudo 2");
-          }
-          if(impactos[0].object == this.escudo3){
-            console.log("Escudo 3");
-          }
-          if(impactos[0].object == this.pinchos1){
-            console.log("Pinchos 1");
-          }
-          if(impactos[0].object == this.pinchos2){
-            console.log("Pinchos 2");
-          }
-          if(impactos[0].object == this.puerta1){
-            console.log("Puerta 1");
+          if (this.impactos[0].object == this.moneda1) {
+            console.log("Moneda 1");
           }
 
         }
