@@ -59,7 +59,7 @@ class Juego extends THREE.Object3D {
     this.coche = new Coche(variablesTubo);
 
     //Añadir los objetos al circuito (a la escena)
-    this.add(this.puerta1.posicionOrientacionObjeto(0 * (Math.PI / 180), 0.25));
+    this.add(this.puerta1.posicionOrientacionObjeto(270 * (Math.PI / 180), 0.22));
     this.add(this.moneda1.posicionOrientacionObjeto(0 * (Math.PI / 180), 0.14));
     this.add(this.moneda2.posicionOrientacionObjeto(170 * (Math.PI / 180), 0.3));
     this.add(this.moneda3.posicionOrientacionObjeto(80 * (Math.PI / 180), 0.44));

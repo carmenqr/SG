@@ -9,9 +9,14 @@ class Escudo extends THREE.Object3D {
     super();
 
     // El material se usa desde varios métodos. Por eso se alamacena en un atributo
-    this.material = new THREE.MeshBasicMaterial({ color: 0xFF0000 }); // Rojo
+    /* this.material = new THREE.MeshBasicMaterial({ color: 0xFF0000 }); // Rojo
     this.material.flatShading = true;
-    this.material.needsUpdate = true;
+    this.material.needsUpdate = true; */
+
+    this.loader = new THREE.TextureLoader();
+    this.textura = this.loader.load('../imgs/texturaEscudo.jpg');
+    this.material = new THREE.MeshStandardMaterial({map: this.textura});
+
 
     this.path = variablesTubo[0];
     this.tubeRadius = variablesTubo[1];

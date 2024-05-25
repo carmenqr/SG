@@ -10,9 +10,19 @@ class Circuito extends THREE.Object3D {
     this.createGUI(gui,titleGui);
     
     // El material se usa desde varios métodos. Por eso se alamacena en un atributo
-    this.material = new THREE.MeshNormalMaterial();
-    this.material.flatShading = true;
-    this.material.needsUpdate = true;
+    // this.material = new THREE.MeshNormalMaterial();
+    // this.material.flatShading = true;
+    // this.material.needsUpdate = true;
+
+    // this.loader = new THREE.TextureLoader();
+    // this.textura = this.loader.load('../imgs/descarga.jpg');
+    // this.material = new THREE.MeshStandardMaterial({map: this.textura});
+
+    this.material = new THREE.MeshStandardMaterial({color: 0xFFFFFF});
+    this.material.bumpMap = new THREE.TextureLoader().load('../imgs/texturacircuito.jpg');
+
+
+
 
     this.circuito = this.createCircuito();
     

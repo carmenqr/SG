@@ -7,9 +7,13 @@ class Pinchos extends THREE.Object3D {
     super();
 
     // El material se usa desde varios métodos. Por eso se alamacena en un atributo
-    this.material = new THREE.MeshBasicMaterial({ color: 0xFF0000 }); // Rojo
-    this.material.flatShading = true;
-    this.material.needsUpdate = true;
+    // this.material = new THREE.MeshBasicMaterial({ color: 0xFF0000 }); // Rojo
+    // this.material.flatShading = true;
+    // this.material.needsUpdate = true;
+
+    this.material = new THREE.MeshStandardMaterial({ color: 0xABAFAC}); // Rojo
+    this.material.roughness = 0.2;
+    this.material.metalness = 0;
 
     this.path = variablesTubo[0];
     this.tubeRadius = variablesTubo[1];

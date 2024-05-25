@@ -125,14 +125,68 @@ export class MyScene extends THREE.Scene {
     // La añadimos a la escena
     this.add(this.ambientLight);
 
+    //0x00aae4
+    this.luzPuntual = new THREE.PointLight(0x00d1d2);
+    this.luzPuntual.power = 1000;
+    this.luzPuntual.position.set(0, 0, -2);
+    this.add(this.luzPuntual);
+
+
+    this.luzPuntual2 = new THREE.PointLight('blue');
+    this.luzPuntual2.power = 1000;
+    this.luzPuntual2.position.set(0, 3, 15);
+    this.add(this.luzPuntual2);
+
+    this.luzPuntual3 = new THREE.PointLight('purple');
+    this.luzPuntual3.power = 1000;
+    this.luzPuntual3.position.set(-10, 6, 10);
+    this.add(this.luzPuntual3); 
+
+
+    this.luzPuntual4 = new THREE.PointLight('red');
+    this.luzPuntual4.power = 1000;
+    this.luzPuntual4.position.set(0, -6, 6);
+    this.add(this.luzPuntual4);
+
+    this.luzPuntual5 = new THREE.PointLight(0x33ff71);
+    this.luzPuntual5.power = 1000;
+    this.luzPuntual5.position.set(0, 12, 4);
+    this.add(this.luzPuntual5);
+
+
+
     // Se crea una luz focal que va a ser la luz principal de la escena
     // La luz focal, además tiene una posición, y un punto de mira
     // Si no se le da punto de mira, apuntará al (0,0,0) en coordenadas del mundo
     // En este caso se declara como   this.atributo   para que sea un atributo accesible desde otros métodos.
     this.pointLight = new THREE.SpotLight(0xffffff);
-    this.pointLight.power = this.guiControls.lightPower;
-    this.pointLight.position.set(2, 3, 1);
+    this.pointLight.power = 1000;
+    this.pointLight.position.set(5, 2, 30);
+    this.pointLight.target.position.set(0, 0, 0);
+
+    // // Crear la esfera de representación del objetivo de la luz
+    // const lightTargetGeometry = new THREE.SphereGeometry(0.5, 32, 32); // Geometría de una esfera pequeña
+    // const lightTargetMaterial = new THREE.MeshBasicMaterial({ color: 'red' }); // Material básico blanco
+    // const lightTargetSphere = new THREE.Mesh(lightTargetGeometry, lightTargetMaterial); // Crear la esfera
+    // lightTargetSphere.position.copy(this.pointLight.position);
+    // this.add(lightTargetSphere);
     this.add(this.pointLight);
+
+
+    this.pointLight2 = new THREE.SpotLight(0xffffff);
+    this.pointLight2.power = 250;
+    this.pointLight2.position.set(0, 8, -15);
+    this.pointLight2.target.position.set(0, 0, 0);
+    this.add(this.pointLight2);
+
+    this.pointLight3 = new THREE.SpotLight(0xffffff);
+    this.pointLight3.power = 1000;
+    this.pointLight3.position.set(-25, 3, 5);
+    this.pointLight3.target.position.set(0, 0, 0);
+    this.add(this.pointLight3);
+
+
+
   }
 
   setLightPower(valor) {

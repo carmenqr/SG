@@ -6,21 +6,35 @@ import { OBJLoader } from '../libs/OBJLoader.js'
 import * as TWEEN from '../libs/tween.esm.js'
 
 class Ovni extends THREE.Object3D {
-  constructor(gui,titleGui) {
+  constructor(gui, titleGui) {
     super();
-    
+
     // Se crea la parte de la interfaz que corresponde a la grapadora
     // Se crea primero porque otros métodos usan las variables que se definen para la interfaz
-    this.createGUI(gui,titleGui);
-    
-    // El material se usa desde varios métodos. Por eso se alamacena en un atributo
-    this.material = new THREE.MeshNormalMaterial();
-    this.material.flatShading = true;
-    this.material.needsUpdate = true;
+    this.createGUI(gui, titleGui);
+
+    /*     // El material se usa desde varios métodos. Por eso se alamacena en un atributo
+        this.material = new THREE.MeshNormalMaterial();
+        this.material.flatShading = true;
+        this.material.needsUpdate = true; */
+
+    this.loader1 = new THREE.TextureLoader();
+    this.textura1 = this.loader1.load("../imgs/cabezaOvni.jpg", function (texture) {
+      // Ajustar las propiedades de la textura para que no se repita
+      texture.wrapS = THREE.ClampToEdgeWrapping;
+      texture.wrapT = THREE.ClampToEdgeWrapping;
+      texture.repeat.set(1, 1);
+    });
+    this.material1 = new THREE.MeshStandardMaterial({ map: this.textura1 });
+
+    this.loader2 = new THREE.TextureLoader();
+    this.textura2 = this.loader2.load("../imgs/cuerpoOvni.jpg");
+    this.material2 = new THREE.MeshStandardMaterial({ map: this.textura2 });
+
 
     this.ovni = this.createOvni();
     //this.ovni.position.set(this.guiControls.posX, this.guiControls.posY, this.guiControls.posZ);
-    
+
     this.add(this.ovni);
   }
 
@@ -39,18 +53,31 @@ class Ovni extends THREE.Object3D {
     this.shape = new THREE.Shape(points);
     this.phiLength = 0;
 
-    var platillo = new THREE.Mesh(new THREE.LatheGeometry(this.shape.getPoints(), 15, this.phiLength, 2 * Math.PI + 0.1), this.material);
+    var platillo = new THREE.Mesh(new THREE.LatheGeometry(this.shape.getPoints(), 15, this.phiLength, 2 * Math.PI + 0.1), this.material2);
 
     var formaEsfera = new THREE.SphereGeometry(0.5, 5, 5);
     formaEsfera.translate(0, -0.4, 0);
-    var esfera = new THREE.Mesh(formaEsfera, this.material);
+    var esfera = new THREE.Mesh(formaEsfera, this.material1);
 
     var forma = new CSG();
-    forma.union([platillo, esfera]);
+    forma.union([esfera, platillo]);
     var ov = forma.toMesh();
     ov.scale.set(0.3, 0.3, 0.3);
     this.proyectil = new THREE.Mesh(new THREE.SphereGeometry(0.5, 8, 8), new THREE.MeshBasicMaterial({ color: 0xff0000 }));
     this.proyectil2 = new THREE.Mesh(new THREE.SphereGeometry(1, 8, 8), new THREE.MeshBasicMaterial({ color: 0xff0000 }));
+
+
+    // Asignar materiales a las partes específicas de la geometría combinada
+    /*  ov.traverse(function (child) {
+       if (child instanceof THREE.Mesh) {
+         if (child.geometry === platillo.geometry) {
+           child.material = this.material2;
+         } else if (child.geometry === esfera.geometry) {
+           child.material = this.material1;
+         }
+       }
+     }); */
+
     // ov.add(this.lanzarProyectil());
 
     //ov.position.set(-2, 13, -5);
@@ -58,7 +85,7 @@ class Ovni extends THREE.Object3D {
   }
 
   lanzarProyectil1() {
-    
+
 
     // Definir la trayectoria del proyectil
     var puntosTrayectoria = [];
@@ -91,7 +118,7 @@ class Ovni extends THREE.Object3D {
   }
 
   lanzarProyectil2() {
-    
+
 
     // Definir la trayectoria del proyectil
     var puntosTrayectoria = [];
@@ -181,7 +208,7 @@ class Ovni extends THREE.Object3D {
 
     this.ovni.add(this.lanzarProyectil2());
     this.ovni.rotation.x = 150 * (Math.PI / 180);
-    
+
 
     var puntos = [
       new THREE.Vector3(-14, 11, 4),
@@ -226,14 +253,14 @@ class Ovni extends THREE.Object3D {
     // Comenzar la animación
     animacion.start();
   }
-  
+
 
   createGUI(gui, titleGui) {
-  
-  }
-  
 
-  update () {
+  }
+
+
+  update() {
     TWEEN.update();
     // No hay nada que actualizar ya que la apertura de la grapadora se ha actualizado desde la interfaz
   }

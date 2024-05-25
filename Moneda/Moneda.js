@@ -39,6 +39,8 @@ class Moneda extends THREE.Object3D {
     // material.flatShading = true;
     // material.needsUpdate = true;
     var material = new THREE.MeshStandardMaterial({ color: 0xffff00, emissive: 0xffff00, emissiveIntensity: 0.2 }); // Amarillo
+    material.roughness = 0.2;
+    material.metalness = 0;
 
     cilin_ext.rotateX(90 * (Math.PI / 180));
     cilin_ext.translate(0, 2, 0);

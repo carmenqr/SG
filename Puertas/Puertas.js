@@ -11,6 +11,11 @@ class Puertas extends THREE.Object3D {
     this.segments = variablesTubo[2];
     this.tubeGeometry = variablesTubo[3];
 
+    this.loader = new THREE.TextureLoader();
+    this.textura = this.loader.load("../imgs/tablones2.jpg");
+    this.material = new THREE.MeshStandardMaterial({map: this.textura});
+    //this.material = new THREE.MeshStandardMaterial({map: this.textura});
+    //this.material.bumpMap = new THREE.TextureLoader().load('../imgs/tablones.jpg');
 
     this.pIzq = null;
     this.pDcha = null;
@@ -27,11 +32,11 @@ class Puertas extends THREE.Object3D {
     var marco_lat = new THREE.BoxGeometry(0.05, 1, 0.05);
     var marco_sup = new THREE.BoxGeometry(0.05, 0.5, 0.05);
 
-    this.material = new THREE.MeshNormalMaterial();
-    this.material.flatShading = true;
-    this.material.needsUpdate = true;
+    // this.material = new THREE.MeshNormalMaterial();
+    // this.material.flatShading = true;
+    // this.material.needsUpdate = true;
     // var material = new THREE.MeshStandardMaterial({ color: 0xffff00, emissive: 0xffff00, emissiveIntensity: 0.2 }); // Amarillo
-
+    
     var marco_latdMesh = new THREE.Mesh(marco_lat, this.material);
     var marco_latiMesh = new THREE.Mesh(marco_lat, this.material);
     var marco_supMesh = new THREE.Mesh(marco_sup, this.material);
