@@ -10,7 +10,6 @@ import { TrackballControls } from '../libs/TrackballControls.js'
 
 import { Juego } from './Juego.js'
 
-
 /// La clase fachada del modelo
 /**
  * Usaremos una clase derivada de la clase Scene de Three.js para llevar el control de la escena y de todo lo que ocurre en ella.
@@ -21,6 +20,8 @@ export class MyScene extends THREE.Scene {
   // la visualización de la escena
   constructor(myCanvas) {
     super();
+
+    this.juegoIniciado = false;
 
     this.cambio = true;
 
@@ -52,8 +53,42 @@ export class MyScene extends THREE.Scene {
     // Por último creamos el modelo.
     // El modelo puede incluir su parte de la interfaz gráfica de usuario. Le pasamos la referencia a 
     // la gui y el texto bajo el que se agruparán los controles de la interfaz que añada el modelo.
-    
+
     this.add(this.model);
+
+    this.onKeyDown = this.onKeyDown.bind(this);
+    addEventListener('keydown', this.onKeyDown, false);
+  }
+
+  onKeyDown(event) {
+    // Comprueba qué tecla se ha presionado
+    switch (event.keyCode) {
+      case 13: // Tecla espacio
+        this.iniciarJuego();
+        break;
+      default:
+        // No hacer nada si se presiona otra tecla
+        break;
+    }
+  }
+
+  // Agrega una función para iniciar el juego
+  iniciarJuego() {
+    // Si el juego ya ha sido iniciado, no hagas nada
+    if (this.juegoIniciado) return;
+
+    // Oculta la pantalla de inicio (puedes implementar esta función según tu estructura HTML)
+    this.ocultarPantallaDeInicio();
+
+    // Establece el estado del juego como iniciado
+    this.juegoIniciado = true;
+
+    // Comienza la actualización de la escena
+    this.update();
+  }
+
+  ocultarPantallaDeInicio() {
+    document.getElementById('inicio-overlay').style.display = 'none';
   }
 
   createCamera() {
@@ -140,7 +175,7 @@ export class MyScene extends THREE.Scene {
     this.luzPuntual3 = new THREE.PointLight('purple');
     this.luzPuntual3.power = 1000;
     this.luzPuntual3.position.set(-10, 6, 10);
-    this.add(this.luzPuntual3); 
+    this.add(this.luzPuntual3);
 
 
     this.luzPuntual4 = new THREE.PointLight('red');
@@ -242,20 +277,51 @@ export class MyScene extends THREE.Scene {
     this.renderer.setSize(window.innerWidth, window.innerHeight);
   }
 
+  actualizarCorazones() {
+    const corazonesContainer = document.getElementById('corazones-container');
+    corazonesContainer.innerHTML = ''; // Limpiar los corazones existentes
+
+    // Crear un corazón HTML para cada vida en el juego
+    for (let i = 0; i < this.model.vidas; i++) {
+      const corazon = document.createElement('span');
+      corazon.innerHTML = '❤️'; // Emoji de corazón
+      corazon.classList.add('corazon'); // Clase para estilos adicionales si es necesario
+      corazonesContainer.appendChild(corazon);
+    }
+  }
+
+  actualizarDistancia() {
+    const distanciaContainer = document.getElementById('distancia');
+    const velocidadContainer = document.getElementById('velocidad');
+    const monedasContainer = document.getElementById('monedas');
+
+    distanciaContainer.textContent = 'Distancia: ' + this.model.distanciaRecorrida.toFixed(2);
+    var velocidad = this.model.coche.velocidad * 10000;
+    velocidadContainer.textContent = 'Velocidad: ' + velocidad.toFixed(1);
+    monedasContainer.textContent = 'Monedas: ' + this.model.monedas;
+}
+
+  // Modifica el método update para que solo actualice la escena cuando el juego esté iniciado
   update() {
-    // Le decimos al renderizador "visualiza la escena que te indico usando la cámara que te estoy pasando"
-    this.renderer.render(this, this.model.getCamara());
+    // Verifica si el juego está iniciado antes de actualizar la escena
+    if (this.juegoIniciado) {
+      // Le decimos al renderizador "visualiza la escena que te indico usando la cámara que te estoy pasando"
+      this.renderer.render(this, this.model.getCamara());
 
-    // Se actualiza la posición de la cámara según su controlador
-    this.cameraControl.update();
+      // Se actualiza la posición de la cámara según su controlador
+      this.cameraControl.update();
 
-    // Se actualiza el resto del modelo
-    this.model.update();
+      // Se actualiza el resto del modelo
+      this.model.update();
+
+      this.actualizarCorazones();
+      this.actualizarDistancia();
+    }
 
     // Este método debe ser llamado cada vez que queramos visualizar la escena de nuevo.
     // Literalmente le decimos al navegador: "La próxima vez que haya que refrescar la pantalla, llama al método que te indico".
     // Si no existiera esta línea,  update()  se ejecutaría solo la primera vez.
-    requestAnimationFrame(() => this.update())
+    requestAnimationFrame(() => this.update());
   }
 }
 

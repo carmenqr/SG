@@ -171,6 +171,9 @@ class Puertas extends THREE.Object3D {
     return this.posObjeto;
   }
 
+  colision(juego){
+    
+  }
 
   update() {
     TWEEN.update();

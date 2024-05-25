@@ -96,6 +96,10 @@ class Escudo extends THREE.Object3D {
     return this.posObjeto;
   }
 
+  colision(juego){
+    
+  }
+
 
   update() {
     // No hay nada que actualizar ya que la apertura de la grapadora se ha actualizado desde la interfaz

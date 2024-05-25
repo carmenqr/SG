@@ -119,6 +119,10 @@ class Moneda extends THREE.Object3D {
     return this.posObjeto;
   }
 
+  colision(juego){
+    juego.monedas += 1;
+  }
+
   update () {
 
     this.moneda.rotateY(0.05);

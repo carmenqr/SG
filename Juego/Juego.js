@@ -11,6 +11,7 @@ import { Circuito } from '../Circuito/Circuito.js'
 import { Puertas } from '../Puertas/Puertas.js'
 import { Corazon } from '../Corazon/Corazon.js'
 import { Coche } from '../Coche/Coche.js'
+import { Vidas } from '../Vidas/Vidas.js'
 
 
 class Juego extends THREE.Object3D {
@@ -19,10 +20,12 @@ class Juego extends THREE.Object3D {
 
     //Inicialización de variables
     this.createGUI(gui, titleGui);
-    this.t = 0.1;
+    this.t = 0.05;
     this.angulo = 0;
     this.cambio = true;
     this.objetos = [];
+    this.objetosConColision = new Set(); 
+    this.monedas = 0;
 
 
     // Creación del material
@@ -40,23 +43,26 @@ class Juego extends THREE.Object3D {
     this.tubeGeometry = variablesTubo[3];
 
     //Creación de objetos
-    this.puerta1 = new Puertas(variablesTubo); this.objetos.push(this.puerta1);
-    this.puerta1.userData = { nombre: "Puerta1" };
-    this.moneda1 = new Moneda(variablesTubo); this.objetos.push(this.moneda1);
-    this.moneda1.userData = { nombre: "Moneda1" };
-    this.moneda2 = new Moneda(variablesTubo); this.objetos.push(this.moneda2);
-    this.moneda3 = new Moneda(variablesTubo); this.objetos.push(this.moneda3);
-    this.moneda4 = new Moneda(variablesTubo); this.objetos.push(this.moneda4);
-    this.ovni1 = new Ovni(); this.objetos.push(this.ovni1.proyectil);
-    this.ovni2 = new Ovni(); this.objetos.push(this.ovni2.proyectil2);
-    this.escudo1 = new Escudo(variablesTubo); this.objetos.push(this.escudo1);
-    this.escudo2 = new Escudo(variablesTubo); this.objetos.push(this.escudo2);
-    this.escudo3 = new Escudo(variablesTubo); this.objetos.push(this.escudo3);
-    this.pinchos1 = new Pinchos(variablesTubo); this.objetos.push(this.pinchos1);
-    this.pinchos2 = new Pinchos(variablesTubo); this.objetos.push(this.pinchos2);
+    this.puerta1 = new Puertas(variablesTubo); this.objetos.push(this.puerta1);this.puerta1.userData = { nombre: "Puerta" };
+    this.moneda1 = new Moneda(variablesTubo); this.objetos.push(this.moneda1);this.moneda1.userData = { nombre: "Moneda" };
+    this.moneda2 = new Moneda(variablesTubo); this.objetos.push(this.moneda2);this.moneda2.userData = { nombre: "Moneda" };
+    this.moneda3 = new Moneda(variablesTubo); this.objetos.push(this.moneda3);this.moneda3.userData = { nombre: "Moneda" };
+    this.moneda4 = new Moneda(variablesTubo); this.objetos.push(this.moneda4);this.moneda4.userData = { nombre: "Moneda" };
+    this.ovni1 = new Ovni(); this.objetos.push(this.ovni1.proyectil); this.ovni1.proyectil.userData = { nombre: "Proyectil" };
+    this.ovni2 = new Ovni(); this.objetos.push(this.ovni2.proyectil2); this.ovni2.proyectil2.userData = { nombre: "Proyectil" };
+    this.escudo1 = new Escudo(variablesTubo); this.objetos.push(this.escudo1);this.escudo1.userData = { nombre: "Escudo" };
+    this.escudo2 = new Escudo(variablesTubo); this.objetos.push(this.escudo2);this.escudo2.userData = { nombre: "Escudo" };
+    this.escudo3 = new Escudo(variablesTubo); this.objetos.push(this.escudo3);this.escudo3.userData = { nombre: "Escudo" };
+    this.pinchos1 = new Pinchos(variablesTubo); this.objetos.push(this.pinchos1);this.pinchos1.userData = { nombre: "Pinchos" };
+    this.pinchos2 = new Pinchos(variablesTubo); this.objetos.push(this.pinchos2);this.pinchos2.userData = { nombre: "Pinchos" };
     this.corazon1 = new Corazon();
     this.corazon2 = new Corazon();
     this.coche = new Coche(variablesTubo);
+
+    this.vidas = 4;
+
+    // Inicializa la distancia recorrida por el coche
+    this.distanciaRecorrida = 0;
 
     //Añadir los objetos al circuito (a la escena)
     this.add(this.puerta1.posicionOrientacionObjeto(270 * (Math.PI / 180), 0.22));
@@ -214,19 +220,25 @@ class Juego extends THREE.Object3D {
 
         if (this.impactos.length > 0) {
           let object = this.impactos[0].object;
+          while (object.parent && object.parent.parent && !(object instanceof Moneda || object instanceof Pinchos || object instanceof Escudo || object instanceof Puertas)) {
+            object = object.parent;
+          }
+          const originalObject = object;
+    
+          if (!this.objetosConColision.has(originalObject)) { // Verificar si el objeto ya ha sido colisionado
+            console.log(originalObject.userData.nombre);
+            originalObject.colision(this);
+            this.objetosConColision.add(originalObject); // Agregar el objeto al conjunto de objetos colisionados
+          }
+        }
+
+        /* if (this.impactos.length > 0) {
+          let object = this.impactos[0].object;
           while (object.parent && object.parent.parent && !(object instanceof Moneda || object instanceof Pinchos || object instanceof Escudo || object instanceof Puertas)) object = object.parent;
           const originalObject = object;
           console.log(originalObject.userData.nombre);
-          //console.log("Colisión detectada" + this.impactos[0].object);
-          //console.log(originalObject);
-          if (this.impactos[0].object.userData.nombre === "Moneda1") {
-            console.log("Moneda 1");
-          }
-          if (this.impactos[0].object == this.moneda1) {
-            console.log("Moneda 1");
-          }
-
-        }
+          originalObject.colision(this);
+        } */
       }
 
     }
@@ -234,6 +246,11 @@ class Juego extends THREE.Object3D {
 
   createGUI(gui, titleGui) {
 
+  }
+
+  actualizarDistanciaRecorrida() {
+    // Actualiza la distancia recorrida en función de la posición actual del coche (t)
+    this.distanciaRecorrida += this.coche.t;
   }
 
   update() {
@@ -247,7 +264,11 @@ class Juego extends THREE.Object3D {
     this.corazon1.update();
     this.corazon2.update();
     this.coche.update();
+    if (this.coche.t < 0.0005) {
+      this.objetosConColision = new Set(); 
+    }
     this.colisiones();
+    this.actualizarDistanciaRecorrida();
   }
 }
 
