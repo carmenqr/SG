@@ -14,8 +14,15 @@ class Escudo extends THREE.Object3D {
     this.material.needsUpdate = true; */
 
     this.loader = new THREE.TextureLoader();
-    this.textura = this.loader.load('../imgs/texturaEscudo.jpg');
-    this.material = new THREE.MeshStandardMaterial({map: this.textura});
+    this.textura = this.loader.load('../imgs/escudo99.png', function (texture) {
+      // Ajustar las propiedades de la textura
+      texture.wrapS = THREE.ClampToEdgeWrapping;
+      texture.wrapT = THREE.ClampToEdgeWrapping;
+      texture.repeat.set(0.5, 0.5); // Repetir una vez en ambas direcciones
+      texture.offset.set(0.51, 0.1); // Ajustar el offset para mover la textura
+    });
+
+    this.material = new THREE.MeshStandardMaterial({ map: this.textura/* , color: 'yellow' */ });
 
 
     this.path = variablesTubo[0];
@@ -31,10 +38,10 @@ class Escudo extends THREE.Object3D {
   createEscudo() {
     var shape = new THREE.Shape();
     shape.moveTo(0, 0);
-    shape.quadraticCurveTo(0.8, 0.3, 0.5, 1.2);
-    shape.quadraticCurveTo(0.2, 1, 0, 1.4);
-    shape.quadraticCurveTo(-0.2, 1, -0.5, 1.2);
-    shape.quadraticCurveTo(-0.8, 0.3, 0, 0);
+    shape.quadraticCurveTo(0.7, 0.3, 0.65, 1.4);
+    shape.quadraticCurveTo(0.2, 1.5, 0, 1.6);
+    shape.quadraticCurveTo(-0.2, 1.5, -0.65, 1.4);
+    shape.quadraticCurveTo(-0.7, 0.3, 0, 0);
 
     var options = { depth: 0.5, steps: 2, curveSegments: 10, bevelEnabled: false }; //etc
     var geometry1 = new THREE.ExtrudeGeometry(shape, options);
