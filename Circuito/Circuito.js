@@ -18,11 +18,8 @@ class Circuito extends THREE.Object3D {
     // this.textura = this.loader.load('../imgs/descarga.jpg');
     // this.material = new THREE.MeshStandardMaterial({map: this.textura});
 
-    this.material = new THREE.MeshStandardMaterial({color: 0xFFFFFF});
+    this.material = new THREE.MeshStandardMaterial({color: 0xFFDF9B});
     this.material.bumpMap = new THREE.TextureLoader().load('../imgs/texturacircuito.jpg');
-
-
-
 
     this.circuito = this.createCircuito();
     

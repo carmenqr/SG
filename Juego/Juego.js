@@ -11,7 +11,6 @@ import { Circuito } from '../Circuito/Circuito.js'
 import { Puertas } from '../Puertas/Puertas.js'
 import { Corazon } from '../Corazon/Corazon.js'
 import { Coche } from '../Coche/Coche.js'
-import { Vidas } from '../Vidas/Vidas.js'
 
 
 class Juego extends THREE.Object3D {
@@ -26,6 +25,7 @@ class Juego extends THREE.Object3D {
     this.objetos = [];
     this.objetosConColision = new Set(); 
     this.monedas = 0;
+    this.inmune = false;
 
 
     // Creación del material
@@ -42,8 +42,11 @@ class Juego extends THREE.Object3D {
     this.segments = variablesTubo[2];
     this.tubeGeometry = variablesTubo[3];
 
+
     //Creación de objetos
     this.puerta1 = new Puertas(variablesTubo); this.objetos.push(this.puerta1);this.puerta1.userData = { nombre: "Puerta" };
+    this.puerta2 = new Puertas(variablesTubo); this.objetos.push(this.puerta2);this.puerta2.userData = { nombre: "Puerta" };
+    this.puerta3 = new Puertas(variablesTubo); this.objetos.push(this.puerta3);this.puerta3.userData = { nombre: "Puerta" };
     this.moneda1 = new Moneda(variablesTubo); this.objetos.push(this.moneda1);this.moneda1.userData = { nombre: "Moneda" };
     this.moneda2 = new Moneda(variablesTubo); this.objetos.push(this.moneda2);this.moneda2.userData = { nombre: "Moneda" };
     this.moneda3 = new Moneda(variablesTubo); this.objetos.push(this.moneda3);this.moneda3.userData = { nombre: "Moneda" };
@@ -66,6 +69,8 @@ class Juego extends THREE.Object3D {
 
     //Añadir los objetos al circuito (a la escena)
     this.add(this.puerta1.posicionOrientacionObjeto(270 * (Math.PI / 180), 0.22));
+    this.add(this.puerta2.posicionOrientacionObjeto(270 * (Math.PI / 180), 0.45));
+    this.add(this.puerta3.posicionOrientacionObjeto(180 * (Math.PI / 180), 0));
     this.add(this.moneda1.posicionOrientacionObjeto(0 * (Math.PI / 180), 0.14));
     this.add(this.moneda2.posicionOrientacionObjeto(170 * (Math.PI / 180), 0.3));
     this.add(this.moneda3.posicionOrientacionObjeto(80 * (Math.PI / 180), 0.44));
@@ -89,12 +94,15 @@ class Juego extends THREE.Object3D {
     this.ovni1.animar1();
     this.ovni2.animar2();
     this.puerta1.animar();
+    this.puerta2.animar();
+    this.puerta3.animar();
     this.corazon1.animar1();
     this.corazon2.animar2();
 
     //Gestión de eventos de reatón y teclado
     this.onKeyDown = this.onKeyDown.bind(this);
     addEventListener('keydown', this.onKeyDown, false);
+    
     this.onDocumentMouseDown = this.onDocumentMouseDown.bind(this);
     addEventListener('mousedown', this.onDocumentMouseDown, false);
   }
@@ -220,7 +228,7 @@ class Juego extends THREE.Object3D {
 
         if (this.impactos.length > 0) {
           let object = this.impactos[0].object;
-          while (object.parent && object.parent.parent && !(object instanceof Moneda || object instanceof Pinchos || object instanceof Escudo || object instanceof Puertas)) {
+          while (object.parent && object.parent.parent && !(object instanceof Ovni ||object instanceof Moneda || object instanceof Pinchos || object instanceof Escudo || object instanceof Puertas)) {
             object = object.parent;
           }
           const originalObject = object;

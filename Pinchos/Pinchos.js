@@ -11,7 +11,7 @@ class Pinchos extends THREE.Object3D {
     // this.material.flatShading = true;
     // this.material.needsUpdate = true;
 
-    this.material = new THREE.MeshStandardMaterial({ color: 0xABAFAC}); // Rojo
+    this.material = new THREE.MeshStandardMaterial({ color: 0xABAFAC }); // Rojo
     this.material.roughness = 0.2;
     this.material.metalness = 0;
 
@@ -100,10 +100,12 @@ class Pinchos extends THREE.Object3D {
     return this.posObjeto;
   }
 
-  colision(juego){
-    juego.vidas -= 1;
-    juego.coche.velocidad *= 1.1;
-    console.log("Choque con pinchos, -1 vida y + velocidad");
+  colision(juego) {
+    if (!juego.inmune) {
+      juego.vidas -= 1;
+      juego.coche.velocidad *= 1.1;
+      console.log("Choque con pinchos, -1 vida y + velocidad");
+    }
   }
 
   update() {

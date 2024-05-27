@@ -25,40 +25,53 @@ export class MyScene extends THREE.Scene {
 
     this.cambio = true;
 
-    // Lo primero, crear el visualizador, pasándole el lienzo sobre el que realizar los renderizados.
     this.renderer = this.createRenderer(myCanvas);
 
-    // Se crea la interfaz gráfica de usuario
     this.gui = this.createGUI();
 
-    // Construimos los distinos elementos que tendremos en la escena
-
-    // Todo elemento que se desee sea tenido en cuenta en el renderizado de la escena debe pertenecer a esta. Bien como hijo de la escena (this en esta clase) o como hijo de un elemento que ya esté en la escena.
-    // Tras crear cada elemento se añadirá a la escena con   this.add(variable)
     this.createLights();
 
     this.model = new Juego(this.gui, "Controles del Juego");
 
-    // Tendremos una cámara con un control de movimiento con el ratón
     this.createCamera();
 
     this.model.asignarCamara(this.camera);
 
-
-    // Y unos ejes. Imprescindibles para orientarnos sobre dónde están las cosas
-    // Todas las unidades están en metros
     this.axis = new THREE.AxesHelper(10);
     this.add(this.axis);
 
-    // Por último creamos el modelo.
-    // El modelo puede incluir su parte de la interfaz gráfica de usuario. Le pasamos la referencia a 
-    // la gui y el texto bajo el que se agruparán los controles de la interfaz que añada el modelo.
-
     this.add(this.model);
+
+    this.asignarFondo();
 
     this.onKeyDown = this.onKeyDown.bind(this);
     addEventListener('keydown', this.onKeyDown, false);
   }
+
+  asignarFondo() {
+    // Ruta del video
+    var videoPath = "../imgs/cielo.mp4";
+
+    // Crear elemento de video
+    var video = document.createElement('video');
+    video.src = videoPath;
+    video.crossOrigin = 'anonymous';
+    video.loop = true;
+    video.muted = true; // Importante para evitar problemas con autoplay en algunos navegadores
+    video.autoplay = true; // Autoreproducción
+    video.play();
+
+    // Crear textura de video
+    var videoTexture = new THREE.VideoTexture(video);
+    videoTexture.minFilter = THREE.LinearFilter;
+    videoTexture.magFilter = THREE.LinearFilter;
+    videoTexture.format = THREE.RGBAFormat; // Cambiado a RGBAFormat
+
+    // Asignar textura de video como fondo
+    this.background = videoTexture;
+}
+
+
 
   onKeyDown(event) {
     // Comprueba qué tecla se ha presionado
@@ -168,7 +181,7 @@ export class MyScene extends THREE.Scene {
 
 
     this.luzPuntual2 = new THREE.PointLight('blue');
-    this.luzPuntual2.power = 1000;
+    this.luzPuntual2.power = 2000;
     this.luzPuntual2.position.set(0, 3, 15);
     this.add(this.luzPuntual2);
 
@@ -219,8 +232,6 @@ export class MyScene extends THREE.Scene {
     this.pointLight3.position.set(-25, 3, 5);
     this.pointLight3.target.position.set(0, 0, 0);
     this.add(this.pointLight3);
-
-
 
   }
 
@@ -299,7 +310,7 @@ export class MyScene extends THREE.Scene {
     var velocidad = this.model.coche.velocidad * 10000;
     velocidadContainer.textContent = 'Velocidad: ' + velocidad.toFixed(1);
     monedasContainer.textContent = 'Monedas: ' + this.model.monedas;
-}
+  }
 
   // Modifica el método update para que solo actualice la escena cuando el juego esté iniciado
   update() {
@@ -316,12 +327,12 @@ export class MyScene extends THREE.Scene {
 
       this.actualizarCorazones();
       this.actualizarDistancia();
-    }
 
-    // Este método debe ser llamado cada vez que queramos visualizar la escena de nuevo.
-    // Literalmente le decimos al navegador: "La próxima vez que haya que refrescar la pantalla, llama al método que te indico".
-    // Si no existiera esta línea,  update()  se ejecutaría solo la primera vez.
-    requestAnimationFrame(() => this.update());
+      // Este método debe ser llamado cada vez que queramos visualizar la escena de nuevo.
+      // Literalmente le decimos al navegador: "La próxima vez que haya que refrescar la pantalla, llama al método que te indico".
+      // Si no existiera esta línea,  update()  se ejecutaría solo la primera vez.
+      requestAnimationFrame(() => this.update());
+    }
   }
 }
 

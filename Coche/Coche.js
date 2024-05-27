@@ -105,6 +105,16 @@ class Coche extends THREE.Object3D {
     this.posCoche.add(this.cameraThirdPerson);
     //FIN CAMÁRA 3ª PERSONA
 
+    //FOCO AL COCHE
+
+    this.foco = new THREE.SpotLight(0xA200FF);
+    this.foco.power = 0;
+    this.foco.position.set(0, 2, 0);
+    this.foco.angle = Math.PI/6;
+    this.foco.penumbra = 1;
+    this.foco.target = this.posCoche;
+    this.posCoche.add(this.foco);
+
     this.posCoche.add(this);
     this.posCoche.position.y = this.tubeRadius;
 

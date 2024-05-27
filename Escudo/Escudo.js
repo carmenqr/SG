@@ -96,9 +96,19 @@ class Escudo extends THREE.Object3D {
     return this.posObjeto;
   }
 
-  colision(juego){
-    
-  }
+  colision(juego) {
+    // Activa la inmunidad inmediatamente después de la colisión
+    juego.inmune = true;
+    juego.coche.foco.power = 150;
+    console.log("Inmunidad activada.");
+
+    // Inicia el temporizador de 10 segundos
+    setTimeout(function() {
+        juego.inmune = false;
+        juego.coche.foco.power = 0;
+        console.log("El estado inmune ha terminado.");
+    }, 20000); 
+}
 
 
   update() {

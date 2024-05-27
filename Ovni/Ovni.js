@@ -13,11 +13,6 @@ class Ovni extends THREE.Object3D {
     // Se crea primero porque otros métodos usan las variables que se definen para la interfaz
     this.createGUI(gui, titleGui);
 
-    /*     // El material se usa desde varios métodos. Por eso se alamacena en un atributo
-        this.material = new THREE.MeshNormalMaterial();
-        this.material.flatShading = true;
-        this.material.needsUpdate = true; */
-
     this.loader1 = new THREE.TextureLoader();
     this.textura1 = this.loader1.load("../imgs/cabezaOvni.jpg", function (texture) {
       // Ajustar las propiedades de la textura para que no se repita
@@ -31,6 +26,9 @@ class Ovni extends THREE.Object3D {
     this.textura2 = this.loader2.load("../imgs/cuerpoOvni.jpg");
     this.material2 = new THREE.MeshStandardMaterial({ map: this.textura2 });
 
+    this.loader3 = new THREE.TextureLoader();
+    this.textura3 = this.loader3.load("../imgs/ovnialiens.jpg");
+    this.material3 = new THREE.MeshStandardMaterial({ map: this.textura3, color: 0x8EFF61 });
 
     this.ovni = this.createOvni();
     //this.ovni.position.set(this.guiControls.posX, this.guiControls.posY, this.guiControls.posZ);
@@ -57,14 +55,20 @@ class Ovni extends THREE.Object3D {
 
     var formaEsfera = new THREE.SphereGeometry(0.5, 5, 5);
     formaEsfera.translate(0, -0.4, 0);
-    var esfera = new THREE.Mesh(formaEsfera, this.material1);
+    var esfera = new THREE.Mesh(formaEsfera, this.material3);
 
     var forma = new CSG();
     forma.union([esfera, platillo]);
     var ov = forma.toMesh();
     ov.scale.set(0.3, 0.3, 0.3);
-    this.proyectil = new THREE.Mesh(new THREE.SphereGeometry(0.5, 8, 8), new THREE.MeshBasicMaterial({ color: 0xff0000 }));
-    this.proyectil2 = new THREE.Mesh(new THREE.SphereGeometry(1, 8, 8), new THREE.MeshBasicMaterial({ color: 0xff0000 }));
+
+    this.material4 = new THREE.MeshStandardMaterial({
+      emissive: 0x36FF00, // Color de la emisividad (verde)
+      emissiveIntensity: 1 // Intensidad de la emisividad (muy alta)
+    });    
+
+    this.proyectil = new THREE.Mesh(new THREE.SphereGeometry(0.5, 8, 8), this.material4);
+    this.proyectil2 = new THREE.Mesh(new THREE.SphereGeometry(0.5, 8, 8), this.material4);
 
 
     // Asignar materiales a las partes específicas de la geometría combinada
@@ -100,7 +104,7 @@ class Ovni extends THREE.Object3D {
     // Crear animación con Tween para mover el proyectil
     var origen = { t: 0 };
     var destino = { t: 1 };
-    var tiempo = 1500; // Duración de la animación en milisegundos
+    var tiempo = 900; // Duración de la animación en milisegundos
 
     var animacion = new TWEEN.Tween(origen).to(destino, tiempo).repeat(Infinity).onUpdate(() => {
       var posicion = trayectoria.getPointAt(origen.t);
@@ -133,7 +137,7 @@ class Ovni extends THREE.Object3D {
     // Crear animación con Tween para mover el proyectil
     var origen = { t: 0 };
     var destino = { t: 1 };
-    var tiempo = 1500; // Duración de la animación en milisegundos
+    var tiempo = 900; // Duración de la animación en milisegundos
 
     var animacion = new TWEEN.Tween(origen).to(destino, tiempo).repeat(Infinity).onUpdate(() => {
       var posicion = trayectoria.getPointAt(origen.t);
@@ -252,6 +256,10 @@ class Ovni extends THREE.Object3D {
 
     // Comenzar la animación
     animacion.start();
+  }
+
+  colision(juego){
+
   }
 
 

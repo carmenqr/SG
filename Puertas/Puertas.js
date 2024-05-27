@@ -110,7 +110,7 @@ class Puertas extends THREE.Object3D {
     const duracion = 2500;
 
     var origen = { rotacion: 0 };
-    var destino = { rotacion: -Math.PI / 2 };
+    var destino = { rotacion: -Math.PI / 2 }; //-90º
 
     var movimiento = new TWEEN.Tween(origen).to(destino, duracion).yoyo(true).repeat(Infinity);
 
