@@ -23,7 +23,7 @@ class Juego extends THREE.Object3D {
     this.angulo = 0;
     this.cambio = true;
     this.objetos = [];
-    this.objetosConColision = new Set(); 
+    this.objetosConColision = new Set();
     this.monedas = 0;
     this.inmune = false;
 
@@ -44,20 +44,20 @@ class Juego extends THREE.Object3D {
 
 
     //Creación de objetos
-    this.puerta1 = new Puertas(variablesTubo); this.objetos.push(this.puerta1);this.puerta1.userData = { nombre: "Puerta" };
-    this.puerta2 = new Puertas(variablesTubo); this.objetos.push(this.puerta2);this.puerta2.userData = { nombre: "Puerta" };
-    this.puerta3 = new Puertas(variablesTubo); this.objetos.push(this.puerta3);this.puerta3.userData = { nombre: "Puerta" };
-    this.moneda1 = new Moneda(variablesTubo); this.objetos.push(this.moneda1);this.moneda1.userData = { nombre: "Moneda" };
-    this.moneda2 = new Moneda(variablesTubo); this.objetos.push(this.moneda2);this.moneda2.userData = { nombre: "Moneda" };
-    this.moneda3 = new Moneda(variablesTubo); this.objetos.push(this.moneda3);this.moneda3.userData = { nombre: "Moneda" };
-    this.moneda4 = new Moneda(variablesTubo); this.objetos.push(this.moneda4);this.moneda4.userData = { nombre: "Moneda" };
+    this.puerta1 = new Puertas(variablesTubo); this.objetos.push(this.puerta1); this.puerta1.userData = { nombre: "Puerta" };
+    this.puerta2 = new Puertas(variablesTubo); this.objetos.push(this.puerta2); this.puerta2.userData = { nombre: "Puerta" };
+    this.puerta3 = new Puertas(variablesTubo); this.objetos.push(this.puerta3); this.puerta3.userData = { nombre: "Puerta" };
+    this.moneda1 = new Moneda(variablesTubo); this.objetos.push(this.moneda1); this.moneda1.userData = { nombre: "Moneda" };
+    this.moneda2 = new Moneda(variablesTubo); this.objetos.push(this.moneda2); this.moneda2.userData = { nombre: "Moneda" };
+    this.moneda3 = new Moneda(variablesTubo); this.objetos.push(this.moneda3); this.moneda3.userData = { nombre: "Moneda" };
+    this.moneda4 = new Moneda(variablesTubo); this.objetos.push(this.moneda4); this.moneda4.userData = { nombre: "Moneda" };
     this.ovni1 = new Ovni(); this.objetos.push(this.ovni1.proyectil); this.ovni1.proyectil.userData = { nombre: "Proyectil" };
     this.ovni2 = new Ovni(); this.objetos.push(this.ovni2.proyectil2); this.ovni2.proyectil2.userData = { nombre: "Proyectil" };
-    this.escudo1 = new Escudo(variablesTubo); this.objetos.push(this.escudo1);this.escudo1.userData = { nombre: "Escudo" };
-    this.escudo2 = new Escudo(variablesTubo); this.objetos.push(this.escudo2);this.escudo2.userData = { nombre: "Escudo" };
-    this.escudo3 = new Escudo(variablesTubo); this.objetos.push(this.escudo3);this.escudo3.userData = { nombre: "Escudo" };
-    this.pinchos1 = new Pinchos(variablesTubo); this.objetos.push(this.pinchos1);this.pinchos1.userData = { nombre: "Pinchos" };
-    this.pinchos2 = new Pinchos(variablesTubo); this.objetos.push(this.pinchos2);this.pinchos2.userData = { nombre: "Pinchos" };
+    this.escudo1 = new Escudo(variablesTubo); this.objetos.push(this.escudo1); this.escudo1.userData = { nombre: "Escudo" };
+    this.escudo2 = new Escudo(variablesTubo); this.objetos.push(this.escudo2); this.escudo2.userData = { nombre: "Escudo" };
+    this.escudo3 = new Escudo(variablesTubo); this.objetos.push(this.escudo3); this.escudo3.userData = { nombre: "Escudo" };
+    this.pinchos1 = new Pinchos(variablesTubo); this.objetos.push(this.pinchos1); this.pinchos1.userData = { nombre: "Pinchos" };
+    this.pinchos2 = new Pinchos(variablesTubo); this.objetos.push(this.pinchos2); this.pinchos2.userData = { nombre: "Pinchos" };
     this.corazon1 = new Corazon();
     this.corazon2 = new Corazon();
     this.coche = new Coche(variablesTubo);
@@ -102,7 +102,7 @@ class Juego extends THREE.Object3D {
     //Gestión de eventos de reatón y teclado
     this.onKeyDown = this.onKeyDown.bind(this);
     addEventListener('keydown', this.onKeyDown, false);
-    
+
     this.onDocumentMouseDown = this.onDocumentMouseDown.bind(this);
     addEventListener('mousedown', this.onDocumentMouseDown, false);
   }
@@ -228,11 +228,11 @@ class Juego extends THREE.Object3D {
 
         if (this.impactos.length > 0) {
           let object = this.impactos[0].object;
-          while (object.parent && object.parent.parent && !(object instanceof Ovni ||object instanceof Moneda || object instanceof Pinchos || object instanceof Escudo || object instanceof Puertas)) {
+          while (object.parent && object.parent.parent && !(object instanceof Ovni || object instanceof Moneda || object instanceof Pinchos || object instanceof Escudo || object instanceof Puertas)) {
             object = object.parent;
           }
           const originalObject = object;
-    
+
           if (!this.objetosConColision.has(originalObject)) { // Verificar si el objeto ya ha sido colisionado
             console.log(originalObject.userData.nombre);
             originalObject.colision(this);
@@ -273,7 +273,7 @@ class Juego extends THREE.Object3D {
     this.corazon2.update();
     this.coche.update();
     if (this.coche.t < 0.0005) {
-      this.objetosConColision = new Set(); 
+      this.objetosConColision = new Set();
     }
     this.colisiones();
     this.actualizarDistanciaRecorrida();

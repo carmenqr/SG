@@ -5,7 +5,8 @@
     <title>Juego</title>
     <meta charset="utf-8">
     <script type="text/javascript" src="../libs/jquery.js"></script>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet"
+        crossorigin="anonymous">
     <script type="importmap">
         { "imports": { "three": "../libs/three.module.js" } }
     </script>
@@ -16,11 +17,14 @@
             overflow: hidden;
             font-family: Arial, sans-serif;
         }
-    
+
         #WebGL-output {
             position: relative;
+            width: 100vw;
+            height: 100vh;
+            overflow: hidden;
         }
-    
+
         #inicio-overlay {
             position: absolute;
             top: 0;
@@ -28,81 +32,70 @@
             width: 100%;
             height: 100%;
             background-color: rgba(0, 0, 0, 0.7);
-            /* Fondo semitransparente */
             display: flex;
             justify-content: center;
             align-items: center;
             color: white;
             font-size: 24px;
             flex-direction: column;
-            /* Para que los elementos estén uno debajo del otro */
         }
-    
+
         #inicio-overlay p {
             margin: 10px 0;
-            /* Espaciado entre párrafos */
         }
-    
+
         #corazones-container {
             position: absolute;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
             z-index: 9999;
-            /* Asegura que esté encima de otros elementos */
             display: flex;
             flex-direction: row;
             align-items: center;
             justify-content: center;
         }
-    
+
         #corazones-container i {
             font-size: 24px;
-            /* Tamaño de fuente más grande para los corazones */
             margin-right: 5px;
-            /* Añade un pequeño margen entre los corazones */
         }
-    
+
         .info-container {
             position: absolute;
             top: 10px;
+            left: 10px;
             color: black;
             font-size: 18px;
-            background-color: transparent; /* Hace que el fondo sea transparente */
+            background-color: transparent;
         }
-    
+
         #distancia {
-            left: 10px;
+            top: 10px;
         }
-    
+
         #velocidad {
-            left: 10px;
-            top: 40px; /* Espaciado entre distancia y velocidad */
+            top: 40px;
         }
-    
+
         #monedas {
-            left: 10px;
-            top: 70px; /* Espaciado entre velocidad y monedas */
+            top: 70px;
         }
     </style>
-    
 </head>
 
 <body>
-    <!-- Div que contendrá el lienzo WebGL y la pantalla de inicio -->
     <div id="WebGL-output">
         <div id="corazones-container" class="position-fixed top-0 end-0 m-4"></div>
-        <div id="distancia"></div>
-        <div id="velocidad"></div>
-        <div id="monedas"></div>
-        <!-- Pantalla de inicio -->
+        <div id="distancia" class="info-container"></div>
+        <div id="velocidad" class="info-container"></div>
+        <div id="monedas" class="info-container"></div>
         <div id="inicio-overlay">
             <p>¡Esperamos que lo disfrutes, suerte!</p>
             <h1>Bienvenido a CAOS</h1>
             <p>Presiona la tecla Enter para empezar</p>
         </div>
     </div>
-    <!-- Elemento para mostrar la distancia recorrida -->
 </body>
 
 </html>
