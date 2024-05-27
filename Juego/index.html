@@ -25,13 +25,13 @@
             overflow: hidden;
         }
 
-        #inicio-overlay {
+        #inicio-overlay,
+        #fin-overlay {
             position: absolute;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background-color: rgba(0, 0, 0, 0.7);
             display: flex;
             justify-content: center;
             align-items: center;
@@ -40,7 +40,34 @@
             flex-direction: column;
         }
 
-        #inicio-overlay p {
+        #inicio-overlay {
+            background-image: url('../imgs/inicio.png');
+            background-size: cover;
+            background-repeat: no-repeat;
+        }
+
+        #inicio-overlay::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            z-index: 1;
+        }
+
+        #inicio-overlay * {
+            position: relative;
+            z-index: 2;
+        }
+
+        #fin-overlay {
+            background-color: rgba(0, 0, 0, 0.7);
+        }
+
+        #inicio-overlay p,
+        #fin-overlay p {
             margin: 10px 0;
         }
 
@@ -94,6 +121,12 @@
             <p>¡Esperamos que lo disfrutes, suerte!</p>
             <h1>Bienvenido a CAOS</h1>
             <p>Presiona la tecla Enter para empezar</p>
+        </div>
+        <div id="fin-overlay" style="display: none;">
+            <p>¡Gracias por jugar!</p>
+            <h1>Fin del Juego</h1>
+            <p id="puntuacion-final"></p>
+            <button onclick="location.reload()">Reiniciar</button>
         </div>
     </div>
 </body>

@@ -14,11 +14,10 @@ import { Coche } from '../Coche/Coche.js'
 
 
 class Juego extends THREE.Object3D {
-  constructor(gui, titleGui) {
+  constructor() {
     super();
 
     //Inicialización de variables
-    this.createGUI(gui, titleGui);
     this.t = 0.05;
     this.angulo = 0;
     this.cambio = true;
@@ -26,6 +25,7 @@ class Juego extends THREE.Object3D {
     this.objetosConColision = new Set();
     this.monedas = 0;
     this.inmune = false;
+    this.vidas = 4;
 
 
     // Creación del material
@@ -51,18 +51,18 @@ class Juego extends THREE.Object3D {
     this.moneda2 = new Moneda(variablesTubo); this.objetos.push(this.moneda2); this.moneda2.userData = { nombre: "Moneda" };
     this.moneda3 = new Moneda(variablesTubo); this.objetos.push(this.moneda3); this.moneda3.userData = { nombre: "Moneda" };
     this.moneda4 = new Moneda(variablesTubo); this.objetos.push(this.moneda4); this.moneda4.userData = { nombre: "Moneda" };
-    this.ovni1 = new Ovni(); this.objetos.push(this.ovni1.proyectil); this.ovni1.proyectil.userData = { nombre: "Proyectil" };
-    this.ovni2 = new Ovni(); this.objetos.push(this.ovni2.proyectil2); this.ovni2.proyectil2.userData = { nombre: "Proyectil" };
+    this.ovni1 = new Ovni(); this.objetos.push(this.ovni1.proyectil); this.ovni1.proyectil.userData = { nombre: "Proyectil" }; this.ovni1.userData = { nombre: "Ovni" };
+    this.ovni2 = new Ovni(); this.objetos.push(this.ovni2.proyectil2); this.ovni2.proyectil2.userData = { nombre: "Proyectil" }; this.ovni2.userData = { nombre: "Ovni" };
     this.escudo1 = new Escudo(variablesTubo); this.objetos.push(this.escudo1); this.escudo1.userData = { nombre: "Escudo" };
     this.escudo2 = new Escudo(variablesTubo); this.objetos.push(this.escudo2); this.escudo2.userData = { nombre: "Escudo" };
     this.escudo3 = new Escudo(variablesTubo); this.objetos.push(this.escudo3); this.escudo3.userData = { nombre: "Escudo" };
     this.pinchos1 = new Pinchos(variablesTubo); this.objetos.push(this.pinchos1); this.pinchos1.userData = { nombre: "Pinchos" };
     this.pinchos2 = new Pinchos(variablesTubo); this.objetos.push(this.pinchos2); this.pinchos2.userData = { nombre: "Pinchos" };
-    this.corazon1 = new Corazon();
-    this.corazon2 = new Corazon();
+    this.corazon1 = new Corazon();this.corazon1.userData = { nombre: "Corazon" };
+    this.corazon2 = new Corazon();this.corazon2.userData = { nombre: "Corazon" };
     this.coche = new Coche(variablesTubo);
 
-    this.vidas = 4;
+    
 
     // Inicializa la distancia recorrida por el coche
     this.distanciaRecorrida = 0;
@@ -78,7 +78,7 @@ class Juego extends THREE.Object3D {
     this.add(this.escudo1.posicionOrientacionObjeto(0 * (Math.PI / 180), 0.8));
     this.add(this.escudo2.posicionOrientacionObjeto(0 * (Math.PI / 180), 0.35));
     this.add(this.escudo3.posicionOrientacionObjeto(0 * (Math.PI / 180), 0.92));
-    this.add(this.pinchos1.posicionOrientacionObjeto(180 * (Math.PI / 180), 0.4));
+    this.add(this.pinchos1.posicionOrientacionObjeto(180 * (Math.PI / 180), 0.2));
     this.add(this.pinchos2.posicionOrientacionObjeto(0 * (Math.PI / 180), 0.88));
 
     this.add(this.coche.posicionOrientacionCoche());//AÑADIR A LA ESCENA EL COCHE
@@ -159,8 +159,18 @@ class Juego extends THREE.Object3D {
     if (pickedObjects.length > 0) {
       var selectedObject = pickedObjects[0].object;
       this.disparar(selectedObject);
-      if (selectedObject == this.ovni1) console.log("Ovni seleccionado");
-      else console.log("Corazon seleccionado");
+    }
+
+    if (pickedObjects.length > 0) {
+      let object = pickedObjects[0].object;
+      var selectedObject = pickedObjects[0].object;
+      while (object.parent && object.parent.parent && !(object instanceof Corazon || object instanceof Ovni)) {
+        object = object.parent;
+      }
+      const originalObject = object;
+      originalObject.seleccionado(this, originalObject);
+      console.log(originalObject.userData.nombre);
+      this.disparar(selectedObject);
     }
 
   }
@@ -174,7 +184,7 @@ class Juego extends THREE.Object3D {
     var posicionObjetoSeleccionado = objeto.getWorldPosition(new THREE.Vector3());;
 
     // Crear una instancia del objeto 3D con forma de bala
-    var bala = new THREE.Mesh(new THREE.SphereGeometry(0.1, 8, 8), new THREE.MeshBasicMaterial({ color: 0xff0000 }));
+    var bala = new THREE.Mesh(new THREE.SphereGeometry(0.2, 8, 8), new THREE.MeshBasicMaterial({ color: 0xff0000 }));
     bala.position.copy(posicionCoche);
 
     // Añadir la bala a la escena
@@ -250,10 +260,6 @@ class Juego extends THREE.Object3D {
       }
 
     }
-  }
-
-  createGUI(gui, titleGui) {
-
   }
 
   actualizarDistanciaRecorrida() {

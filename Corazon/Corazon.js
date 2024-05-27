@@ -38,6 +38,13 @@ class Corazon extends THREE.Object3D {
       });
   }
 
+  seleccionado(juego, objeto){
+    juego.vidas += 1;
+    setTimeout(() => {
+      juego.remove(objeto);
+    }, 400);
+  }
+
   animar1() {
     var pts = [
       new THREE.Vector3(-6, 4, 20),

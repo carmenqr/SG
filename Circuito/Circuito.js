@@ -20,6 +20,7 @@ class Circuito extends THREE.Object3D {
 
     this.material = new THREE.MeshStandardMaterial({color: 0xFFDF9B});
     this.material.bumpMap = new THREE.TextureLoader().load('../imgs/texturacircuito.jpg');
+    
 
     this.circuito = this.createCircuito();
     
@@ -41,6 +42,27 @@ class Circuito extends THREE.Object3D {
       new THREE.Vector3(-15, 10, 8), //7
       new THREE.Vector3(-10, 3, 2) //9
     ];
+
+    /* this.path = new THREE.CatmullRomCurve3(
+      [
+        new THREE.Vector3(-200, -35, 100),
+        new THREE.Vector3(-250, 0, -20),
+        new THREE.Vector3(-125, 100, 20),
+        new THREE.Vector3(0, 50, 35),
+        new THREE.Vector3(50, 70, -25),
+        new THREE.Vector3(100, -50, 10),
+        new THREE.Vector3(-50, 0, 100),
+        new THREE.Vector3(0, 75, 150),
+        new THREE.Vector3(125, 50, 125),
+        new THREE.Vector3(-25, 0, 0),
+        new THREE.Vector3(-100, 150, -75),
+        new THREE.Vector3(-150, 150, 50),
+        new THREE.Vector3(-175, 50, 100),
+        new THREE.Vector3(-100, 0, 150),
+        new THREE.Vector3(-150, -50, 200)
+      ].map(point => point.divideScalar(10)), // Divide each vector by 100
+      true // Closed curve
+    ) */
 
     // Crear la curva de Catmull-Rom cerrada
     this.path = new THREE.CatmullRomCurve3(pts, true);

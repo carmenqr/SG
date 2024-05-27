@@ -1,6 +1,4 @@
-
 import * as THREE from 'three'
-import { CSG } from '../libs/CSG-v2.js'
 import { MTLLoader } from '../libs/MTLLoader.js'
 import { OBJLoader } from '../libs/OBJLoader.js'
 import * as TWEEN from '../libs/tween.esm.js'
@@ -13,18 +11,23 @@ class Ovni extends THREE.Object3D {
     // Se crea primero porque otros métodos usan las variables que se definen para la interfaz
     this.createGUI(gui, titleGui);
 
-    this.loader1 = new THREE.TextureLoader();
-    this.textura1 = this.loader1.load("../imgs/cabezaOvni.jpg", function (texture) {
+    /* this.loader1 = new THREE.TextureLoader();
+    this.textura1 = this.loader1.load("../imgs/cristal.jpeg", function (texture) {
       // Ajustar las propiedades de la textura para que no se repita
       texture.wrapS = THREE.ClampToEdgeWrapping;
       texture.wrapT = THREE.ClampToEdgeWrapping;
       texture.repeat.set(1, 1);
-    });
-    this.material1 = new THREE.MeshStandardMaterial({ map: this.textura1 });
+    }); */
+    this.material1 = new THREE.MeshStandardMaterial({ color: 0xFB60FD });
+    this.material1.bumpMap = new THREE.TextureLoader().load('../imgs/roto.jpeg');
+    this.material1.roughness = 0.2;
+    this.material1.metalness = 0;
 
     this.loader2 = new THREE.TextureLoader();
-    this.textura2 = this.loader2.load("../imgs/cuerpoOvni.jpg");
-    this.material2 = new THREE.MeshStandardMaterial({ map: this.textura2 });
+    this.textura2 = this.loader2.load("../imgs/metal.jpg");
+    this.material2 = new THREE.MeshStandardMaterial({ map: this.textura2, color: 0x13BC2F });
+    this.material2.roughness = 0.5;
+    this.material2.metalness = 0.5;
 
     this.loader3 = new THREE.TextureLoader();
     this.textura3 = this.loader3.load("../imgs/ovnialiens.jpg");
@@ -53,44 +56,36 @@ class Ovni extends THREE.Object3D {
 
     var platillo = new THREE.Mesh(new THREE.LatheGeometry(this.shape.getPoints(), 15, this.phiLength, 2 * Math.PI + 0.1), this.material2);
 
-    var formaEsfera = new THREE.SphereGeometry(0.5, 5, 5);
+    var formaEsfera = new THREE.SphereGeometry(0.5, 10, 10);
     formaEsfera.translate(0, -0.4, 0);
-    var esfera = new THREE.Mesh(formaEsfera, this.material3);
+    var esfera = new THREE.Mesh(formaEsfera, this.material1);
 
-    var forma = new CSG();
-    forma.union([esfera, platillo]);
-    var ov = forma.toMesh();
-    ov.scale.set(0.3, 0.3, 0.3);
+    // Crear un grupo y añadir el platillo y la esfera al grupo
+    var ovniGroup = new THREE.Group();
+    ovniGroup.add(platillo);
+    ovniGroup.add(esfera);
+    ovniGroup.scale.set(0.3, 0.3, 0.3);
 
     this.material4 = new THREE.MeshStandardMaterial({
       emissive: 0x36FF00, // Color de la emisividad (verde)
       emissiveIntensity: 1 // Intensidad de la emisividad (muy alta)
-    });    
+    });
 
     this.proyectil = new THREE.Mesh(new THREE.SphereGeometry(0.5, 8, 8), this.material4);
     this.proyectil2 = new THREE.Mesh(new THREE.SphereGeometry(0.5, 8, 8), this.material4);
 
+    // ovniGroup.position.set(-2, 13, -5);
+    return ovniGroup;
+  }
 
-    // Asignar materiales a las partes específicas de la geometría combinada
-    /*  ov.traverse(function (child) {
-       if (child instanceof THREE.Mesh) {
-         if (child.geometry === platillo.geometry) {
-           child.material = this.material2;
-         } else if (child.geometry === esfera.geometry) {
-           child.material = this.material1;
-         }
-       }
-     }); */
+  seleccionado(juego, objeto) {
 
-    // ov.add(this.lanzarProyectil());
-
-    //ov.position.set(-2, 13, -5);
-    return ov;
+    setTimeout(() => {
+      juego.remove(objeto);
+    }, 400);
   }
 
   lanzarProyectil1() {
-
-
     // Definir la trayectoria del proyectil
     var puntosTrayectoria = [];
     puntosTrayectoria.push(new THREE.Vector3(0, 0, 0)); // Punto inicial
@@ -122,8 +117,6 @@ class Ovni extends THREE.Object3D {
   }
 
   lanzarProyectil2() {
-
-
     // Definir la trayectoria del proyectil
     var puntosTrayectoria = [];
     puntosTrayectoria.push(new THREE.Vector3(0, 1, 0)); // Punto inicial
@@ -205,7 +198,6 @@ class Ovni extends THREE.Object3D {
     // Comenzar la animación
     animacion.start();
   }
-
   animar2() {
     // Punto 7
     var punto = new THREE.Vector3(1, -2, 10);
@@ -258,7 +250,7 @@ class Ovni extends THREE.Object3D {
     animacion.start();
   }
 
-  colision(juego){
+  colision(juego) {
 
   }
 

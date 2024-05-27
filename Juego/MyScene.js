@@ -1,9 +1,7 @@
-
 // Clases de la biblioteca
 // import * as THREE from "three"
 
 import * as THREE from '../libs/three.module.js'
-import { GUI } from '../libs/dat.gui.module.js'
 import { TrackballControls } from '../libs/TrackballControls.js'
 
 // Clases de mi proyecto
@@ -27,11 +25,9 @@ export class MyScene extends THREE.Scene {
 
     this.renderer = this.createRenderer(myCanvas);
 
-    this.gui = this.createGUI();
-
     this.createLights();
 
-    this.model = new Juego(this.gui, "Controles del Juego");
+    this.model = new Juego();
 
     this.createCamera();
 
@@ -69,14 +65,12 @@ export class MyScene extends THREE.Scene {
 
     // Asignar textura de video como fondo
     this.background = videoTexture;
-}
-
-
+  }
 
   onKeyDown(event) {
     // Comprueba qué tecla se ha presionado
     switch (event.keyCode) {
-      case 13: // Tecla espacio
+      case 13: // Tecla Enter
         this.iniciarJuego();
         break;
       default:
@@ -99,6 +93,27 @@ export class MyScene extends THREE.Scene {
     // Comienza la actualización de la escena
     this.update();
   }
+
+  acabarJuego() {
+    // Calcular la puntuación final
+    const puntuacionFinal = this.model.distanciaRecorrida + (this.model.monedas * 200);
+    
+    // Actualizar el contenido del overlay de fin
+    const finOverlay = document.getElementById('fin-overlay');
+    finOverlay.innerHTML = `
+        <p>¡Gracias por jugar!</p>
+        <h1>Fin del Juego</h1>
+        <p>Puntuación Final: ${puntuacionFinal.toFixed(2)}</p>
+        <button onclick="location.reload()">Reiniciar</button>
+    `;
+
+    // Mostrar la pantalla de fin
+    finOverlay.style.display = 'flex';
+
+    // Establecer el estado del juego como no iniciado
+    this.juegoIniciado = false;
+}
+
 
   ocultarPantallaDeInicio() {
     document.getElementById('inicio-overlay').style.display = 'none';
@@ -126,42 +141,6 @@ export class MyScene extends THREE.Scene {
     this.cameraControl.panSpeed = 0.5;
     // Debe orbitar con respecto al punto de mira de la cámara
     this.cameraControl.target = look;
-
-  }
-
-  createGUI() {
-    // Se crea la interfaz gráfica de usuario
-    var gui = new GUI();
-
-    // La escena le va a añadir sus propios controles. 
-    // Se definen mediante un objeto de control
-    // En este caso la intensidad de la luz y si se muestran o no los ejes
-    this.guiControls = {
-      // En el contexto de una función   this   alude a la función
-      lightPower: 100.0,  // La potencia de esta fuente de luz se mide en lúmenes
-      ambientIntensity: 0.35,
-      axisOnOff: true
-    }
-
-    // Se crea una sección para los controles de esta clase
-    var folder = gui.addFolder('Luz y Ejes');
-
-    // Se le añade un control para la potencia de la luz puntual
-    folder.add(this.guiControls, 'lightPower', 0, 200, 10)
-      .name('Luz puntual : ')
-      .onChange((value) => this.setLightPower(value));
-
-    // Otro para la intensidad de la luz ambiental
-    folder.add(this.guiControls, 'ambientIntensity', 0, 1, 0.05)
-      .name('Luz ambiental: ')
-      .onChange((value) => this.setAmbientIntensity(value));
-
-    // Y otro para mostrar u ocultar los ejes
-    folder.add(this.guiControls, 'axisOnOff')
-      .name('Mostrar ejes : ')
-      .onChange((value) => this.setAxisVisible(value));
-
-    return gui;
   }
 
   createLights() {
@@ -169,7 +148,7 @@ export class MyScene extends THREE.Scene {
     // La luz ambiental solo tiene un color y una intensidad
     // Se declara como   var   y va a ser una variable local a este método
     //    se hace así puesto que no va a ser accedida desde otros métodos
-    this.ambientLight = new THREE.AmbientLight('white', this.guiControls.ambientIntensity);
+    this.ambientLight = new THREE.AmbientLight('white', 0.35);
     // La añadimos a la escena
     this.add(this.ambientLight);
 
@@ -178,7 +157,6 @@ export class MyScene extends THREE.Scene {
     this.luzPuntual.power = 1000;
     this.luzPuntual.position.set(0, 0, -2);
     this.add(this.luzPuntual);
-
 
     this.luzPuntual2 = new THREE.PointLight('blue');
     this.luzPuntual2.power = 2000;
@@ -190,7 +168,6 @@ export class MyScene extends THREE.Scene {
     this.luzPuntual3.position.set(-10, 6, 10);
     this.add(this.luzPuntual3);
 
-
     this.luzPuntual4 = new THREE.PointLight('red');
     this.luzPuntual4.power = 1000;
     this.luzPuntual4.position.set(0, -6, 6);
@@ -201,8 +178,6 @@ export class MyScene extends THREE.Scene {
     this.luzPuntual5.position.set(0, 12, 4);
     this.add(this.luzPuntual5);
 
-
-
     // Se crea una luz focal que va a ser la luz principal de la escena
     // La luz focal, además tiene una posición, y un punto de mira
     // Si no se le da punto de mira, apuntará al (0,0,0) en coordenadas del mundo
@@ -212,14 +187,7 @@ export class MyScene extends THREE.Scene {
     this.pointLight.position.set(5, 2, 30);
     this.pointLight.target.position.set(0, 0, 0);
 
-    // // Crear la esfera de representación del objetivo de la luz
-    // const lightTargetGeometry = new THREE.SphereGeometry(0.5, 32, 32); // Geometría de una esfera pequeña
-    // const lightTargetMaterial = new THREE.MeshBasicMaterial({ color: 'red' }); // Material básico blanco
-    // const lightTargetSphere = new THREE.Mesh(lightTargetGeometry, lightTargetMaterial); // Crear la esfera
-    // lightTargetSphere.position.copy(this.pointLight.position);
-    // this.add(lightTargetSphere);
     this.add(this.pointLight);
-
 
     this.pointLight2 = new THREE.SpotLight(0xffffff);
     this.pointLight2.power = 250;
@@ -232,7 +200,6 @@ export class MyScene extends THREE.Scene {
     this.pointLight3.position.set(-25, 3, 5);
     this.pointLight3.target.position.set(0, 0, 0);
     this.add(this.pointLight3);
-
   }
 
   setLightPower(valor) {
@@ -316,6 +283,12 @@ export class MyScene extends THREE.Scene {
   update() {
     // Verifica si el juego está iniciado antes de actualizar la escena
     if (this.juegoIniciado) {
+      // Verifica si el juego ha terminado
+      if (this.model.vidas <= 0) {
+        this.acabarJuego();
+        return;
+      }
+
       // Le decimos al renderizador "visualiza la escena que te indico usando la cámara que te estoy pasando"
       this.renderer.render(this, this.model.getCamara());
 
@@ -336,10 +309,8 @@ export class MyScene extends THREE.Scene {
   }
 }
 
-
 /// La función   main
 $(function () {
-
   // Se instancia la escena pasándole el  div  que se ha creado en el html para visualizar
   var scene = new MyScene("#WebGL-output");
 
