@@ -26,6 +26,7 @@ class Juego extends THREE.Object3D {
     this.monedas = 0;
     this.inmune = false;
     this.vidas = 4;
+    this.distanciaRecorrida = 0;
 
 
     // Creación del material
@@ -58,28 +59,34 @@ class Juego extends THREE.Object3D {
     this.escudo3 = new Escudo(variablesTubo); this.objetos.push(this.escudo3); this.escudo3.userData = { nombre: "Escudo" };
     this.pinchos1 = new Pinchos(variablesTubo); this.objetos.push(this.pinchos1); this.pinchos1.userData = { nombre: "Pinchos" };
     this.pinchos2 = new Pinchos(variablesTubo); this.objetos.push(this.pinchos2); this.pinchos2.userData = { nombre: "Pinchos" };
-    this.corazon1 = new Corazon();this.corazon1.userData = { nombre: "Corazon" };
-    this.corazon2 = new Corazon();this.corazon2.userData = { nombre: "Corazon" };
+    this.pinchos3 = new Pinchos(variablesTubo); this.objetos.push(this.pinchos3); this.pinchos3.userData = { nombre: "Pinchos" };
+    this.pinchos4 = new Pinchos(variablesTubo); this.objetos.push(this.pinchos4); this.pinchos4.userData = { nombre: "Pinchos" };
+    this.pinchos5 = new Pinchos(variablesTubo); this.objetos.push(this.pinchos5); this.pinchos5.userData = { nombre: "Pinchos" };
+    this.corazon1 = new Corazon(); this.corazon1.userData = { nombre: "Corazon" };
+    this.corazon2 = new Corazon(); this.corazon2.userData = { nombre: "Corazon" };
     this.coche = new Coche(variablesTubo);
 
-    
+
 
     // Inicializa la distancia recorrida por el coche
-    this.distanciaRecorrida = 0;
+   
 
     //Añadir los objetos al circuito (a la escena)
-    this.add(this.puerta1.posicionOrientacionObjeto(270 * (Math.PI / 180), 0.22));
+    this.add(this.puerta1.posicionOrientacionObjeto(270 * (Math.PI / 180), 0.16));
     this.add(this.puerta2.posicionOrientacionObjeto(270 * (Math.PI / 180), 0.45));
     this.add(this.puerta3.posicionOrientacionObjeto(180 * (Math.PI / 180), 0));
-    this.add(this.moneda1.posicionOrientacionObjeto(0 * (Math.PI / 180), 0.14));
+    this.add(this.moneda1.posicionOrientacionObjeto(4 * (Math.PI / 180), 0.14));
     this.add(this.moneda2.posicionOrientacionObjeto(170 * (Math.PI / 180), 0.3));
     this.add(this.moneda3.posicionOrientacionObjeto(80 * (Math.PI / 180), 0.44));
     this.add(this.moneda4.posicionOrientacionObjeto(45 * (Math.PI / 180), 0.71));
-    this.add(this.escudo1.posicionOrientacionObjeto(0 * (Math.PI / 180), 0.8));
-    this.add(this.escudo2.posicionOrientacionObjeto(0 * (Math.PI / 180), 0.35));
-    this.add(this.escudo3.posicionOrientacionObjeto(0 * (Math.PI / 180), 0.92));
+    this.add(this.escudo1.posicionOrientacionObjeto(123 * (Math.PI / 180), 0.8));
+    this.add(this.escudo2.posicionOrientacionObjeto(30 * (Math.PI / 180), 0.38));
+    /* this.add(this.escudo3.posicionOrientacionObjeto(0 * (Math.PI / 180), 0.92)); */
     this.add(this.pinchos1.posicionOrientacionObjeto(180 * (Math.PI / 180), 0.2));
     this.add(this.pinchos2.posicionOrientacionObjeto(0 * (Math.PI / 180), 0.88));
+    this.add(this.pinchos3.posicionOrientacionObjeto(10 * (Math.PI / 180), 0.61));
+    this.add(this.pinchos4.posicionOrientacionObjeto(111 * (Math.PI / 180), 0.09));
+    this.add(this.pinchos5.posicionOrientacionObjeto(0 * (Math.PI / 180), 0.09));
 
     this.add(this.coche.posicionOrientacionCoche());//AÑADIR A LA ESCENA EL COCHE
 
@@ -93,9 +100,6 @@ class Juego extends THREE.Object3D {
     //Funciones específicas de los objetos
     this.ovni1.animar1();
     this.ovni2.animar2();
-    this.puerta1.animar();
-    this.puerta2.animar();
-    this.puerta3.animar();
     this.corazon1.animar1();
     this.corazon2.animar2();
 
@@ -206,6 +210,15 @@ class Juego extends THREE.Object3D {
       .start();
   }
 
+  posAleatoria() {
+    return Math.random();
+  }
+
+  // Función para generar un número aleatorio entre 0 y 360
+  angAleatorio() {
+    return Math.random() * 360;
+  }
+
   getObject(Object3D) {
     return Object3D;
   }
@@ -245,7 +258,7 @@ class Juego extends THREE.Object3D {
 
           if (!this.objetosConColision.has(originalObject)) { // Verificar si el objeto ya ha sido colisionado
             console.log(originalObject.userData.nombre);
-            originalObject.colision(this);
+            originalObject.colision(this, originalObject);
             this.objetosConColision.add(originalObject); // Agregar el objeto al conjunto de objetos colisionados
           }
         }
@@ -278,9 +291,9 @@ class Juego extends THREE.Object3D {
     this.corazon1.update();
     this.corazon2.update();
     this.coche.update();
-    if (this.coche.t < 0.0005) {
+    /* if (this.coche.t < 0.0005) {
       this.objetosConColision = new Set();
-    }
+    } */
     this.colisiones();
     this.actualizarDistanciaRecorrida();
   }

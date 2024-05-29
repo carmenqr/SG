@@ -96,19 +96,28 @@ class Escudo extends THREE.Object3D {
     return this.posObjeto;
   }
 
-  colision(juego) {
-    // Activa la inmunidad inmediatamente después de la colisión
-    juego.inmune = true;
-    juego.coche.foco.power = 150;
-    console.log("Inmunidad activada.");
+  colision(juego, objeto) {
+    if (!juego.inmune) {
+      // Activa la inmunidad inmediatamente después de la colisión
+      juego.inmune = true;
+      juego.coche.foco.power = 150;
+      console.log("Inmunidad activada.");
 
-    // Inicia el temporizador de 10 segundos
-    setTimeout(function() {
+      // Inicia el temporizador de 10 segundos
+      setTimeout(function () {
         juego.inmune = false;
         juego.coche.foco.power = 0;
         console.log("El estado inmune ha terminado.");
-    }, 20000); 
-}
+      }, 8000);
+    }
+
+    objeto.posObjetoTubo(juego.posAleatoria());
+    objeto.setAnguloObjeto(juego.angAleatorio() * (Math.PI / 180));
+
+    setTimeout(function () {
+      juego.objetosConColision.delete(objeto);
+    }, 2000);
+  }
 
 
   update() {

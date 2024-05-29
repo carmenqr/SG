@@ -43,6 +43,10 @@ class Corazon extends THREE.Object3D {
     setTimeout(() => {
       juego.remove(objeto);
     }, 400);
+
+    setTimeout(() => {
+      juego.add(objeto);
+    }, 10000);
   }
 
   animar1() {

@@ -64,7 +64,7 @@ class Ovni extends THREE.Object3D {
     var ovniGroup = new THREE.Group();
     ovniGroup.add(platillo);
     ovniGroup.add(esfera);
-    ovniGroup.scale.set(0.3, 0.3, 0.3);
+    ovniGroup.scale.set(0.6, 0.6, 0.6);
 
     this.material4 = new THREE.MeshStandardMaterial({
       emissive: 0x36FF00, // Color de la emisividad (verde)
@@ -83,13 +83,17 @@ class Ovni extends THREE.Object3D {
     setTimeout(() => {
       juego.remove(objeto);
     }, 400);
+
+    setTimeout(() => {
+      juego.add(objeto);
+    }, 10000);
   }
 
   lanzarProyectil1() {
     // Definir la trayectoria del proyectil
     var puntosTrayectoria = [];
     puntosTrayectoria.push(new THREE.Vector3(0, 0, 0)); // Punto inicial
-    puntosTrayectoria.push(new THREE.Vector3(0, 14, 0)); // Punto final
+    puntosTrayectoria.push(new THREE.Vector3(0, 5, 0)); // Punto final
 
     var trayectoria = new THREE.CatmullRomCurve3(puntosTrayectoria);
 
@@ -99,7 +103,7 @@ class Ovni extends THREE.Object3D {
     // Crear animación con Tween para mover el proyectil
     var origen = { t: 0 };
     var destino = { t: 1 };
-    var tiempo = 900; // Duración de la animación en milisegundos
+    var tiempo = 700; // Duración de la animación en milisegundos
 
     var animacion = new TWEEN.Tween(origen).to(destino, tiempo).repeat(Infinity).onUpdate(() => {
       var posicion = trayectoria.getPointAt(origen.t);
@@ -120,7 +124,7 @@ class Ovni extends THREE.Object3D {
     // Definir la trayectoria del proyectil
     var puntosTrayectoria = [];
     puntosTrayectoria.push(new THREE.Vector3(0, 1, 0)); // Punto inicial
-    puntosTrayectoria.push(new THREE.Vector3(0, 10, 0)); // Punto final
+    puntosTrayectoria.push(new THREE.Vector3(0, 5, 0)); // Punto final
 
     var trayectoria = new THREE.CatmullRomCurve3(puntosTrayectoria);
 
@@ -130,7 +134,7 @@ class Ovni extends THREE.Object3D {
     // Crear animación con Tween para mover el proyectil
     var origen = { t: 0 };
     var destino = { t: 1 };
-    var tiempo = 900; // Duración de la animación en milisegundos
+    var tiempo = 700; // Duración de la animación en milisegundos
 
     var animacion = new TWEEN.Tween(origen).to(destino, tiempo).repeat(Infinity).onUpdate(() => {
       var posicion = trayectoria.getPointAt(origen.t);
@@ -250,8 +254,17 @@ class Ovni extends THREE.Object3D {
     animacion.start();
   }
 
-  colision(juego) {
-
+  colision(juego, objeto) {
+    if (!juego.inmune) {
+      juego.vidas -= 1;
+      if(juego.coche.vueltas >= 2) juego.coche.velocidad *= 1.1;
+      // Restar el 10% de las monedas
+      var monedasPerdidas = Math.ceil(juego.monedas * 0.5);
+      juego.monedas -= monedasPerdidas;
+    }
+    setTimeout(function () {
+      juego.objetosConColision.delete(objeto);
+    }, 500);
   }
 
 

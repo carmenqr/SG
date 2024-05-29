@@ -96,7 +96,7 @@ export class MyScene extends THREE.Scene {
 
   acabarJuego() {
     // Calcular la puntuación final
-    const puntuacionFinal = this.model.distanciaRecorrida + (this.model.monedas * 200);
+    const puntuacionFinal = this.model.distanciaRecorrida + (this.model.monedas * 50);
     
     // Actualizar el contenido del overlay de fin
     const finOverlay = document.getElementById('fin-overlay');

@@ -100,11 +100,17 @@ class Pinchos extends THREE.Object3D {
     return this.posObjeto;
   }
 
-  colision(juego) {
+  colision(juego, objeto) {
     if (!juego.inmune) {
       juego.vidas -= 1;
       juego.coche.velocidad *= 1.1;
       console.log("Choque con pinchos, -1 vida y + velocidad");
+      
+      objeto.posObjetoTubo(juego.posAleatoria());
+      objeto.setAnguloObjeto(juego.angAleatorio() * (Math.PI / 180));
+      setTimeout(function () {
+        juego.objetosConColision.delete(objeto);
+      }, 2000);
     }
   }
 

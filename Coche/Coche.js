@@ -10,9 +10,10 @@ class Coche extends THREE.Object3D {
     super();
 
     this.coche = this.createCoche();
-    this.velocidad = 0.0002;
+    this.velocidad = 0.0004;
+    this.vueltas = 0;
 
-    this.t = 0.1;
+    this.t = 0.1; //0.058
     this.angulo = 0;
 
     this.path = variablesTubo[0];
@@ -130,6 +131,7 @@ class Coche extends THREE.Object3D {
     this.t = (this.t + this.velocidad) % 1;
     if (this.t < 0.0005) {
       this.velocidad *= 1.1; // Aumentar la velocidad en un 10%
+      this.vueltas += 1;
     }
     this.avanzarCoche(this.t);
     this.setAnguloCoche(this.angulo);

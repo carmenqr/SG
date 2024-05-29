@@ -10,10 +10,11 @@ class Puertas extends THREE.Object3D {
     this.tubeRadius = variablesTubo[1];
     this.segments = variablesTubo[2];
     this.tubeGeometry = variablesTubo[3];
+    this.abierta = true;
 
     this.loader = new THREE.TextureLoader();
     this.textura = this.loader.load("../imgs/tablones2.jpg");
-    this.material = new THREE.MeshStandardMaterial({map: this.textura});
+    this.material = new THREE.MeshStandardMaterial({ map: this.textura });
     //this.material = new THREE.MeshStandardMaterial({map: this.textura});
     //this.material.bumpMap = new THREE.TextureLoader().load('../imgs/tablones.jpg');
 
@@ -36,7 +37,7 @@ class Puertas extends THREE.Object3D {
     // this.material.flatShading = true;
     // this.material.needsUpdate = true;
     // var material = new THREE.MeshStandardMaterial({ color: 0xffff00, emissive: 0xffff00, emissiveIntensity: 0.2 }); // Amarillo
-    
+
     var marco_latdMesh = new THREE.Mesh(marco_lat, this.material);
     var marco_latiMesh = new THREE.Mesh(marco_lat, this.material);
     var marco_supMesh = new THREE.Mesh(marco_sup, this.material);
@@ -69,6 +70,7 @@ class Puertas extends THREE.Object3D {
 
     PuertaIzq.position.x = -0.2;
     PuertaIzq.add(formaMesh);
+    PuertaIzq.rotation.y = -90 * (Math.PI / 180);
 
     return PuertaIzq;
 
@@ -86,6 +88,7 @@ class Puertas extends THREE.Object3D {
 
     PuertaDcha.position.x = 0.2;
     PuertaDcha.add(formaMesh);
+    PuertaDcha.rotation.y = 90 * (Math.PI / 180);
 
     return PuertaDcha;
 
@@ -106,13 +109,29 @@ class Puertas extends THREE.Object3D {
     return puertas;
   }
 
-  animar() {
+  abrir() {
     const duracion = 2500;
 
     var origen = { rotacion: 0 };
     var destino = { rotacion: -Math.PI / 2 }; //-90º
 
-    var movimiento = new TWEEN.Tween(origen).to(destino, duracion).yoyo(true).repeat(Infinity);
+    var movimiento = new TWEEN.Tween(origen).to(destino, duracion);
+
+    movimiento.onUpdate(() => {
+      this.setAngulo(origen.rotacion);
+    });
+
+    movimiento.start();
+
+  }
+
+  cerrar() {
+    const duracion = 2500;
+
+    var origen = { rotacion: -Math.PI / 2 };
+    var destino = { rotacion: 0 };
+
+    var movimiento = new TWEEN.Tween(origen).to(destino, duracion);
 
     movimiento.onUpdate(() => {
       this.setAngulo(origen.rotacion);
@@ -168,11 +187,48 @@ class Puertas extends THREE.Object3D {
     this.posObjeto.add(this);
     this.posObjeto.position.y = this.tubeRadius;
 
+    this.foco = new THREE.SpotLight(0x2AFF00);
+    this.foco.power = 200;
+    this.foco.position.set(0, 4, 0);
+    this.foco.angle = Math.PI/12;
+    this.foco.penumbra = 1;
+    this.foco.target = this.posObjeto;
+    this.posObjeto.add(this.foco);
+
     return this.posObjeto;
   }
 
-  colision(juego){
-    
+  colision(juego, objeto) {
+
+    if (!this.abierta && !juego.inmune) {
+      juego.coche.t = (juego.coche.t - 0.25) + 1;
+      juego.coche.t = juego.coche.t % 1;
+
+      var distanciaPerdida = Math.ceil(juego.distanciaRecorrida * 0.4);
+      juego.distanciaRecorrida -= distanciaPerdida;
+
+      this.foco.color.set(0x2AFF00);
+
+      juego.coche.velocidad *= 1.1;
+      this.abierta = true;
+      this.abrir();
+    }
+    else if (this.abierta) {
+      juego.coche.t = (juego.coche.t + 0.1) % 1;
+
+      var distanciaGanada = Math.ceil(juego.distanciaRecorrida * 0.2);
+      juego.distanciaRecorrida += distanciaGanada;
+
+      this.foco.color.set(0xFF0000);
+
+      this.abierta = false;
+      this.cerrar();
+    }
+
+    setTimeout(function () {
+      juego.objetosConColision.delete(objeto);
+    }, 2000);
+
   }
 
   update() {

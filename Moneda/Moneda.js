@@ -6,7 +6,7 @@ class Moneda extends THREE.Object3D {
     super();
 
     this.nombre;
-    
+
     this.path = variablesTubo[0];
     this.tubeRadius = variablesTubo[1];
     this.segments = variablesTubo[2];
@@ -119,11 +119,18 @@ class Moneda extends THREE.Object3D {
     return this.posObjeto;
   }
 
-  colision(juego){
+  colision(juego, objeto) {
     juego.monedas += 1;
+
+    objeto.posObjetoTubo(juego.posAleatoria());
+    objeto.setAnguloObjeto(juego.angAleatorio() * (Math.PI / 180));
+    
+    setTimeout(function () {
+      juego.objetosConColision.delete(objeto);
+    }, 2000);
   }
 
-  update () {
+  update() {
 
     this.moneda.rotateY(0.05);
     // No hay nada que actualizar ya que la apertura de la grapadora se ha actualizado desde la interfaz
