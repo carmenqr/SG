@@ -24,6 +24,7 @@ class Juego extends THREE.Object3D {
     this.objetos = [];
     this.objetosConColision = new Set();
     this.monedas = 0;
+    this.ovnis = 0;
     this.inmune = false;
     this.vidas = 4;
     this.distanciaRecorrida = 0;
@@ -187,8 +188,12 @@ class Juego extends THREE.Object3D {
     // Obtener la posición del objeto seleccionado con el ratón
     var posicionObjetoSeleccionado = objeto.getWorldPosition(new THREE.Vector3());;
 
+    this.loader = new THREE.TextureLoader();
+    this.textura = this.loader.load("../imgs/bolafutbol.jpg");
+    this.material = new THREE.MeshStandardMaterial({ map: this.textura});
+
     // Crear una instancia del objeto 3D con forma de bala
-    var bala = new THREE.Mesh(new THREE.SphereGeometry(0.2, 8, 8), new THREE.MeshBasicMaterial({ color: 0xff0000 }));
+    var bala = new THREE.Mesh(new THREE.SphereGeometry(0.15, 8, 8), this.material);
     bala.position.copy(posicionCoche);
 
     // Añadir la bala a la escena

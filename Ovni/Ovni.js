@@ -78,16 +78,7 @@ class Ovni extends THREE.Object3D {
     return ovniGroup;
   }
 
-  seleccionado(juego, objeto) {
-
-    setTimeout(() => {
-      juego.remove(objeto);
-    }, 400);
-
-    setTimeout(() => {
-      juego.add(objeto);
-    }, 10000);
-  }
+  
 
   lanzarProyectil1() {
     // Definir la trayectoria del proyectil
@@ -252,6 +243,17 @@ class Ovni extends THREE.Object3D {
 
     // Comenzar la animación
     animacion.start();
+  }
+
+  seleccionado(juego, objeto) {
+    juego.ovnis += 1;
+    setTimeout(() => {
+      juego.remove(objeto);
+    }, 400);
+
+    setTimeout(() => {
+      juego.add(objeto);
+    }, 10000);
   }
 
   colision(juego, objeto) {

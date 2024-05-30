@@ -33,8 +33,8 @@ export class MyScene extends THREE.Scene {
 
     this.model.asignarCamara(this.camera);
 
-    this.axis = new THREE.AxesHelper(10);
-    this.add(this.axis);
+    //this.axis = new THREE.AxesHelper(10);
+    //this.add(this.axis);
 
     this.add(this.model);
 
@@ -73,6 +73,9 @@ export class MyScene extends THREE.Scene {
       case 13: // Tecla Enter
         this.iniciarJuego();
         break;
+      case 70: // Tecla F
+        this.acabarJuego();
+        break;
       default:
         // No hacer nada si se presiona otra tecla
         break;
@@ -96,8 +99,8 @@ export class MyScene extends THREE.Scene {
 
   acabarJuego() {
     // Calcular la puntuación final
-    const puntuacionFinal = this.model.distanciaRecorrida + (this.model.monedas * 50);
-    
+    const puntuacionFinal = this.model.distanciaRecorrida + (this.model.monedas * 50) + (this.model.ovnis * 100);
+
     // Actualizar el contenido del overlay de fin
     const finOverlay = document.getElementById('fin-overlay');
     finOverlay.innerHTML = `
@@ -112,7 +115,7 @@ export class MyScene extends THREE.Scene {
 
     // Establecer el estado del juego como no iniciado
     this.juegoIniciado = false;
-}
+  }
 
 
   ocultarPantallaDeInicio() {
@@ -272,11 +275,17 @@ export class MyScene extends THREE.Scene {
     const distanciaContainer = document.getElementById('distancia');
     const velocidadContainer = document.getElementById('velocidad');
     const monedasContainer = document.getElementById('monedas');
+    const ovnisContainer = document.getElementById('ovnis');
+    const inmuneContainer = document.getElementById('inmunidad');
 
     distanciaContainer.textContent = 'Distancia: ' + this.model.distanciaRecorrida.toFixed(2);
     var velocidad = this.model.coche.velocidad * 10000;
     velocidadContainer.textContent = 'Velocidad: ' + velocidad.toFixed(1);
     monedasContainer.textContent = 'Monedas: ' + this.model.monedas;
+    ovnisContainer.textContent = 'Ovnis destruidos: ' + this.model.ovnis;
+    if (this.model.inmune) inmuneContainer.textContent = 'Inmunidad: Activada';
+    else inmuneContainer.textContent = 'Inmunidad: Desactivada';
+
   }
 
   // Modifica el método update para que solo actualice la escena cuando el juego esté iniciado

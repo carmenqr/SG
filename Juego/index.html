@@ -108,6 +108,23 @@
         #monedas {
             top: 70px;
         }
+
+        #ovnis {
+            top: 100px;
+        }
+
+        #inmunidad {
+            top: 130px;
+        }
+
+        /* Estilo para la frase "Pulse F para salir" */
+        #exit-message {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            color: white;
+            font-size: 16px;
+        }
     </style>
 </head>
 
@@ -117,6 +134,8 @@
         <div id="distancia" class="info-container"></div>
         <div id="velocidad" class="info-container"></div>
         <div id="monedas" class="info-container"></div>
+        <div id="ovnis" class="info-container"></div>
+        <div id="inmunidad" class="info-container"></div>
         <div id="inicio-overlay">
             <p>¡Esperamos que lo disfrutes, suerte!</p>
             <h1>Bienvenido a CAOS</h1>
@@ -128,6 +147,8 @@
             <p id="puntuacion-final"></p>
             <button onclick="location.reload()">Reiniciar</button>
         </div>
+        <!-- Frase "Pulse F para salir" -->
+        <div id="exit-message">Pulse F para salir</div>
     </div>
 </body>
 

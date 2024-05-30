@@ -2,28 +2,12 @@
 import * as THREE from 'three'
 import { MTLLoader } from '../libs/MTLLoader.js'
 import { OBJLoader } from '../libs/OBJLoader.js'
+import { CSG } from '../libs/CSG-v2.js'
 
 
 class Escudo extends THREE.Object3D {
   constructor(variablesTubo) {
     super();
-
-    // El material se usa desde varios métodos. Por eso se alamacena en un atributo
-    /* this.material = new THREE.MeshBasicMaterial({ color: 0xFF0000 }); // Rojo
-    this.material.flatShading = true;
-    this.material.needsUpdate = true; */
-
-    this.loader = new THREE.TextureLoader();
-    this.textura = this.loader.load('../imgs/escudo99.png', function (texture) {
-      // Ajustar las propiedades de la textura
-      texture.wrapS = THREE.ClampToEdgeWrapping;
-      texture.wrapT = THREE.ClampToEdgeWrapping;
-      texture.repeat.set(0.5, 0.5); // Repetir una vez en ambas direcciones
-      texture.offset.set(0.51, 0.1); // Ajustar el offset para mover la textura
-    });
-
-    this.material = new THREE.MeshStandardMaterial({ map: this.textura/* , color: 'yellow' */ });
-
 
     this.path = variablesTubo[0];
     this.tubeRadius = variablesTubo[1];
@@ -43,13 +27,60 @@ class Escudo extends THREE.Object3D {
     shape.quadraticCurveTo(-0.2, 1.5, -0.65, 1.4);
     shape.quadraticCurveTo(-0.7, 0.3, 0, 0);
 
+    /* this.loader = new THREE.TextureLoader();
+    this.textura = this.loader.load('../imgs/escudo99.png', function (texture) {
+      // Ajustar las propiedades de la textura
+      texture.wrapS = THREE.ClampToEdgeWrapping;
+      texture.wrapT = THREE.ClampToEdgeWrapping;
+      texture.repeat.set(0.5, 0.5); // Repetir una vez en ambas direcciones
+      texture.offset.set(0.51, 0.1); // Ajustar el offset para mover la textura
+    }); */
+
+
+    this.loader = new THREE.TextureLoader();
+    this.textura = this.loader.load("../imgs/metalTornillos.jpg");
+    this.material1 = new THREE.MeshStandardMaterial({ map: this.textura/* , color: 'yellow' */ });
+
+    this.loader2 = new THREE.TextureLoader();
+    //this.textura2 = this.loader2.load("../imgs/rejilla.jpg");
+    this.textura2 = this.loader.load("../imgs/maderavieja.jpg", function (texture) {
+      // Ajustar las propiedades de la textura
+      texture.wrapS = THREE.ClampToEdgeWrapping;
+      texture.wrapT = THREE.ClampToEdgeWrapping;
+      texture.repeat.set(0.5, 0.5);
+      texture.offset.set(0.51, 0);
+      texture.needsUpdate = true; 
+  });
+    this.material2 = new THREE.MeshStandardMaterial({ map: this.textura2/* , color: 'yellow' */ });
+
     var options = { depth: 0.5, steps: 2, curveSegments: 10, bevelEnabled: false }; //etc
     var geometry1 = new THREE.ExtrudeGeometry(shape, options);
 
-    var forma = new THREE.Mesh(geometry1, this.material);
+    var options2 = { depth: 0.7, steps: 2, curveSegments: 10, bevelEnabled: false }; //etc
+    var geometry2 = new THREE.ExtrudeGeometry(shape, options2);
+
+    var forma = new THREE.Mesh(geometry1, this.material1);
+    var forma2 = new THREE.Mesh(geometry1, this.material2);
+    var forma3 = new THREE.Mesh(geometry2, this.material2);
+
     forma.scale.set(0.5, 0.5, 0.5);
+    forma2.scale.set(0.4, 0.4, 0.4);
+    forma3.scale.set(0.4, 0.4, 0.4);
     forma.position.y = -0.01;
-    return forma;
+    forma2.position.y = 0.09;
+    forma2.position.z = 0.02;
+    forma3.position.y = 0.09;
+
+    var csg = new CSG();
+    csg.union([forma]);
+    csg.subtract([forma3]);
+    var borde = csg.toMesh();
+
+    var grupo = new THREE.Group();
+    grupo.add(borde);
+    grupo.add(forma2);
+
+    return grupo;
   }
 
   setAnguloObjeto(valor) {

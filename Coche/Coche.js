@@ -51,9 +51,10 @@ class Coche extends THREE.Object3D {
     var tangente = this.path.getTangentAt(valor);
     posTmp.add(tangente);
     var segmentoActual = Math.floor(valor * this.segments);
-    this.posOrCoche.up = this.tubeGeometry.binormals[segmentoActual];
+    //this.posOrCoche.up = this.tubeGeometry.binormals[segmentoActual]; SIN ESTO EL COCHE NO ROTA "SOLO"
     this.posOrCoche.lookAt(posTmp);
   }
+
 
   posicionOrientacionCoche() {
     this.posOrCoche = new THREE.Object3D();
