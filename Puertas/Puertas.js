@@ -74,13 +74,12 @@ class Puertas extends THREE.Object3D {
     PuertaIzq.add(formaMesh);
     PuertaIzq.rotation.y = -90 * (Math.PI / 180);
 
-    // var pomoIzq = new Pomo();
-    // pomoIzq.position.set(0.1, 0.5, 0.03); // Ajustar la posición del pomo según sea necesario
-    // pomoIzq.rotation.y = 90 * (Math.PI / 180);
-    // pomoIzq.scale.set(0.35, 0.35, 0.35);
-    // PuertaIzq.add(pomoIzq);
-
-    // PuertaIzq.add(pomoIzq);
+    var pomo = new Pomo();
+    var pomoIzq = pomo.createPomoIzq();
+    pomoIzq.position.set(0.15, 0.5, 0.03);
+    pomoIzq.scale.set(0.35, 0.35, 0.35);
+    PuertaIzq.add(pomoIzq);
+    pomo.animarIzq();
 
     return PuertaIzq;
 
@@ -100,10 +99,12 @@ class Puertas extends THREE.Object3D {
     PuertaDcha.add(formaMesh);
     PuertaDcha.rotation.y = 90 * (Math.PI / 180);
 
-    var pomoDcha = new Pomo();
-    pomoDcha.position.set(-0.15, 0.5, 0.03); // Ajustar la posición del pomo según sea necesario
-    pomoDcha.scale.set(0.35, 0.35, 0.35);
-    PuertaDcha.add(pomoDcha);
+    var pomo = new Pomo();
+    var pomoDer = pomo.createPomoDer();
+    pomoDer.position.set(-0.15, 0.5, 0.03);
+    pomoDer.scale.set(0.35, 0.35, 0.35);
+    PuertaDcha.add(pomoDer);
+    pomo.animarDer();
 
     return PuertaDcha;
 
