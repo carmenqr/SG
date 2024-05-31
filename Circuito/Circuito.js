@@ -4,8 +4,8 @@ import * as THREE from 'three'
 class Circuito extends THREE.Object3D {
   constructor() {
     super();
-
-    this.material = new THREE.MeshStandardMaterial({color: 0xFFDF9B});
+    //0xFFDF9B
+    this.material = new THREE.MeshStandardMaterial({color: 0xFFFFFF});
     this.material.bumpMap = new THREE.TextureLoader().load('../imgs/texturacircuito.jpg');
     
 

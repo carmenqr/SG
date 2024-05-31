@@ -3,26 +3,8 @@ import { CSG } from '../libs/CSG-v2.js'
 import * as TWEEN from '../libs/tween.esm.js'
 
 class Pomo extends THREE.Object3D {
-  constructor(variablesTubo) {
+  constructor() {
     super();
-
-    // this.path = variablesTubo[0];
-    // this.tubeRadius = variablesTubo[1];
-    // this.segments = variablesTubo[2];
-    // this.tubeGeometry = variablesTubo[3];
-    // this.abierta = true;
-
-    // this.loader = new THREE.TextureLoader();
-    // this.textura = this.loader.load("../imgs/tablones2.jpg");
-    // this.material = new THREE.MeshStandardMaterial({ map: this.textura });
-
-    // this.pDcha = null;
-
-    // this.pomo = this.createPomoIzq();
-
-    //this.add(this.pomo);
-
-    // this.animarIzq();
 
     this.material = new THREE.MeshStandardMaterial({
       color: 0xdcdcdc,
@@ -46,12 +28,6 @@ class Pomo extends THREE.Object3D {
     palo1.rotateX(90* (Math.PI / 180));
     palo2.translate(0, 0.125, 0.175);
     palo2.rotateZ(-90* (Math.PI / 180));
-
-    this.material = new THREE.MeshStandardMaterial({ 
-      color: 0xdcdcdc, // Color aluminio claro
-      metalness: 1.0,  // Valor alto para apariencia metálica
-      roughness: 0.3   // Valor moderado para una superficie algo suave
-    });
 
     var soporteMesh = new THREE.Mesh(soporte, this.material);
     var palo1Mesh = new THREE.Mesh(palo1, this.material);
@@ -77,12 +53,6 @@ class Pomo extends THREE.Object3D {
     palo1.rotateX(90* (Math.PI / 180));
     palo2.translate(0, -0.125, 0.175);
     palo2.rotateZ(-90* (Math.PI / 180));
-
-    this.material = new THREE.MeshStandardMaterial({ 
-      color: 0xdcdcdc, // Color aluminio claro
-      metalness: 1.0,  // Valor alto para apariencia metálica
-      roughness: 0.3   // Valor moderado para una superficie algo suave
-    });
 
     var soporteMesh = new THREE.Mesh(soporte, this.material);
     var palo1Mesh = new THREE.Mesh(palo1, this.material);

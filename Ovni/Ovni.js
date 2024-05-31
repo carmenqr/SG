@@ -17,11 +17,7 @@ class Ovni extends THREE.Object3D {
     this.material2 = new THREE.MeshStandardMaterial({ map: this.textura2, color: 0x13BC2F });
     this.material2.roughness = 0.5;
     this.material2.metalness = 0.5;
-
-    this.loader3 = new THREE.TextureLoader();
-    this.textura3 = this.loader3.load("../imgs/ovnialiens.jpg");
-    this.material3 = new THREE.MeshStandardMaterial({ map: this.textura3, color: 0x8EFF61 });
-
+    
     this.ovni = this.createOvni();
 
     this.add(this.ovni);
@@ -63,7 +59,6 @@ class Ovni extends THREE.Object3D {
     this.proyectil2 = new THREE.Mesh(new THREE.SphereGeometry(0.5, 8, 8), this.material4);
     this.proyectil3 = new THREE.Mesh(new THREE.SphereGeometry(0.5, 8, 8), this.material4); 
 
-    // ovniGroup.position.set(-2, 13, -5);
     return ovniGroup;
   }
 
@@ -283,8 +278,6 @@ class Ovni extends THREE.Object3D {
       var tangente = splineAnillo.getTangentAt(origen.t);
       posicion.add(tangente);
       this.ovni.up = binormales[Math.floor(origen.t * segmentos)];
-     //this.ovni.lookAt(posicion);
-
     });
 
     // Comenzar la animación
