@@ -2,21 +2,8 @@
 import * as THREE from 'three'
 
 class Circuito extends THREE.Object3D {
-  constructor(gui,titleGui) {
+  constructor() {
     super();
-    
-    // Se crea la parte de la interfaz que corresponde a la grapadora
-    // Se crea primero porque otros métodos usan las variables que se definen para la interfaz
-    this.createGUI(gui,titleGui);
-    
-    // El material se usa desde varios métodos. Por eso se alamacena en un atributo
-    // this.material = new THREE.MeshNormalMaterial();
-    // this.material.flatShading = true;
-    // this.material.needsUpdate = true;
-
-    // this.loader = new THREE.TextureLoader();
-    // this.textura = this.loader.load('../imgs/descarga.jpg');
-    // this.material = new THREE.MeshStandardMaterial({map: this.textura});
 
     this.material = new THREE.MeshStandardMaterial({color: 0xFFDF9B});
     this.material.bumpMap = new THREE.TextureLoader().load('../imgs/texturacircuito.jpg');
@@ -68,11 +55,6 @@ class Circuito extends THREE.Object3D {
   getVariablesTubo(){
     var variables = [this.path,this.tubeRadius,this.segments,this.tubeGeometry];
     return variables;
-  }
-  
-
-  createGUI(gui, titleGui) {
-    
   }
   
 

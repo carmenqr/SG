@@ -18,14 +18,6 @@ class Moneda extends THREE.Object3D {
 
   }
 
-  setNombre(nombre) {
-    this.nombre = nombre;
-  }
-
-  getNombre() {
-    return this.nombre;
-  }
-
   createMoneda() {
     var coin = new THREE.Object3D();
 

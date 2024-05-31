@@ -27,16 +27,6 @@ class Escudo extends THREE.Object3D {
     shape.quadraticCurveTo(-0.2, 1.5, -0.65, 1.4);
     shape.quadraticCurveTo(-0.7, 0.3, 0, 0);
 
-    /* this.loader = new THREE.TextureLoader();
-    this.textura = this.loader.load('../imgs/escudo99.png', function (texture) {
-      // Ajustar las propiedades de la textura
-      texture.wrapS = THREE.ClampToEdgeWrapping;
-      texture.wrapT = THREE.ClampToEdgeWrapping;
-      texture.repeat.set(0.5, 0.5); // Repetir una vez en ambas direcciones
-      texture.offset.set(0.51, 0.1); // Ajustar el offset para mover la textura
-    }); */
-
-
     this.loader = new THREE.TextureLoader();
     this.textura = this.loader.load("../imgs/metalTornillos.jpg");
     this.material1 = new THREE.MeshStandardMaterial({ map: this.textura/* , color: 'yellow' */ });

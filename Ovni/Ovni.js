@@ -4,20 +4,9 @@ import { OBJLoader } from '../libs/OBJLoader.js'
 import * as TWEEN from '../libs/tween.esm.js'
 
 class Ovni extends THREE.Object3D {
-  constructor(gui, titleGui) {
+  constructor() {
     super();
 
-    // Se crea la parte de la interfaz que corresponde a la grapadora
-    // Se crea primero porque otros métodos usan las variables que se definen para la interfaz
-    this.createGUI(gui, titleGui);
-
-    /* this.loader1 = new THREE.TextureLoader();
-    this.textura1 = this.loader1.load("../imgs/cristal.jpeg", function (texture) {
-      // Ajustar las propiedades de la textura para que no se repita
-      texture.wrapS = THREE.ClampToEdgeWrapping;
-      texture.wrapT = THREE.ClampToEdgeWrapping;
-      texture.repeat.set(1, 1);
-    }); */
     this.material1 = new THREE.MeshStandardMaterial({ color: 0xFB60FD });
     this.material1.bumpMap = new THREE.TextureLoader().load('../imgs/roto.jpeg');
     this.material1.roughness = 0.2;
@@ -34,7 +23,6 @@ class Ovni extends THREE.Object3D {
     this.material3 = new THREE.MeshStandardMaterial({ map: this.textura3, color: 0x8EFF61 });
 
     this.ovni = this.createOvni();
-    //this.ovni.position.set(this.guiControls.posX, this.guiControls.posY, this.guiControls.posZ);
 
     this.add(this.ovni);
   }
@@ -195,12 +183,6 @@ class Ovni extends THREE.Object3D {
     // Crear el spline cerrado del anillo
     var splineAnillo = new THREE.CatmullRomCurve3(puntosAnillo, true);
 
-    // Se dibuja con esto
-    // var resolutionAnillo = 100;
-    // var geometryAnillo = new THREE.BufferGeometry().setFromPoints(splineAnillo.getPoints(resolutionAnillo));
-    // var materialAnillo = new THREE.LineBasicMaterial({ color: 0xff0000 });
-    // var splineMeshAnillo = new THREE.Line(geometryAnillo, materialAnillo);
-    // this.add(splineMeshAnillo);
 
     // Se necesitan los binormales del spline
     var segmentos = 100;
@@ -247,12 +229,6 @@ class Ovni extends THREE.Object3D {
     // Crear el spline cerrado del anillo
     var splineAnillo = new THREE.CatmullRomCurve3(puntos, true);
 
-    // Se dibuja con esto
-    // var resolutionAnillo = 100;
-    // var geometryAnillo = new THREE.BufferGeometry().setFromPoints(splineAnillo.getPoints(resolutionAnillo));
-    // var materialAnillo = new THREE.LineBasicMaterial({ color: 0xff0000 });
-    // var splineMeshAnillo = new THREE.Line(geometryAnillo, materialAnillo);
-    // this.add(splineMeshAnillo);
 
     // Se necesitan los binormales del spline
     var segmentos = 100;
@@ -337,11 +313,6 @@ class Ovni extends THREE.Object3D {
     setTimeout(function () {
       juego.objetosConColision.delete(objeto);
     }, 500);
-  }
-
-
-  createGUI(gui, titleGui) {
-
   }
 
 

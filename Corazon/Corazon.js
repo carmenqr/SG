@@ -4,12 +4,8 @@ import { OBJLoader } from '../libs/OBJLoader.js'
 import * as TWEEN from '../libs/tween.esm.js'
 
 class Corazon extends THREE.Object3D {
-  constructor(gui,titleGui) {
+  constructor() {
     super();
-    
-    // Se crea la parte de la hCorazon interfaz que corresponde a la grapadora
-    // Se crea primero porque otros métodos usan las variables que se definen para la interfaz
-    this.createGUI(gui, titleGui);
 
     this.corazon = this.createCorazon();
 
@@ -62,13 +58,6 @@ class Corazon extends THREE.Object3D {
 
     var splineen8 = new THREE.CatmullRomCurve3(pts, true);
 
-    // Se dibuja con esto
-    // var resolutionAnillo = 100;
-    // var geometryAnillo = new THREE.BufferGeometry().setFromPoints(splineAnillo.getPoints(resolutionAnillo));
-    // var materialAnillo = new THREE.LineBasicMaterial({ color: 0xff0000 });
-    // var splineMeshAnillo = new THREE.Line(geometryAnillo, materialAnillo);
-    // this.add(splineMeshAnillo);
-
     var segmentos = 100;
     var binormales = splineen8.computeFrenetFrames(segmentos, true).binormals;
 
@@ -97,22 +86,9 @@ class Corazon extends THREE.Object3D {
     var pts = [
       new THREE.Vector3(-6, 10, 9),
       new THREE.Vector3(-2, 9, 9),
-      //new THREE.Vector3(-7, 4, 19),
-      // new THREE.Vector3(-8, 4, 20),
-      // new THREE.Vector3(-7, 4, 21),
-      // new THREE.Vector3(-5, 4, 19),
-      // new THREE.Vector3(-4, 4, 20),
-      // new THREE.Vector3(-5, 4, 21)
     ];
 
     var splineen8 = new THREE.CatmullRomCurve3(pts, true);
-
-    // Se dibuja con esto
-    // var resolutionAnillo = 100;
-    // var geometryAnillo = new THREE.BufferGeometry().setFromPoints(splineAnillo.getPoints(resolutionAnillo));
-    // var materialAnillo = new THREE.LineBasicMaterial({ color: 0xff0000 });
-    // var splineMeshAnillo = new THREE.Line(geometryAnillo, materialAnillo);
-    // this.add(splineMeshAnillo);
 
     var segmentos = 100;
     var binormales = splineen8.computeFrenetFrames(segmentos, true).binormals;
@@ -138,9 +114,6 @@ class Corazon extends THREE.Object3D {
     animacion.start();
   }
 
-  createGUI (gui,titleGui) {
-
-  }
   
   update () {
 

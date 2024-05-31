@@ -205,18 +205,6 @@ export class MyScene extends THREE.Scene {
     this.add(this.pointLight3);
   }
 
-  setLightPower(valor) {
-    this.pointLight.power = valor;
-  }
-
-  setAmbientIntensity(valor) {
-    this.ambientLight.intensity = valor;
-  }
-
-  setAxisVisible(valor) {
-    this.axis.visible = valor;
-  }
-
   createRenderer(myCanvas) {
     // Se recibe el lienzo sobre el que se van a hacer los renderizados. Un div definido en el html.
 
@@ -271,7 +259,7 @@ export class MyScene extends THREE.Scene {
     }
   }
 
-  actualizarDistancia() {
+  actualizarDatos() {
     const distanciaContainer = document.getElementById('distancia');
     const velocidadContainer = document.getElementById('velocidad');
     const monedasContainer = document.getElementById('monedas');
@@ -308,7 +296,7 @@ export class MyScene extends THREE.Scene {
       this.model.update();
 
       this.actualizarCorazones();
-      this.actualizarDistancia();
+      this.actualizarDatos();
 
       // Este método debe ser llamado cada vez que queramos visualizar la escena de nuevo.
       // Literalmente le decimos al navegador: "La próxima vez que haya que refrescar la pantalla, llama al método que te indico".
