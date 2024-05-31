@@ -55,6 +55,7 @@ class Juego extends THREE.Object3D {
     this.moneda4 = new Moneda(variablesTubo); this.objetos.push(this.moneda4); this.moneda4.userData = { nombre: "Moneda" };
     this.ovni1 = new Ovni(); this.objetos.push(this.ovni1.proyectil); this.ovni1.proyectil.userData = { nombre: "Proyectil" }; this.ovni1.userData = { nombre: "Ovni" };
     this.ovni2 = new Ovni(); this.objetos.push(this.ovni2.proyectil2); this.ovni2.proyectil2.userData = { nombre: "Proyectil" }; this.ovni2.userData = { nombre: "Ovni" };
+    this.ovni3 = new Ovni(); this.objetos.push(this.ovni3.proyectil3); this.ovni3.proyectil3.userData = { nombre: "Proyectil" }; this.ovni3.userData = { nombre: "Ovni" };
     this.escudo1 = new Escudo(variablesTubo); this.objetos.push(this.escudo1); this.escudo1.userData = { nombre: "Escudo" };
     this.escudo2 = new Escudo(variablesTubo); this.objetos.push(this.escudo2); this.escudo2.userData = { nombre: "Escudo" };
     this.escudo3 = new Escudo(variablesTubo); this.objetos.push(this.escudo3); this.escudo3.userData = { nombre: "Escudo" };
@@ -93,6 +94,7 @@ class Juego extends THREE.Object3D {
 
     this.add(this.ovni1);
     this.add(this.ovni2);
+    this.add(this.ovni3);
     this.add(this.corazon1);
     this.add(this.corazon2);
 
@@ -101,6 +103,7 @@ class Juego extends THREE.Object3D {
     //Funciones específicas de los objetos
     this.ovni1.animar1();
     this.ovni2.animar2();
+    this.ovni3.animar3();
     this.corazon1.animar1();
     this.corazon2.animar2();
 
@@ -159,7 +162,7 @@ class Juego extends THREE.Object3D {
 
     raycaster.setFromCamera(mouse, this.camera); // Raycaster
 
-    var pickedObjects = raycaster.intersectObjects([this.ovni1, this.corazon1, this.corazon2, this.ovni2], true);
+    var pickedObjects = raycaster.intersectObjects([this.ovni1, this.corazon1, this.corazon2, this.ovni2, this.ovni3], true);
 
     if (pickedObjects.length > 0) {
       var selectedObject = pickedObjects[0].object;

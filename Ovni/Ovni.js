@@ -73,6 +73,7 @@ class Ovni extends THREE.Object3D {
 
     this.proyectil = new THREE.Mesh(new THREE.SphereGeometry(0.5, 8, 8), this.material4);
     this.proyectil2 = new THREE.Mesh(new THREE.SphereGeometry(0.5, 8, 8), this.material4);
+    this.proyectil3 = new THREE.Mesh(new THREE.SphereGeometry(0.5, 8, 8), this.material4); 
 
     // ovniGroup.position.set(-2, 13, -5);
     return ovniGroup;
@@ -142,6 +143,37 @@ class Ovni extends THREE.Object3D {
     return this.proyectil2;
   }
 
+  lanzarProyectil3() {
+    // Definir la trayectoria del proyectil
+    var puntosTrayectoria = [];
+    puntosTrayectoria.push(new THREE.Vector3(0, 1, 0)); // Punto inicial
+    puntosTrayectoria.push(new THREE.Vector3(0, 5, 0)); // Punto final
+
+    var trayectoria = new THREE.CatmullRomCurve3(puntosTrayectoria);
+
+    var segmentos = 100;
+    var binormales = trayectoria.computeFrenetFrames(segmentos, true).binormals;
+
+    // Crear animación con Tween para mover el proyectil
+    var origen = { t: 0 };
+    var destino = { t: 1 };
+    var tiempo = 700; // Duración de la animación en milisegundos
+
+    var animacion = new TWEEN.Tween(origen).to(destino, tiempo).repeat(Infinity).onUpdate(() => {
+      var posicion = trayectoria.getPointAt(origen.t);
+      this.proyectil3.position.copy(posicion);
+      var tangente = trayectoria.getTangentAt(origen.t);
+      posicion.add(tangente);
+      this.proyectil3.up = binormales[Math.floor(origen.t * segmentos)];
+      this.proyectil3.lookAt(posicion);
+
+    });
+
+    animacion.start();
+
+    return this.proyectil3;
+  }
+
   animar1() {
     // Punto 7
     var punto = new THREE.Vector3(1, -2, 10);
@@ -193,6 +225,7 @@ class Ovni extends THREE.Object3D {
     // Comenzar la animación
     animacion.start();
   }
+
   animar2() {
     // Punto 7
     var punto = new THREE.Vector3(1, -2, 10);
@@ -238,6 +271,43 @@ class Ovni extends THREE.Object3D {
       posicion.add(tangente);
       this.ovni.up = binormales[Math.floor(origen.t * segmentos)];
       //this.ovni.lookAt(posicion);
+
+    });
+
+    // Comenzar la animación
+    animacion.start();
+  }
+
+  animar3() {
+
+    this.ovni.add(this.lanzarProyectil3());
+    this.ovni.rotation.x = 180 * (Math.PI / 180);
+
+    var puntos = [
+      new THREE.Vector3(3.5, 0, -4),
+      new THREE.Vector3(3.5, -2, -1),
+    ];
+
+    // Crear el spline cerrado del anillo
+    var splineAnillo = new THREE.CatmullRomCurve3(puntos, true);
+
+    // Se necesitan los binormales del spline
+    var segmentos = 100;
+    var binormales = splineAnillo.computeFrenetFrames(segmentos, true).binormals;
+
+    // Parámetros para la animación
+    var origen = { t: 0 };
+    var destino = { t: 1 };
+    var tiempo = 10000;
+
+    // Crear animación con Tween
+    var animacion = new TWEEN.Tween(origen).to(destino, tiempo).repeat(Infinity).onUpdate(() => {
+      var posicion = splineAnillo.getPointAt(origen.t);
+      this.ovni.position.copy(posicion);
+      var tangente = splineAnillo.getTangentAt(origen.t);
+      posicion.add(tangente);
+      this.ovni.up = binormales[Math.floor(origen.t * segmentos)];
+     //this.ovni.lookAt(posicion);
 
     });
 

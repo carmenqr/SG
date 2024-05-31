@@ -1,6 +1,8 @@
 import * as THREE from 'three'
 import { CSG } from '../libs/CSG-v2.js'
 import * as TWEEN from '../libs/tween.esm.js'
+import { Pomo } from '../Pomo/Pomo.js'; // Asegúrate de que la ruta a Pomo.js sea correcta
+
 
 class Puertas extends THREE.Object3D {
   constructor(variablesTubo) {
@@ -72,6 +74,14 @@ class Puertas extends THREE.Object3D {
     PuertaIzq.add(formaMesh);
     PuertaIzq.rotation.y = -90 * (Math.PI / 180);
 
+    // var pomoIzq = new Pomo();
+    // pomoIzq.position.set(0.1, 0.5, 0.03); // Ajustar la posición del pomo según sea necesario
+    // pomoIzq.rotation.y = 90 * (Math.PI / 180);
+    // pomoIzq.scale.set(0.35, 0.35, 0.35);
+    // PuertaIzq.add(pomoIzq);
+
+    // PuertaIzq.add(pomoIzq);
+
     return PuertaIzq;
 
   }
@@ -89,6 +99,11 @@ class Puertas extends THREE.Object3D {
     PuertaDcha.position.x = 0.2;
     PuertaDcha.add(formaMesh);
     PuertaDcha.rotation.y = 90 * (Math.PI / 180);
+
+    var pomoDcha = new Pomo();
+    pomoDcha.position.set(-0.15, 0.5, 0.03); // Ajustar la posición del pomo según sea necesario
+    pomoDcha.scale.set(0.35, 0.35, 0.35);
+    PuertaDcha.add(pomoDcha);
 
     return PuertaDcha;
 
