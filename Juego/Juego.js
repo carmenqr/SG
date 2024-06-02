@@ -26,7 +26,7 @@ class Juego extends THREE.Object3D {
     this.monedas = 0;
     this.ovnis = 0;
     this.inmune = false;
-    this.vidas = 4;
+    this.vidas = 3;
     this.distanciaRecorrida = 0;
 
 
@@ -151,7 +151,6 @@ class Juego extends THREE.Object3D {
     }
   }
 
-  //Pulsaciones de ratón
   onDocumentMouseDown(event) {
     var mouse = new THREE.Vector2();
     var raycaster = new THREE.Raycaster();
@@ -160,14 +159,10 @@ class Juego extends THREE.Object3D {
     mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
     mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
 
-    raycaster.setFromCamera(mouse, this.camera); // Raycaster
+    raycaster.setFromCamera(mouse, this.camera); 
 
     var pickedObjects = raycaster.intersectObjects([this.ovni1, this.corazon1, this.corazon2, this.ovni2, this.ovni3], true);
 
-    if (pickedObjects.length > 0) {
-      var selectedObject = pickedObjects[0].object;
-      this.disparar(selectedObject);
-    }
 
     if (pickedObjects.length > 0) {
       let object = pickedObjects[0].object;
@@ -250,12 +245,7 @@ class Juego extends THREE.Object3D {
       this.rayo.set(origenRayo, direccionMirada);
 
       if (this.coche.posCoche.children[i] != this.cameraThirdPerson) {
-        /* var rayoVisual = new THREE.ArrowHelper(this.rayo.ray.direction, this.rayo.ray.origin, 0.5, 0xff0000);
-        // // Agregar el objeto visual a la escena
-        this.add(rayoVisual); */
         this.impactos = this.rayo.intersectObjects(this.objetos, true);
-
-        //console.log(this.objetos[1].userData.nombre);
 
         if (this.impactos.length > 0) {
           let object = this.impactos[0].object;
@@ -264,20 +254,13 @@ class Juego extends THREE.Object3D {
           }
           const originalObject = object;
 
-          if (!this.objetosConColision.has(originalObject)) { // Verificar si el objeto ya ha sido colisionado
+          if (!this.objetosConColision.has(originalObject)) { 
             console.log(originalObject.userData.nombre);
+            console.log(originalObject);
             originalObject.colision(this, originalObject);
-            this.objetosConColision.add(originalObject); // Agregar el objeto al conjunto de objetos colisionados
+            this.objetosConColision.add(originalObject); 
           }
         }
-
-        /* if (this.impactos.length > 0) {
-          let object = this.impactos[0].object;
-          while (object.parent && object.parent.parent && !(object instanceof Moneda || object instanceof Pinchos || object instanceof Escudo || object instanceof Puertas)) object = object.parent;
-          const originalObject = object;
-          console.log(originalObject.userData.nombre);
-          originalObject.colision(this);
-        } */
       }
 
     }
@@ -299,9 +282,6 @@ class Juego extends THREE.Object3D {
     this.corazon1.update();
     this.corazon2.update();
     this.coche.update();
-    /* if (this.coche.t < 0.0005) {
-      this.objetosConColision = new Set();
-    } */
     this.colisiones();
     this.actualizarDistanciaRecorrida();
   }
